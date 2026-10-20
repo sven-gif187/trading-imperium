@@ -1,0 +1,68 @@
+{
+  "_kommentar": "Zielgroessen fuer die Terminal-Anzeige. Von Hand aenderbar, wird nur GELESEN. Stand 19.08.2026, Grundlage: Svens Entwurf 2 plus die vier Korrekturen aus BOT-HANDBUCH.md 4.60.",
+  "_stand": "2026-08-19",
+  "_quelle": "BOT-HANDBUCH.md 4.60",
+  "ev_netto_pct": {
+    "ziel": 0.3,
+    "warnung": 0.0,
+    "einheit": "%",
+    "titel": "Erwartungswert je Trade",
+    "richtung": "hoch",
+    "klasse": "freischaltung",
+    "freischaltung_ab": 0.0,
+    "_freischaltung_warum": "Fuer den Live-Gang genuegt ein Erwartungswert UEBER NULL. Die 0,30 % sind das Ziel, nicht die Huerde - ein Bot, der 0,10 % verdient, verdient Geld."
+  },
+  "payoff_ratio": {
+    "ziel": 1.27,
+    "warnung": 1.0,
+    "einheit": "",
+    "titel": "Gewinner / Verlierer",
+    "richtung": "hoch",
+    "klasse": "beobachtung"
+  },
+  "profit_faktor": {
+    "ziel": 1.2,
+    "warnung": 1.0,
+    "einheit": "",
+    "titel": "Profit-Faktor",
+    "richtung": "hoch",
+    "klasse": "beobachtung"
+  },
+  "verschenkt_pp": {
+    "ziel": 1.0,
+    "warnung": 1.5,
+    "einheit": "PP",
+    "titel": "Verschenkte Bewegung",
+    "richtung": "tief",
+    "klasse": "beobachtung"
+  },
+  "max_drawdown_pct": {
+    "ziel": 15.0,
+    "warnung": 20.0,
+    "einheit": "%",
+    "titel": "Größter Rückschlag",
+    "richtung": "tief",
+    "klasse": "freischaltung",
+    "freischaltung_ab": 20.0,
+    "_freischaltung_warum": "Fuer die Freischaltung gilt die Schmerzgrenze 20 %, nicht das Ziel 15 %."
+  },
+  "_bewusst_kein_ziel": {
+    "trefferquote": "Ist 44,1 % gegen Ziel 45 % - sie ist nicht das Problem. Ein Ziel darauf lenkt die Arbeit auf den Einstieg. Stattdessen zaehlt payoff_ratio.",
+    "trades_pro_woche": "Ist ~3,7. Die bindende Grenze ist max_open_positions=3, nicht die Signalguete: 71,5 % aller Ablehnungen sind Kapazitaet."
+  },
+  "mindest_fallzahl": 30,
+  "_mindest_fallzahl_warum": "Unter 30 unabhaengigen Trades ist jede Kennzahl Rauschen. Die Anzeige nennt die Fallzahl deshalb immer mit.",
+  "kosten_je_runde_pct": 0.15,
+  "_kosten_warum": "[KOSTENLATTE BITVAVO 14.10.2026] K-BASIS ab L9: Bitvavo USDC 2 x 0,05 % plus Spread (Stichprobe), gerundet 0.15. Vorher 0.505 (Bybit EU) - gilt weiter fuer aeltere Epochen. Nie aus ccxt holen.",
+  "messfenster_ende": "2026-09-18",
+  "_messfenster_warum": "E6_messfenster ab 13.08. 13:21 UTC. Bis dahin keine Verhaltensaenderung. [20.08.2026] Ende von 27.08. auf 29.08. verschoben, Entscheidung Sven. Grund: nachgerechnet erreicht E7 bis zum 27.08. nur 25 Verkaeufe, noetig sind 30 (mindest_fallzahl). Bei 2,13 Verkaeufen/Tag sind 30 am 29.08. erreicht. Zwei Tage laenger kosten zwei Tage - ein Abbruch unter der Fallzahl kostet die ganze Epoche. Handbuch 4.97.",
+  "_klassen_warum": "Sven am 19.08.: 'die verschenkte bewegung mitzaehlen aber im schattenmodus und nicht als muss fuer eine Freischaltung zum Live'. Richtig - und der Grund ist staerker als vermutet: Die verschenkte Bewegung laesst sich trivial auf null bringen, indem man sofort verkauft. Dann ist nichts zurueckgegeben und nichts verdient. Eine Zielgroesse, die man durch Verschlechtern erreichen kann, taugt nicht als Bedingung. Ausserdem ist sie im Erwartungswert bereits enthalten: wer weniger zurueckgibt, hat automatisch einen hoeheren EV.",
+  "_freischaltung": {
+    "bedingungen": [
+      "ev_netto_pct > 0",
+      "max_drawdown_pct <= 20"
+    ],
+    "mindest_fallzahl": 30,
+    "hinweis": "Nur diese zwei blockieren den Live-Gang. Alle uebrigen Kennzahlen laufen im Schattenmodus mit: gemessen, angezeigt, aber ohne Sperrwirkung."
+  }
+}

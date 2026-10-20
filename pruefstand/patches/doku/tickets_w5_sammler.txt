@@ -1,0 +1,2 @@
+BUG: sammler_pruefen.py starten() zaehlte Sammler aus FREMDEN Bot-Ordnern als laufend (skript.lower() in prozesse) - v7 schrieb deshalb seit 02.10.2026 keinen Positionsverlauf. Behoben 14.10.2026 mit _laeuft_hier() (nur eigener Ordner), v6 und v7, keine Epoche (nur Datensammeln). BOT-HANDBUCH 10.14.
+DOKUMENTIEREN: Betriebs-Waechter W5 seit 14.10.2026 - Windows-Aufgabe TI-Waechter-W5 alle 5 min (pruefstand/waechter/w5_betrieb.py): Prozess, Port, Dateialter, Aufgaben, Platte; Ampel in pruefstand/status.json, Telegram bei Wechsel nach Rot. BOT-HANDBUCH 10.14.

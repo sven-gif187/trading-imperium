@@ -1,0 +1,118 @@
+{
+  "_comment": "TRADING IMPERIUM V6 - BEISPIEL-KONFIGURATION",
+  "_warning": "API-Keys NIEMALS hier eintragen! Nutze .env Datei!",
+
+  "exchange": {
+    "name": "Binance",
+    "ccxt_id": "binance",
+    "testnet": false,
+    "quote_currency": "USDC",
+    "timeout_connect": 3,
+    "timeout_read": 10,
+    "max_retries": 3,
+    "_api_keys_comment": "API-Keys werden aus .env geladen, nicht hier!",
+    "api_key": "",
+    "api_secret": ""
+  },
+
+  "trading": {
+    "_comment": "Paper oder Live Trading",
+    "mode": "paper",
+    "_paper_balance_comment": "Nur fuer Paper-Modus! Live nutzt echte Binance-Balance",
+    "initial_paper_balance": 300.0,
+    "coins": [
+      "BTC/USDC", "ETH/USDC", "SOL/USDC", "XRP/USDC",
+      "ADA/USDC", "AVAX/USDC", "LINK/USDC", "DOT/USDC",
+      "DOGE/USDC", "NEAR/USDC", "UNI/USDC", "ATOM/USDC"
+    ],
+    "default_timeframe": "1h",
+    "candle_limit": 120,
+    "loop_interval_seconds": 12,
+    "dca_enabled": true,
+    "btc_dca_enabled": false
+  },
+
+  "modes": {
+    "_comment": "DREI VORDEFINIERTE TRADING-MODI - ALLES PROZENTUAL",
+    "_active_comment": "Wechsle Modus mit: 'all_in', 'balanced' oder 'diversified'",
+    "active_mode": "balanced",
+
+    "all_in": {
+      "_comment": "MODUS A: 1 grosser Trade mit 95% des Kapitals",
+      "name": "all_in",
+      "position_size_pct": 95.0,
+      "max_positions": 1,
+      "cash_reserve_pct": 5.0,
+      "sector_limit_pct": 100.0,
+      "max_coin_pct": 100.0
+    },
+
+    "balanced": {
+      "_comment": "MODUS B: 3 Trades mit je 30% (DEFAULT)",
+      "name": "balanced",
+      "position_size_pct": 30.0,
+      "max_positions": 3,
+      "cash_reserve_pct": 10.0,
+      "sector_limit_pct": 80.0,
+      "max_coin_pct": 35.0
+    },
+
+    "diversified": {
+      "_comment": "MODUS C: 8-10 Trades mit je 10% (max Diversifikation)",
+      "name": "diversified",
+      "position_size_pct": 10.0,
+      "max_positions": 10,
+      "cash_reserve_pct": 10.0,
+      "sector_limit_pct": 40.0,
+      "max_coin_pct": 15.0
+    }
+  },
+
+  "risk": {
+    "_comment": "RISK-MANAGEMENT - 100% PROZENTUAL!",
+    "_daily_loss_comment": "Bot pausiert sich bei -10% Tagesverlust und schliesst alle Positionen",
+    "max_daily_loss_pct": 10.0,
+    "max_drawdown_pct": 15.0,
+
+    "_sl_tp_comment": "Stop-Loss/Take-Profit IMMER prozentual vom Einstiegspreis!",
+    "stop_loss_pct": 4.0,
+    "take_profit_pct": 8.0,
+    "trailing_stop_pct": 1.5,
+
+    "cooldown_after_losses": 3,
+    "kill_switch_enabled": true,
+
+    "_live_safety_comment": "Sicherheits-Filter NUR fuer Live-Trading",
+    "min_volume_24h_usd": 1000000,
+    "max_spread_pct": 0.5,
+
+    "use_dynamic_sizing": false
+  },
+
+  "telegram": {
+    "_comment": "Optional - Token aus .env (TELEGRAM_BOT_TOKEN)",
+    "enabled": false,
+    "token": "",
+    "chat_id": ""
+  },
+
+  "dashboard": {
+    "enabled": true,
+    "port": 5050,
+    "host": "0.0.0.0",
+    "refresh_interval_sec": 8,
+    "ngrok_token": "",
+    "ngrok_enabled": false
+  },
+
+  "rebalance": {
+    "enabled": false,
+    "interval_min": 240
+  },
+
+  "ai": {
+    "news_interval_min": 30
+  },
+
+  "version": "6.1.0"
+}

@@ -1,0 +1,292 @@
+============================================================================================
+ RETTUNG 2026-07-31 - 61 Dateien
+============================================================================================
+    Datei                            Zeilen  Mitgl. uebersprungen  Rate (geschaetzt)
+    ----------------------------------------------------------------------------------
+    funding_ADAUSDT.csv.gz              327     327          184B              99.4%
+    funding_ATOMUSDT.csv.gz             326     326           83B             100.0%
+    funding_AVAXUSDT.csv.gz             331     331            0B             100.0%
+    funding_BTCUSDT.csv.gz              330     330          106B              99.7%
+    funding_DOGEUSDT.csv.gz             326     326          193B              99.4%
+    funding_DOTUSDT.csv.gz              330     330            0B             100.0%
+    funding_ETHUSDT.csv.gz              330     330            0B             100.0%
+    funding_LINKUSDT.csv.gz             326     326          106B              99.7%
+    funding_NEARUSDT.csv.gz             327     327           10B             100.0%
+    funding_SOLUSDT.csv.gz              328     328           10B             100.0%
+    funding_UNIUSDT.csv.gz              327     327            0B             100.0%
+    funding_XRPUSDT.csv.gz              328     328           10B             100.0%
+    heartbeat.csv.gz                   2072    2072          178B             100.0%
+    oi_ADAUSDT.csv.gz                   326     326           74B              99.7%
+    oi_ATOMUSDT.csv.gz                  326     326            0B             100.0%
+    oi_AVAXUSDT.csv.gz                  329     329           62B             100.0%
+    oi_BTCUSDT.csv.gz                   333     333            0B             100.0%
+    oi_DOGEUSDT.csv.gz                  328     328            0B             100.0%
+    oi_DOTUSDT.csv.gz                   325     325           10B             100.0%
+    oi_ETHUSDT.csv.gz                   332     332            0B             100.0%
+    oi_LINKUSDT.csv.gz                  330     330            0B             100.0%
+    oi_NEARUSDT.csv.gz                  330     330            0B             100.0%
+    oi_SOLUSDT.csv.gz                   328     328            0B             100.0%
+    oi_UNIUSDT.csv.gz                   327     327            0B             100.0%
+    oi_XRPUSDT.csv.gz                   329     329           66B             100.0%
+    orderbuch_ADAUSDC.csv.gz           2045    2045          630B              99.9%
+    orderbuch_ATOMUSDC.csv.gz          2037    2037          732B              99.9%
+    orderbuch_AVAXUSDC.csv.gz          2044    2044          822B              99.9%
+    orderbuch_BTCUSDC.csv.gz           2043    2043         1724B              99.9%
+    orderbuch_DOGEUSDC.csv.gz          2049    2049          455B             100.0%
+    orderbuch_DOTUSDC.csv.gz           2047    2047          574B              99.9%
+    orderbuch_ETHUSDC.csv.gz           2045    2045         1636B              99.9%
+    orderbuch_LINKUSDC.csv.gz          2046    2046          373B             100.0%
+    orderbuch_NEARUSDC.csv.gz          2043    2043          730B             100.0%
+    orderbuch_SOLUSDC.csv.gz           2044    2044         2291B              99.8%
+    orderbuch_UNIUSDC.csv.gz           2043    2043         1185B              99.9%
+    orderbuch_XRPUSDC.csv.gz           2038    2038         1252B              99.9%
+    ticker_ADAUSDC.csv.gz              2042    2042          201B              99.9%
+    ticker_ATOMUSDC.csv.gz             2033    2033          395B              99.8%
+    ticker_AVAXUSDC.csv.gz             2039    2039          316B              99.9%
+    ticker_BTCUSDC.csv.gz              2041    2041          130B             100.0%
+    ticker_DOGEUSDC.csv.gz             2040    2040          483B              99.8%
+    ticker_DOTUSDC.csv.gz              2041    2041          605B              99.7%
+    ticker_ETHUSDC.csv.gz              2047    2047          312B              99.9%
+    ticker_LINKUSDC.csv.gz             2048    2048          100B             100.0%
+    ticker_NEARUSDC.csv.gz             2038    2038          301B              99.9%
+    ticker_SOLUSDC.csv.gz              2044    2044          588B              99.7%
+    ticker_UNIUSDC.csv.gz              2036    2036          289B              99.9%
+    ticker_XRPUSDC.csv.gz              2034    2034          204B              99.9%
+    trades_ADAUSDC.csv.gz              2044    2044          293B              99.9%
+    trades_ATOMUSDC.csv.gz             2035    2035          201B              99.9%
+    trades_AVAXUSDC.csv.gz             2040    2040          407B              99.8%
+    trades_BTCUSDC.csv.gz              2041    2041          607B              99.7%
+    trades_DOGEUSDC.csv.gz             2042    2042          222B              99.9%
+    trades_DOTUSDC.csv.gz              2040    2040          203B              99.9%
+    trades_ETHUSDC.csv.gz              2044    2044          294B              99.9%
+    trades_LINKUSDC.csv.gz             2042    2042          394B              99.8%
+    trades_NEARUSDC.csv.gz             2048    2048          107B             100.0%
+    trades_SOLUSDC.csv.gz              2038    2038          392B              99.8%
+    trades_UNIUSDC.csv.gz              2041    2041          190B              99.9%
+    trades_XRPUSDC.csv.gz              2038    2038          192B              99.9%
+    ----------------------------------------------------------------------------------
+    GESAMT                            83451                                    99.9%
+
+    Geborgen nach: C:\Users\<BENUTZER>\Desktop\trading_imperium_v6(21)\docs\forschungsprogramm_2026-07\capture\gerettet_2026-07-31
+    Originale unveraendert, nichts geloescht.
+    Die Rate ist eine NAEHERUNG - die wahre Zeilenzahl der
+    zerstoerten Mitglieder ist nicht rekonstruierbar.
+============================================================================================
+ RETTUNG 2026-08-01 - 61 Dateien
+============================================================================================
+    Datei                            Zeilen  Mitgl. uebersprungen  Rate (geschaetzt)
+    ----------------------------------------------------------------------------------
+    funding_ADAUSDT.csv.gz             1413    1413          272B              99.8%
+    funding_ATOMUSDT.csv.gz            1408    1408          122B              99.9%
+    funding_AVAXUSDT.csv.gz            1408    1408          683B              99.5%
+    funding_BTCUSDT.csv.gz             1410    1410          202B              99.9%
+    funding_DOGEUSDT.csv.gz            1407    1407          579B              99.6%
+    funding_DOTUSDT.csv.gz             1414    1414          548B              99.6%
+    funding_ETHUSDT.csv.gz             1408    1408          301B              99.8%
+    funding_LINKUSDT.csv.gz            1407    1407          763B              99.4%
+    funding_NEARUSDT.csv.gz            1405    1405          759B              99.4%
+    funding_SOLUSDT.csv.gz             1415    1415          199B              99.9%
+    funding_UNIUSDT.csv.gz             1413    1413          399B              99.7%
+    funding_XRPUSDT.csv.gz             1416    1416          563B              99.6%
+    heartbeat.csv.gz                   8402    8402         3879B              99.5%
+    oi_ADAUSDT.csv.gz                  1401    1401          420B              99.6%
+    oi_ATOMUSDT.csv.gz                 1408    1408          224B              99.8%
+    oi_AVAXUSDT.csv.gz                 1410    1410          128B              99.9%
+    oi_BTCUSDT.csv.gz                  1407    1407           85B              99.9%
+    oi_DOGEUSDT.csv.gz                 1414    1414          123B              99.9%
+    oi_DOTUSDT.csv.gz                  1418    1418          274B              99.7%
+    oi_ETHUSDT.csv.gz                  1410    1410           77B              99.9%
+    oi_LINKUSDT.csv.gz                 1415    1415          201B              99.8%
+    oi_NEARUSDT.csv.gz                 1413    1413          205B              99.8%
+    oi_SOLUSDT.csv.gz                  1408    1408          274B              99.7%
+    oi_UNIUSDT.csv.gz                  1409    1409          286B              99.7%
+    oi_XRPUSDT.csv.gz                  1415    1415            0B             100.0%
+    orderbuch_ADAUSDC.csv.gz           8293    8293         3091B              99.9%
+    orderbuch_ATOMUSDC.csv.gz          8273    8273         3959B              99.9%
+    orderbuch_AVAXUSDC.csv.gz          8286    8286         7421B              99.8%
+    orderbuch_BTCUSDC.csv.gz           8286    8286        16115B              99.8%
+    orderbuch_DOGEUSDC.csv.gz          8282    8282         2810B              99.9%
+    orderbuch_DOTUSDC.csv.gz           8272    8272         2897B              99.9%
+    orderbuch_ETHUSDC.csv.gz           8296    8296         9146B              99.8%
+    orderbuch_LINKUSDC.csv.gz          8284    8284         3801B              99.9%
+    orderbuch_NEARUSDC.csv.gz          8284    8284         3885B              99.9%
+    orderbuch_SOLUSDC.csv.gz           8300    8300         6049B              99.8%
+    orderbuch_UNIUSDC.csv.gz           8285    8285         6791B              99.8%
+    orderbuch_XRPUSDC.csv.gz           8261    8261         6349B              99.8%
+    ticker_ADAUSDC.csv.gz              8281    8281         2157B              99.7%
+    ticker_ATOMUSDC.csv.gz             8270    8270         2113B              99.7%
+    ticker_AVAXUSDC.csv.gz             8287    8287         1971B              99.8%
+    ticker_BTCUSDC.csv.gz              8266    8266         2391B              99.7%
+    ticker_DOGEUSDC.csv.gz             8265    8265         2279B              99.7%
+    ticker_DOTUSDC.csv.gz              8242    8242         2576B              99.7%
+    ticker_ETHUSDC.csv.gz              8279    8279         2453B              99.7%
+    ticker_LINKUSDC.csv.gz             8280    8280         1804B              99.8%
+    ticker_NEARUSDC.csv.gz             8253    8253         2647B              99.7%
+    ticker_SOLUSDC.csv.gz              8275    8275         2840B              99.7%
+    ticker_UNIUSDC.csv.gz              8266    8266         1991B              99.7%
+    ticker_XRPUSDC.csv.gz              8274    8274         1977B              99.8%
+    trades_ADAUSDC.csv.gz              8278    8278         2339B              99.7%
+    trades_ATOMUSDC.csv.gz             8262    8262         2413B              99.7%
+    trades_AVAXUSDC.csv.gz             8275    8275         2503B              99.7%
+    trades_BTCUSDC.csv.gz              8296    8296         2153B              99.7%
+    trades_DOGEUSDC.csv.gz             8288    8288          816B              99.9%
+    trades_DOTUSDC.csv.gz              8266    8266         2143B              99.7%
+    trades_ETHUSDC.csv.gz              8287    8287         2228B              99.7%
+    trades_LINKUSDC.csv.gz             8272    8272         2127B              99.7%
+    trades_NEARUSDC.csv.gz             8272    8272         2044B              99.7%
+    trades_SOLUSDC.csv.gz              8298    8298         1167B              99.9%
+    trades_UNIUSDC.csv.gz              8263    8263         2928B              99.6%
+    trades_XRPUSDC.csv.gz              8257    8257         2378B              99.7%
+    ----------------------------------------------------------------------------------
+    GESAMT                           340208                                    99.8%
+
+    Geborgen nach: C:\Users\<BENUTZER>\Desktop\trading_imperium_v6(21)\docs\forschungsprogramm_2026-07\capture\gerettet_2026-08-01
+    Originale unveraendert, nichts geloescht.
+    Die Rate ist eine NAEHERUNG - die wahre Zeilenzahl der
+    zerstoerten Mitglieder ist nicht rekonstruierbar.
+============================================================================================
+ RETTUNG 2026-08-02 - 61 Dateien
+============================================================================================
+    Datei                            Zeilen  Mitgl. uebersprungen  Rate (geschaetzt)
+    ----------------------------------------------------------------------------------
+    funding_ADAUSDT.csv.gz             2333    2333         1477B              99.3%
+    funding_ATOMUSDT.csv.gz            2361    2361          665B              99.7%
+    funding_AVAXUSDT.csv.gz            2349    2349          489B              99.8%
+    funding_BTCUSDT.csv.gz             2339    2339          395B              99.8%
+    funding_DOGEUSDT.csv.gz            2355    2355          740B              99.7%
+    funding_DOTUSDT.csv.gz             2352    2352          794B              99.7%
+    funding_ETHUSDT.csv.gz             2330    2330         1521B              99.3%
+    funding_LINKUSDT.csv.gz            2359    2359          683B              99.7%
+    funding_NEARUSDT.csv.gz            2357    2357          554B              99.7%
+    funding_SOLUSDT.csv.gz             2347    2347          741B              99.7%
+    funding_UNIUSDT.csv.gz             2356    2356          945B              99.6%
+    funding_XRPUSDT.csv.gz             2360    2360          516B              99.8%
+    heartbeat.csv.gz                  13424   13424         4880B              99.6%
+    oi_ADAUSDT.csv.gz                  2342    2342          310B              99.8%
+    oi_ATOMUSDT.csv.gz                 2357    2357          970B              99.4%
+    oi_AVAXUSDT.csv.gz                 2353    2353          393B              99.7%
+    oi_BTCUSDT.csv.gz                  2338    2338          679B              99.6%
+    oi_DOGEUSDT.csv.gz                 2348    2348          700B              99.6%
+    oi_DOTUSDT.csv.gz                  2349    2349          774B              99.5%
+    oi_ETHUSDT.csv.gz                  2347    2347          518B              99.7%
+    oi_LINKUSDT.csv.gz                 2344    2344          824B              99.5%
+    oi_NEARUSDT.csv.gz                 2351    2351          810B              99.5%
+    oi_SOLUSDT.csv.gz                  2344    2344          283B              99.8%
+    oi_UNIUSDT.csv.gz                  2358    2358          478B              99.7%
+    oi_XRPUSDT.csv.gz                  2366    2366          718B              99.6%
+    orderbuch_ADAUSDC.csv.gz          13397   13397        11171B              99.7%
+    orderbuch_ATOMUSDC.csv.gz         13347   13347        13797B              99.7%
+    orderbuch_AVAXUSDC.csv.gz         13402   13402        11376B              99.8%
+    orderbuch_BTCUSDC.csv.gz          13344   13344        42996B              99.6%
+    orderbuch_DOGEUSDC.csv.gz         13389   13389        10952B              99.8%
+    orderbuch_DOTUSDC.csv.gz          13380   13380        10470B              99.7%
+    orderbuch_ETHUSDC.csv.gz          13401   13401        22994B              99.7%
+    orderbuch_LINKUSDC.csv.gz         13375   13375         8591B              99.8%
+    orderbuch_NEARUSDC.csv.gz         13367   13367        13894B              99.7%
+    orderbuch_SOLUSDC.csv.gz          13398   13398        17434B              99.7%
+    orderbuch_UNIUSDC.csv.gz          13357   13357        11253B              99.8%
+    orderbuch_XRPUSDC.csv.gz          13358   13358        15376B              99.7%
+    ticker_ADAUSDC.csv.gz             13357   13357         5335B              99.6%
+    ticker_ATOMUSDC.csv.gz            13339   13339         3475B              99.7%
+    ticker_AVAXUSDC.csv.gz            13370   13370         4407B              99.7%
+    ticker_BTCUSDC.csv.gz             13358   13358         5465B              99.6%
+    ticker_DOGEUSDC.csv.gz            13361   13361         4503B              99.7%
+    ticker_DOTUSDC.csv.gz             13359   13359         5206B              99.6%
+    ticker_ETHUSDC.csv.gz             13387   13387         5298B              99.6%
+    ticker_LINKUSDC.csv.gz            13359   13359         3862B              99.7%
+    ticker_NEARUSDC.csv.gz            13376   13376         3477B              99.7%
+    ticker_SOLUSDC.csv.gz             13367   13367         4999B              99.6%
+    ticker_UNIUSDC.csv.gz             13323   13323         5541B              99.6%
+    ticker_XRPUSDC.csv.gz             13322   13322         4650B              99.6%
+    trades_ADAUSDC.csv.gz             13373   13373         4282B              99.7%
+    trades_ATOMUSDC.csv.gz            13331   13331         5370B              99.6%
+    trades_AVAXUSDC.csv.gz            13362   13362         4987B              99.6%
+    trades_BTCUSDC.csv.gz             13394   13394         4830B              99.6%
+    trades_DOGEUSDC.csv.gz            13378   13378         4514B              99.6%
+    trades_DOTUSDC.csv.gz             13370   13370         4206B              99.7%
+    trades_ETHUSDC.csv.gz             13376   13376         4536B              99.6%
+    trades_LINKUSDC.csv.gz            13375   13375         4258B              99.7%
+    trades_NEARUSDC.csv.gz            13344   13344         5798B              99.6%
+    trades_SOLUSDC.csv.gz             13363   13363         5243B              99.6%
+    trades_UNIUSDC.csv.gz             13335   13335         5991B              99.5%
+    trades_XRPUSDC.csv.gz             13340   13340         4248B              99.7%
+    ----------------------------------------------------------------------------------
+    GESAMT                           550953                                    99.7%
+
+    Geborgen nach: C:\Users\<BENUTZER>\Desktop\trading_imperium_v6(21)\docs\forschungsprogramm_2026-07\capture\gerettet_2026-08-02
+    Originale unveraendert, nichts geloescht.
+    Die Rate ist eine NAEHERUNG - die wahre Zeilenzahl der
+    zerstoerten Mitglieder ist nicht rekonstruierbar.
+============================================================================================
+ RETTUNG 2026-08-03 - 61 Dateien
+============================================================================================
+    Datei                            Zeilen  Mitgl. uebersprungen  Rate (geschaetzt)
+    ----------------------------------------------------------------------------------
+    funding_ADAUSDT.csv.gz              813     813          999B              98.8%
+    funding_ATOMUSDT.csv.gz             832     832          564B              99.3%
+    funding_AVAXUSDT.csv.gz             826     826          275B              99.8%
+    funding_BTCUSDT.csv.gz              831     831          679B              99.2%
+    funding_DOGEUSDT.csv.gz             825     825         1211B              98.4%
+    funding_DOTUSDT.csv.gz              827     827          819B              98.9%
+    funding_ETHUSDT.csv.gz              827     827          674B              99.2%
+    funding_LINKUSDT.csv.gz             812     812          376B              99.5%
+    funding_NEARUSDT.csv.gz             817     817          674B              99.2%
+    funding_SOLUSDT.csv.gz              826     826         1126B              98.6%
+    funding_UNIUSDT.csv.gz              830     830          647B              99.2%
+    funding_XRPUSDT.csv.gz              813     813          747B              99.0%
+    heartbeat.csv.gz                   1968    1968        22515B              90.2%
+    oi_ADAUSDT.csv.gz                   825     825          920B              98.3%
+    oi_ATOMUSDT.csv.gz                  836     836          620B              98.9%
+    oi_AVAXUSDT.csv.gz                  827     827          393B              99.3%
+    oi_BTCUSDT.csv.gz                   825     825          713B              98.8%
+    oi_DOGEUSDT.csv.gz                  837     837          297B              99.5%
+    oi_DOTUSDT.csv.gz                   838     838          198B              99.6%
+    oi_ETHUSDT.csv.gz                   822     822          479B              99.2%
+    oi_LINKUSDT.csv.gz                  818     818          871B              98.4%
+    oi_NEARUSDT.csv.gz                  831     831          250B              99.6%
+    oi_SOLUSDT.csv.gz                   823     823          329B              99.5%
+    oi_UNIUSDT.csv.gz                   833     833           74B              99.9%
+    oi_XRPUSDT.csv.gz                   809     809          613B              98.9%
+    orderbuch_ADAUSDC.csv.gz           1438    1438         2827B              99.4%
+    orderbuch_ATOMUSDC.csv.gz          1436    1436         4065B              99.2%
+    orderbuch_AVAXUSDC.csv.gz          1438    1438         3251B              99.4%
+    orderbuch_BTCUSDC.csv.gz           1410    1410        11150B              99.1%
+    orderbuch_DOGEUSDC.csv.gz          1429    1429         3624B              99.4%
+    orderbuch_DOTUSDC.csv.gz           1428    1428         4383B              99.0%
+    orderbuch_ETHUSDC.csv.gz           1436    1436         7978B              99.0%
+    orderbuch_LINKUSDC.csv.gz          1439    1439         4640B              99.1%
+    orderbuch_NEARUSDC.csv.gz          1422    1422         4279B              99.2%
+    orderbuch_SOLUSDC.csv.gz           1450    1450         4298B              99.2%
+    orderbuch_UNIUSDC.csv.gz           1436    1436         2351B              99.6%
+    orderbuch_XRPUSDC.csv.gz           1404    1404         5430B              99.2%
+    ticker_ADAUSDC.csv.gz              1447    1447         1214B              99.2%
+    ticker_ATOMUSDC.csv.gz             1389    1389         1226B              99.1%
+    ticker_AVAXUSDC.csv.gz             1431    1431         1851B              98.7%
+    ticker_BTCUSDC.csv.gz              1455    1455         2289B              98.5%
+    ticker_DOGEUSDC.csv.gz             1431    1431          974B              99.3%
+    ticker_DOTUSDC.csv.gz              1454    1454         1113B              99.2%
+    ticker_ETHUSDC.csv.gz              1447    1447         1299B              99.1%
+    ticker_LINKUSDC.csv.gz             1446    1446          956B              99.4%
+    ticker_NEARUSDC.csv.gz             1434    1434          941B              99.4%
+    ticker_SOLUSDC.csv.gz              1428    1428         1335B              99.0%
+    ticker_UNIUSDC.csv.gz              1431    1431          681B              99.5%
+    ticker_XRPUSDC.csv.gz              1422    1422         1307B              99.1%
+    trades_ADAUSDC.csv.gz              1426    1426         1443B              99.0%
+    trades_ATOMUSDC.csv.gz             1436    1436          970B              99.3%
+    trades_AVAXUSDC.csv.gz             1440    1440          889B              99.4%
+    trades_BTCUSDC.csv.gz              1425    1425         1378B              99.0%
+    trades_DOGEUSDC.csv.gz             1434    1434          774B              99.4%
+    trades_DOTUSDC.csv.gz              1437    1437         1437B              99.0%
+    trades_ETHUSDC.csv.gz              1437    1437         1142B              99.2%
+    trades_LINKUSDC.csv.gz             1429    1429          888B              99.4%
+    trades_NEARUSDC.csv.gz             1419    1419          801B              99.4%
+    trades_SOLUSDC.csv.gz              1429    1429         1827B              98.7%
+    trades_UNIUSDC.csv.gz              1426    1426         1064B              99.2%
+    trades_XRPUSDC.csv.gz              1430    1430          931B              99.4%
+    ----------------------------------------------------------------------------------
+    GESAMT                            73320                                    98.9%
+
+    Geborgen nach: C:\Users\<BENUTZER>\Desktop\trading_imperium_v6(21)\docs\forschungsprogramm_2026-07\capture\gerettet_2026-08-03
+    Originale unveraendert, nichts geloescht.
+    Die Rate ist eine NAEHERUNG - die wahre Zeilenzahl der
+    zerstoerten Mitglieder ist nicht rekonstruierbar.

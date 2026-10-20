@@ -1,0 +1,49 @@
+Daten 2017-08-17 .. 2026-10-13, Rueckrechnung ab 2018-03-05
+
+  OK   M1 bei K=0.15: Simulator 3627.5282 $ = Formel 3627.5282 $
+  OK   M1 bei K=1.0: Simulator 3612.1879 $ = Formel 3612.1879 $
+  OK   Konto = Summe der Runden: M1 BTC halten                    Abweichung 0.00e+00 $ | Endwert 3,621.20 $ | Runden 1
+  OK   Konto = Summe der Runden: M2 Korb 12 gleich, monatlich     Abweichung 9.09e-13 $ | Endwert 5,193.71 $ | Runden 12
+  OK   Konto = Summe der Runden: M3 BTC ueber 200-Tage-Linie      Abweichung 4.55e-13 $ | Endwert 3,547.78 $ | Runden 33
+  OK   Konto = Summe der Runden: K1 Trend-Ensemble                Abweichung -5.09e-11 $ | Endwert 21,589.16 $ | Runden 1299
+  OK   Konto = Summe der Runden: K2 Trend + BTC-200-Filter        Abweichung 2.18e-11 $ | Endwert 25,311.75 $ | Runden 602
+  OK   Konto = Summe der Runden: K3 Rotation Top 3 / Halteband 6  Abweichung -3.64e-12 $ | Endwert 26,836.38 $ | Runden 111
+  OK   kein Blick in die Zukunft: K1 Trend-Ensemble                Schnitt 2019-04-09
+  OK   kein Blick in die Zukunft: K1 Trend-Ensemble                Schnitt 2022-04-13
+  OK   kein Blick in die Zukunft: K1 Trend-Ensemble                Schnitt 2026-09-14
+  OK   kein Blick in die Zukunft: K3 Rotation Top 3 / Halteband 6  Schnitt 2019-04-09
+  OK   kein Blick in die Zukunft: K3 Rotation Top 3 / Halteband 6  Schnitt 2022-04-13
+  OK   kein Blick in die Zukunft: K3 Rotation Top 3 / Halteband 6  Schnitt 2026-09-14
+  OK   kein Blick in die Zukunft: M2 Korb 12 gleich, monatlich     Schnitt 2019-04-09
+  OK   kein Blick in die Zukunft: M2 Korb 12 gleich, monatlich     Schnitt 2022-04-13
+  OK   kein Blick in die Zukunft: M2 Korb 12 gleich, monatlich     Schnitt 2026-09-14
+SELBSTTEST BESTANDEN
+M1 BTC halten                      K=0.15  Jahr    25.9 %  MaxDD  -76.6 %  Sharpe  0.69  Calmar 0.34  Runden/Mon   0.0  Kostenanteil 0.0 %  | 13.08.-13.10.: 31.02 %
+M1 BTC halten                      K=0.20  Jahr    25.9 %  MaxDD  -76.6 %  Sharpe  0.69  Calmar 0.34  Runden/Mon   0.0  Kostenanteil 0.0 %  | 13.08.-13.10.: 31.02 %
+M1 BTC halten                      K=0.50  Jahr    25.8 %  MaxDD  -76.6 %  Sharpe  0.69  Calmar 0.34  Runden/Mon   0.0  Kostenanteil 0.0 %  | 13.08.-13.10.: 31.02 %
+M1 BTC halten                      K=1.00  Jahr    25.8 %  MaxDD  -76.6 %  Sharpe  0.68  Calmar 0.34  Runden/Mon   0.0  Kostenanteil 0.1 %  | 13.08.-13.10.: 31.02 %
+M2 Korb 12 gleich, monatlich       K=0.15  Jahr    31.6 %  MaxDD  -83.2 %  Sharpe  0.75  Calmar 0.38  Runden/Mon   0.1  Kostenanteil 0.8 %  | 13.08.-13.10.: 59.07 %
+M2 Korb 12 gleich, monatlich       K=0.20  Jahr    31.6 %  MaxDD  -83.2 %  Sharpe  0.75  Calmar 0.38  Runden/Mon   0.1  Kostenanteil 1.1 %  | 13.08.-13.10.: 59.06 %
+M2 Korb 12 gleich, monatlich       K=0.50  Jahr    31.2 %  MaxDD  -83.3 %  Sharpe  0.75  Calmar 0.37  Runden/Mon   0.1  Kostenanteil 2.7 %  | 13.08.-13.10.: 58.99 %
+M2 Korb 12 gleich, monatlich       K=1.00  Jahr    30.7 %  MaxDD  -83.4 %  Sharpe  0.74  Calmar 0.37  Runden/Mon   0.1  Kostenanteil 5.3 %  | 13.08.-13.10.: 58.88 %
+M3 BTC ueber 200-Tage-Linie        K=0.15  Jahr    27.2 %  MaxDD  -63.9 %  Sharpe  0.78  Calmar 0.43  Runden/Mon   0.3  Kostenanteil 2.7 %  | 13.08.-13.10.: 19.86 %
+M3 BTC ueber 200-Tage-Linie        K=0.20  Jahr    27.0 %  MaxDD  -64.0 %  Sharpe  0.77  Calmar 0.42  Runden/Mon   0.3  Kostenanteil 3.6 %  | 13.08.-13.10.: 19.83 %
+M3 BTC ueber 200-Tage-Linie        K=0.50  Jahr    25.5 %  MaxDD  -65.0 %  Sharpe  0.75  Calmar 0.39  Runden/Mon   0.3  Kostenanteil 9.0 %  | 13.08.-13.10.: 19.65 %
+M3 BTC ueber 200-Tage-Linie        K=1.00  Jahr    23.2 %  MaxDD  -66.7 %  Sharpe  0.70  Calmar 0.35  Runden/Mon   0.3  Kostenanteil 17.7 %  | 13.08.-13.10.: 19.36 %
+K1 Trend-Ensemble                  K=0.15  Jahr    60.1 %  MaxDD  -65.0 %  Sharpe  1.23  Calmar 0.93  Runden/Mon  12.6  Kostenanteil 7.5 %  | 13.08.-13.10.: 40.4 %
+K1 Trend-Ensemble                  K=0.20  Jahr    59.3 %  MaxDD  -65.4 %  Sharpe  1.22  Calmar 0.91  Runden/Mon  12.6  Kostenanteil 9.9 %  | 13.08.-13.10.: 40.31 %
+K1 Trend-Ensemble                  K=0.50  Jahr    54.8 %  MaxDD  -67.5 %  Sharpe  1.16  Calmar 0.81  Runden/Mon  12.6  Kostenanteil 23.0 %  | 13.08.-13.10.: 40.15 %
+K1 Trend-Ensemble                  K=1.00  Jahr    47.7 %  MaxDD  -70.8 %  Sharpe  1.06  Calmar 0.67  Runden/Mon  12.6  Kostenanteil 41.2 %  | 13.08.-13.10.: 39.33 %
+K2 Trend + BTC-200-Filter          K=0.15  Jahr    60.6 %  MaxDD  -48.6 %  Sharpe  1.30  Calmar 1.25  Runden/Mon   5.8  Kostenanteil 3.5 %  | 13.08.-13.10.: 33.57 %
+K2 Trend + BTC-200-Filter          K=0.20  Jahr    60.2 %  MaxDD  -48.9 %  Sharpe  1.29  Calmar 1.23  Runden/Mon   5.8  Kostenanteil 4.6 %  | 13.08.-13.10.: 33.5 %
+K2 Trend + BTC-200-Filter          K=0.50  Jahr    57.7 %  MaxDD  -50.5 %  Sharpe  1.25  Calmar 1.14  Runden/Mon   5.8  Kostenanteil 11.2 %  | 13.08.-13.10.: 33.07 %
+K2 Trend + BTC-200-Filter          K=1.00  Jahr    53.5 %  MaxDD  -52.7 %  Sharpe  1.19  Calmar 1.02  Runden/Mon   5.8  Kostenanteil 21.5 %  | 13.08.-13.10.: 32.34 %
+K3 Rotation Top 3 / Halteband 6    K=0.15  Jahr    61.0 %  MaxDD  -63.4 %  Sharpe  1.04  Calmar 0.96  Runden/Mon   1.1  Kostenanteil 3.1 %  | 13.08.-13.10.: 8.79 %
+K3 Rotation Top 3 / Halteband 6    K=0.20  Jahr    60.6 %  MaxDD  -63.5 %  Sharpe  1.03  Calmar 0.95  Runden/Mon   1.1  Kostenanteil 4.1 %  | 13.08.-13.10.: 8.71 %
+K3 Rotation Top 3 / Halteband 6    K=0.50  Jahr    58.8 %  MaxDD  -64.0 %  Sharpe  1.02  Calmar 0.92  Runden/Mon   1.1  Kostenanteil 9.9 %  | 13.08.-13.10.: 8.2 %
+K3 Rotation Top 3 / Halteband 6    K=1.00  Jahr    55.5 %  MaxDD  -64.8 %  Sharpe  0.98  Calmar 0.86  Runden/Mon   1.1  Kostenanteil 19.0 %  | 13.08.-13.10.: 7.36 %
+K4 heutiger Bot (v6 E7)            K=0.15  13.08.-13.10.: 8.53 %  MaxDD -5.3 %
+K4 heutiger Bot (v6 E7)            K=0.20  13.08.-13.10.: 6.34 %  MaxDD -5.88 %
+K4 heutiger Bot (v6 E7)            K=0.50  13.08.-13.10.: -6.8 %  MaxDD -12.57 %
+K4 heutiger Bot (v6 E7)            K=1.00  13.08.-13.10.: -28.69 %  MaxDD -30.21 %
+gespeichert: C:\Users\<BENUTZER>\Desktop\pruefstand\labor\ergebnisse\stufe4.json

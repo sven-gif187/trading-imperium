@@ -1,0 +1,109 @@
+====================================================================================================
+ AUDIT CAPTURE-DATEN  -  Stand 03.08.2026
+ Nur lesend. Frage: sind die Daten trotz Mehrfachinstanzen brauchbar?
+====================================================================================================
+
+====================================================================================================
+ 1. HEARTBEAT - Abdeckung und Mehrfachinstanzen
+====================================================================================================
+
+  Tag           Zeilen  eindeut.ts   Dupl.    ok>0    ok=0 von                  bis                 
+  ------------------------------------------------------------------------------------------------
+  2026-07-31      2072        2071       1    2042      30 2026-07-31 08:57:28  2026-07-31 23:59:56 
+  2026-08-01      8402        8367      35    8322      80 2026-08-01 00:00:01  2026-08-01 23:59:59 
+  2026-08-02     13424       13380      44   13424       0 2026-08-02 00:00:02  2026-08-02 23:59:30 
+  2026-08-03      1968                KEINE gueltigen Zeitstempel - Datei zerstoert
+
+====================================================================================================
+ 2. TICKER BTCUSDC - Duplikate, Luecken, Dichte
+====================================================================================================
+
+  Tag           Zeilen  eindeut.  Dupl.%   Soll  Abdeck.%  Luecken>10min   max Luecke
+  --------------------------------------------------------------------------------------------
+  2026-07-31      2041      2040    0.0%    452    451.3%              4       101.0m
+  2026-08-01      8266      8252    0.2%    720   1146.1%              8       166.8m
+  2026-08-02     13358     13308    0.4%    720   1848.3%              6       123.4m
+  2026-08-03      1455      1455    0.0%    362    401.9%              5       131.6m
+
+  GESAMT: 25120 Zeilen, 25055 eindeutige Zeitstempel, 0.3 % Duplikate
+
+====================================================================================================
+ 3. NATUR DER DUPLIKATE - identische Zeile oder Widerspruch?
+====================================================================================================
+
+  2026-08-02: 50 Zeitstempel mehrfach, davon 50 mit identischem mid, 0 mit abweichendem mid
+
+  2026-08-03: 0 Zeitstempel mehrfach, davon 0 mit identischem mid, 0 mit abweichendem mid
+
+====================================================================================================
+ 4. SPREADS ueber die gesamte Erfassung (dedupliziert)
+====================================================================================================
+
+    Coin             n      min      p25   median      p75      p90       max  Nullen
+    --------------------------------------------------------------------------------
+    ADAUSDC      23633    5.218    5.321    5.762    5.951   11.574    29.317       0
+    ATOMUSDC     24985   23.557   56.703   57.260   63.847   64.154    87.684       0
+    AVAXUSDC     25063    1.551    8.106   10.623   12.514   15.172    48.529       0
+    BTCUSDC      25055    0.016    0.016    0.016    0.191    2.059    11.945       0
+    DOGEUSDC     25045    1.408    1.426    1.431    1.447    2.880    18.834       0
+    DOTUSDC      23597   25.063   39.500   50.378   52.493   63.012    79.470       0
+    ETHUSDC      25116    0.053    0.054    0.054    1.400    3.937    12.225       0
+    LINKUSDC     25097    1.206    9.874   11.983   12.315   13.371    63.775       0
+    NEARUSDC     25063    5.853   17.927   23.557   29.420   35.149    63.787       0
+    SOLUSDC      25056    1.356    1.370    1.388    2.736    2.751    11.280       0
+    UNIUSDC      25013    2.285    9.588   12.003   14.609   19.286    47.710       0
+    XRPUSDC      24999    0.922    4.626    5.654    8.335   10.205    14.075       0
+
+====================================================================================================
+ 5. VERGLEICH zur Eintagesmessung vom 31.07. (Kostenmatrix v3)
+====================================================================================================
+
+    Coin        Median 31.07.  Median gesamt   Faktor
+    --------------------------------------------------
+    ETHUSDC            0.054          0.054     1.01x
+    BTCUSDC            0.118          0.016     0.13x
+    SOLUSDC            1.366          1.388     1.02x
+    DOGEUSDC           1.441          1.431     0.99x
+    ADAUSDC            5.954          5.762     0.97x
+    XRPUSDC            6.591          5.654     0.86x
+    LINKUSDC          12.105         11.983     0.99x
+    AVAXUSDC          12.372         10.623     0.86x
+    UNIUSDC           16.519         12.003     0.73x
+    NEARUSDC          18.276         23.557     1.29x
+    ATOMUSDC          56.887         57.260     1.01x
+    DOTUSDC           65.232         50.378     0.77x
+
+  Faktor deutlich ueber 1 heisst: die Eintagesmessung war zu
+  guenstig. Faktor unter 1: sie war zu pessimistisch.
+
+====================================================================================================
+ 6. SCHADENSBILANZ DER GZIP-DATEIEN
+====================================================================================================
+
+  geprueft: 52 Dateien
+  intakt  : 0
+  beschaedigt, teilweise gerettet: 52
+  In den beschaedigten Dateien: 22.2 MB entpackt aus 30.0 MB Rohdaten
+
+  Datei                                           Mitglieder  Fehler
+  --------------------------------------------------------------------
+  2026-07-31\heartbeat.csv.gz                           2072       2
+  2026-07-31\ticker_ADAUSDC.csv.gz                      2042       2
+  2026-07-31\ticker_ATOMUSDC.csv.gz                     2033       3
+  2026-07-31\ticker_AVAXUSDC.csv.gz                     2039       3
+  2026-07-31\ticker_BTCUSDC.csv.gz                      2041       1
+  2026-07-31\ticker_DOGEUSDC.csv.gz                     2040       4
+  2026-07-31\ticker_DOTUSDC.csv.gz                      2041       6
+  2026-07-31\ticker_ETHUSDC.csv.gz                      2047       3
+  2026-07-31\ticker_LINKUSDC.csv.gz                     2048       1
+  2026-07-31\ticker_NEARUSDC.csv.gz                     2038       3
+  2026-07-31\ticker_SOLUSDC.csv.gz                      2044       6
+  2026-07-31\ticker_UNIUSDC.csv.gz                      2036       3
+  2026-07-31\ticker_XRPUSDC.csv.gz                      2034       2
+  2026-08-01\heartbeat.csv.gz                           8402      37
+  2026-08-01\ticker_ADAUSDC.csv.gz                      8281      21
+  ... und 37 weitere
+
+  URSACHE: mehrere Instanzen haben gleichzeitig per gzip-Append
+  in dieselben Dateien geschrieben. Die gzip-Mitglieder sind
+  ineinander verschraenkt. Kein Schreibschutz, keine Dateisperre.

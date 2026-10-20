@@ -1,0 +1,164 @@
+{
+  "_comment": "Verhaltensaenderungen des Bots. Auswertung NUR innerhalb einer Epoche vergleichen.",
+  "epochs": [
+    {
+      "id": "L1_echtgeld_start",
+      "start": "",
+      "label": "Erster Echtgeld-Betrieb, Bybit EU",
+      "note": "Startzeit wird beim ersten Lauf eingetragen. Deckel: 25 $ je Order, 200 $ Kapital. Freigabepruefung ausgeschaltet - Sven am 14.09.2026, ausdruecklich und im Wissen, dass die Kriterien B, C, E und F nicht erfuellt sind.",
+      "changes": [
+        "mode=live",
+        "boerse=bybit.eu",
+        "gate=aus"
+      ]
+    },
+    {
+      "id": "L2_fraktal_tor",
+      "start": "2026-09-15 07:26:43",
+      "label": "Fraktal-Tor scharf - Einstieg nur in Konfluenzzonen",
+      "note": "Svens Fraktal-Verfahren haengt ab jetzt am Handelspfad. Vorher kaufte der Bot nach Trendfolge (MACD + EMA + ADX + VWAP), also nach dem Anstieg; features/fraktal_konfluenz.py war von keinem Handelspfad importiert. Das Tor kann nur ABLEHNEN, nie ausloesen - die Schwelle 7 aus Befund 103 bleibt unangetastet. Gemessen vor dem Einschalten: 4 von 4 Kaeufen des 14.09. abgelehnt (fraktal_rueckblick.py), Tor in 27,2 Prozent der Stunden offen ueber 30 Tage (fraktal_oeffnung.py), 21 von 21 Pruefungen bestanden (fraktal_tor_test.py).",
+      "changes": [
+        "fraktal_tor_aktiv=true",
+        "nur Aufwaertswellen bilden Kaufzonen",
+        "Wellen ab 2,0 % Spanne",
+        "Ruecksetzer ab 0,5",
+        "Live-Bestaende werden ins Register uebernommen"
+      ]
+    },
+    {
+      "id": "L3_fraktal_komplett",
+      "start": "2026-09-15 12:23:36",
+      "label": "Fraktal-System komplett - Ein- UND Ausstieg nach Fibonacci",
+      "note": "Zweite Haelfte von Svens Verfahren. Bis L2 stieg der Bot nach dem Verfahren ein und nach dem alten Schema aus - feste Prozentmarken. Jetzt ist das Ziel die Verlaengerung derselben Welle, in deren Ruecksetzer gekauft wurde (features/fraktal_ziele.py, Verhaeltnisse aus FIB_VOR in chartanalyse.py:233, an Marks Charts nachgerechnet). Verkauft wird bei Ziel 1,0 - dem Wellenhoch. Gestaffelte Teilverkaeufe bei 1,272 und 1,618 sind vorbereitet, aber NICHT angeschlossen: Der Verkaufspfad raeumt die Position atomar weg (exit_monitor.py record_result), und bei der aktuellen Kontogroesse laegen Teilmengen unter der Boersen-Mindestmenge. Zugleich Regime-Filter aus. 36 von 36 Pruefungen bestanden (fraktal_tor_test.py).",
+      "changes": [
+        "Fibonacci-Ziel als Ausstieg (Ziel 1,0 = Wellenhoch)",
+        "Kaufwelle wird an der Position gespeichert",
+        "Whitelist in state_manager erweitert (Befund 88)",
+        "regime_filter enabled=false",
+        "Trailing-Kette repariert (elif -> if)"
+      ]
+    },
+    {
+      "id": "L4_warteauftraege_live",
+      "start": "2026-09-16 23:43:17",
+      "label": "Kaeufe als echte Warte-Auftraege (Limit-Order, Maker)",
+      "note": "Der Bot kauft nicht mehr sofort zum Marktpreis, sondern legt ein Angebot 0,10 % unter den Markt und wartet bis zu einer Stunde. Wird es bedient, zahlt er 0,10 % Maker statt 0,25 % Taker; wird es nicht bedient, findet der Kauf nicht statt. Kosten je Runde 0,505 % -> 0,355 %. Gemessener Vorteil +0,161 Prozentpunkte an 382 echten Kaeufen (11.09.2026), Gegenauslese eingerechnet, Vertrauensintervall +0,077 bis +0,237. VERKAEUFE bleiben Sofort-Auftraege - ein Limit-Verkauf wird bei einem schnellen Rutsch nicht bedient. Zu beobachten: die Ausfuehrungsquote. Im Papier wurden 73,3 % gemessen, aber als Obergrenze; live haelt die Boerse den Auftrag und sieht jeden Handel, die Quote sollte hoeher liegen.",
+      "changes": [
+        "warteauftraege.nur_paper=false",
+        "Kaeufe: Limit-Order 0,10 % unter Markt statt Market-Order",
+        "gueltig 4 Kerzen a 15 Minuten, danach Ruecknahme",
+        "Verkaeufe unveraendert als Market-Order",
+        "K-BASIS je Runde 0,505 % -> 0,355 % (K_WARTE)"
+      ]
+    },
+    {
+      "id": "L5_zurueck_auf_papier",
+      "start": "2026-09-25T14:28:16+00:00",
+      "label": "Zurueck auf Papierbetrieb",
+      "note": "Echtgeld beendet. Sven hat das Kapital selbst vom Bybit-Konto genommen (seine Aussage, 25.09.2026); die Boerse fuehrte danach nur noch Staub - ETH 0.000268, USDC ~0, zweifach unabhaengig gelesen. Umgestellt wurde ueber die OBERFLAECHE, nicht ueber papierwechsel.py: Modus auf paper (ui/main_window.py:2627) und Journal geleert mit dem Reset-Knopf (ui/main_window.py:2454 -> core/state_store.py:342 clear). Der Zeitpunkt hier ist der des clear(), belegt durch die Sicherung, die es selbst anlegt: trades_v5.json.vor_clear_20260925_162816 - 16:28:16 Ortszeit, Versatz nachgerechnet +2:00, also 14:28:16 UTC. Die 10 Echtgeld-Trades liegen dreifach gesichert. trades_v5.json ist seit hier LEER, es gibt also nichts zu mischen: alles danach ist Papier. Deckel und Schwellen blieben unangetastet, Papierkapital 500 USDC. ACHTUNG fuer Auswertungen: die Journal-Eintraege tragen KEIN Modus-Feld (43 Felder geprueft).",
+      "changes": [
+        "mode=live -> mode=paper",
+        "initial_paper_balance=500",
+        "Journal geleert (Sicherung vor_clear_20260925_162816)",
+        "Phantom-Position BTC/USDC damit ebenfalls entfallen",
+        "veralteter Warte-Auftrag 2305796432030230786 verworfen",
+        "Dashboard-Anschluss 5050 -> 5070, Cockpit 8110 -> 8170"
+      ]
+    },
+    {
+      "id": "L6_abschalten_speichert",
+      "start": "2026-09-25T21:32:09.079588+00:00",
+      "label": "Abschalten speichert den Zustand wieder (Befund 72)",
+      "note": "live/watchdog.py hatte kein stop(), app.py:4731 rief es trotzdem. Der AttributeError flog mitten in AppEngine.stop(), und alles danach lief nie: state_manager.auto_save() und state.save() - also genau der Doppelverkauf-Fix vom 13.08.2026. Belegt im Log vom 25.09.2026, data_store/jobs/bot_konsole.log, mit vollstaendigem Traceback vom Klick auf den Stopp-Knopf. Befund 72 stand seit dem 04.09. auf 'Nicht repariert - Freeze'; das Messfenster endete am 18.09. Behoben durch die fehlende Methode, nicht durch ein try/except um den Aufruf - Ursache vor Symptom. stop() setzt einen Riegel, den check() zuerst prueft, damit waehrend des Abschaltens keine Threads mehr neu gestartet werden. Gegentest in beide Richtungen: vor stop() findet check() den toten Thread und startet ihn neu, nach stop() nicht mehr. Alle fuenf Aufrufe in AppEngine.stop() auf Existenz geprueft, die Kette laeuft jetzt durch. BEWUSST NICHT mitgemacht: check() an den Taktgeber haengen - die Methode wird von keiner Stelle gerufen, die Neustart-Funktion ist toter Code, und sie scharfzuschalten braucht eine eigene Messung.",
+      "changes": [
+        "live/watchdog.py: stop() ergaenzt",
+        "live/watchdog.py: check() bricht nach stop() ab",
+        "Abschalten sichert jetzt wieder den Positionsstand"
+      ]
+    },
+    {
+      "id": "L7_svens_drei_entscheidungen",
+      "start": "2026-09-25T21:56:26.849729+00:00",
+      "label": "Svens drei Entscheidungen: 50 Prozent, eine Position, Kaufweg 2 aus",
+      "note": "Freigabe Sven 25.09.2026, woertlich: '50 % und eine Position, Kaufweg 2 aus, zurueck auf 35'. BEWUSST EINE Grenze fuer alle drei Aenderungen statt drei einzelne - jede Epochengrenze setzt die Zaehlung auf null, und genau dieser Mechanismus hat das Projekt sieben Monate gekostet. (1) Positionsgroesse: modes.balanced von 30 Prozent auf 50 und von 3 Positionen auf 1. Der Name 'balanced' ist damit irrefuehrend, liess sich aber nicht aendern - active_mode zeigt auf diesen Feldnamen (config/settings.py:173). Der wirksame Hebel ist dieser Block, NICHT trading.position_size_pct: app.py:1592-1600 ueberschreibt intent.amount_usd zuletzt mit portfolio.get_position_size() aus dem aktiven Modus. Handprobe: 500 USDC mal 50 Prozent gleich 250 USD, hoechstens eine Position. (2) Kaufweg 2 aus: app.py:2948 las trading.dca_enabled nicht und kaufte bei jedem Angst-Wert unter 30, am Fraktal-Tor VORBEI - also an dem Kern von Svens Verfahren, der seit L2 scharf ist. Jetzt 'if fg < 30 and dca_enabled'. dca_enabled steht auf false, der Weg ist damit zu. Wahrheitstabelle geprueft. (3) risk.max_exposure_per_coin_pct auf Svens Wunsch zurueck auf 35. WICHTIG: Der Wert wirkt so nicht. risk/engine.py:47 rechnet max(modes.max_coin_pct, position_size_pct+5), also max(35, 55) gleich 55 - eine 35er Grenze wuerde die eigene 50-Prozent-Position blockieren, das Anheben ist Absicht. Und risk.max_exposure_per_coin_pct wird bei vorhandenem aktiven Modus ueberhaupt nicht gelesen, nur im Rueckfallzweig engine.py:51. ui/main_window.py:2663 rechnet es beim naechsten Speichern in der Maske wieder auf 55. 35 und 50 Prozent sind zusammen nicht moeglich - Sven ist darueber unterrichtet.",
+      "changes": [
+        "modes.balanced.position_size_pct 30 -> 50",
+        "modes.balanced.max_positions 3 -> 1",
+        "app.py:2948 liest jetzt trading.dca_enabled (Kaufweg 2 aus)",
+        "risk.max_exposure_per_coin_pct 55 -> 35 (wirkungslos, s. Notiz)"
+      ]
+    },
+    {
+      "id": "L8_einheitsgebuehr",
+      "start": "2026-10-14T09:51:17.558608+00:00",
+      "label": "Bybit-EU-Einheitsgebuehr: Warte-Auftraege 0,25 % statt 0,10 %",
+      "note": "Bybit EU seit 05.10.2026 11:00 UTC Einheitsgebuehr 0,25 % (VIP 0), kein Maker-Rabatt (Trading-Fee-Structure, Last updated 2026-10-05 13:01:39, abgerufen 14.10.2026). backtest/fees.py bybit maker 0.10->0.25, engine.py Rueckfall maker 0.0010->0.0025, core/kosten.py MAKER_PCT 0.10->0.25 (K_WARTE_PCT 0.355->0.505). Nur Buchung, keine Handelsregel - aber pnl wirkt auf Lernen und Verlustzaehler. Seit 05.10. 8 Kaeufe mit 0,10 % gebucht, 2,88 $ zu wenig. Offene SOL-Position (Kauf 14.10. vor L8) traegt noch den alten Satz. Vorab-Registrierung pruefstand/epochen/L8_v7_einheitsgebuehr.md. Freigabe Sven 14.10.2026.",
+      "changes": [
+        "bybit_maker=0.25",
+        "MAKER_PCT=0.25",
+        "K_WARTE_PCT=0.505"
+      ]
+    },
+    {
+      "id": "L9_kostenlatte_bitvavo",
+      "start": "2026-10-14T13:59:20.010646+00:00",
+      "label": "Kostenlatte Bitvavo USDC (Zielboerse gewechselt)",
+      "note": "Entscheidung Sven 14.10.2026: Zielboerse Bitvavo USDC-Maerkte statt Bybit EU. core/kosten.py TAKER/MAKER 0.25 -> 0.05, SCHLUPF 0.005 -> 0.050, K_BASIS 0.505 -> 0.150 (K_WARTE 0.150). exit_rules K 0.150, Puffer 0.195, TRAIL_AB 1.21. Papier-Gebuehr bitvavo_usdc, SPREAD_BP BTC/ETH/SOL aus Bitvavo-Stichprobe 14.10. Warte-Auftraege ohne Gebuehrenvorteil (Maker = Taker). Offene ETH-Position von vor L9. Vorab-Registrierung pruefstand/epochen/E10_L9_kostenlatte_bitvavo.md.",
+      "changes": [
+        "paper_boerse=bitvavo_usdc",
+        "K_BASIS=0.150",
+        "BREAKEVEN_PUFFER=0.195",
+        "TRAIL_AB=1.21",
+        "SPREAD_BP=bitvavo"
+      ]
+    },
+    {
+      "id": "L10_trailstart_wirksam",
+      "start": "2026-10-14T19:56:08.654947+00:00",
+      "label": "Nachzieh-Start aus wirksamem Abstand (A5-V1)",
+      "note": "Entscheidung Sven 14.10.2026 (Z4). risk/exit_rules.py effektiver_trail(): Start = (1+K)/(1-Abstand)-1+0,05 mit dem wirksamen Abstand (Config x Regime x Leiter x Trend-Bonus) statt fest TRAIL_AB_PCT 1,21. EARLY_BEAR 0,85 -> 1,06; Trend 1,3 -> 1,52. Auswertung gemeinsam mit der vorigen Epoche (gleiche Kostenlatte). Vorab-Registrierung pruefstand/epochen/E11_L10_trailstart_wirksam.md.",
+      "changes": [
+        "trail_start=aus_wirksamem_abstand"
+      ]
+    },
+    {
+      "id": "L11_puffer_pflichtfelder",
+      "start": "2026-10-15T09:35:57.687689+00:00",
+      "label": "Puffer K+0,10 und Kauf-Felder am Verkauf (E5, Befund 88)",
+      "note": "Entscheidung Sven 15.10.2026 (E5): risk/exit_rules.py BREAKEVEN_MARGE_PCT 0,045 -> 0,10, Puffer der Nullsicherung 0,195 -> 0,25 %. Dazu nur Aufzeichnung: app.py _journal_add fuellt fehlende Kauf-Felder eines Verkaufs aus dem ersten Kauf der Runde (Befund 88). Vorab-Registrierung pruefstand/epochen/E12_L11_puffer_pflichtfelder.md.",
+      "changes": [
+        "breakeven_marge_pct=0.10",
+        "breakeven_puffer_pct=0.25",
+        "journal_kauf_felder_am_verkauf"
+      ]
+    },
+    {
+      "id": "L12_kleinigkeiten",
+      "start": "2026-10-15T10:03:05.007945+00:00",
+      "label": "Nachzieh-Marge 0,10 und Kleinigkeiten (E5b, Befund 72, P0-11)",
+      "note": "Entscheidung Sven 15.10.2026 (E5b): risk/exit_rules.py TRAIL_MARGE_PCT 0,05 -> 0,10, Nachzieh-Start = Nulllinie + 0,10 (0,85->1,11 / 1,0->1,26 / 1,3->1,57). Ohne Handelswirkung: maker_schatten.py Bitvavo-Gebuehren. Vorab-Registrierung pruefstand/epochen/E13_L12_kleinigkeiten.md.",
+      "changes": [
+        "trail_marge_pct=0.10"
+      ]
+    },
+    {
+      "id": "L13_kaufgroesse_handelsgeld",
+      "start": "2026-10-15T20:35:04.880957+00:00",
+      "label": "Kaufgroesse aus Handelsgeld ohne Sparplan (KG1)",
+      "note": "Entscheidung Sven 15.10.2026 (KG1/KG1a, pruefstand/entscheidungen.md): Kaufgroesse nur aus dem Handelsgeld, das Sparplan-BTC zaehlt nicht mehr mit. portfolio/manager.py neue Funktion get_trading_capital() (= get_total_capital() minus Sparplan); app.py Block MANUELLES SIZING nutzt sie statt get_total_capital(). Drawdown-Guard, Tagesverlust, Tagesstart und Anzeige rechnen weiter mit Sparplan (E10-KAPITAL). Beleg: v7 setzte am 15.10. 95 % der Handelskasse in eine Muenze (Signal 117,44 $, ueberschrieben auf 232,91 $). Bots waren seit 20:11 Berlin aus (Claude-App-Update beendete sie), Patch bei geschlossenem Bot. Vorab-Registrierung pruefstand/epochen/E14_L13_kaufgroesse_handelsgeld.md.",
+      "changes": [
+        "sizing_basis=get_trading_capital (ohne Sparplan)"
+      ]
+    },
+    {
+      "id": "L14_warte_kauf_felder",
+      "start": "2026-10-19T21:00:50.469900+00:00",
+      "label": "Warte-Kauf traegt Kauf-Felder, Log-Warteschlange (ohne Handelswirkung)",
+      "note": "Auftrag Sven 19.10.2026: (1) execution/engine.py Befund 88 Rest: bediente Warte-Auftraege behalten stop_loss, trailing_stop_pct, take_profit, agent_id, risk_reason, evaluation_id (pruefstand/epochen/L14_warte_kauf_felder.md). (2) ui/main_window.py Log-Warteschlange gegen Haenger wie v6 E15. Keine Handelsregel geaendert, keine Messgrenze: Auswertung weiter gemeinsam ab L9. Vorab-Registrierung pruefstand/epochen/E15_L14_log_warteschlange.md.",
+      "changes": [
+        "warte_kauf_felder",
+        "log_warteschlange"
+      ]
+    }
+  ]
+}

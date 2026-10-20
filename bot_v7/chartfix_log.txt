@@ -1,0 +1,5 @@
+============================================================
+INSTALLER: Chart-Thread-Fix (main_window.py)
+============================================================
+BEREITS INSTALLIERT (Marker gefunden) - nichts zu tun.
+ERGEBNIS: OK

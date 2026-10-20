@@ -1,0 +1,176 @@
+====================================================================================================
+ MESSUNG F1 - DIE HUERDE: wie hoch muss sie wirklich sein?
+ Stand 30.07.2026 - Datenbasis wie PRUEFSUMMEN.txt
+====================================================================================================
+
+====================================================================================================
+ F1a  ORDERTYPEN - was ruft der Bot tatsaechlich auf?
+====================================================================================================
+
+  MARKET-Orders: 13 Fundstellen
+    execution/engine.py:384  return best_exchange.create_market_buy_order(intent.symbol, menge)
+    execution/engine.py:385  return best_exchange.create_market_sell_order(intent.symbol, menge)
+    execution/exchange_client.py:364  return self._exchange.create_market_buy_order(symbol, qty)
+    execution/exchange_client.py:366  return self._exchange.create_market_sell_order(symbol, intent.quantity)
+    execution/futures_trader.py:67  order = self.client.create_market_buy_order(symbol, qty)
+    execution/futures_trader.py:87  order = self.client.create_market_sell_order(symbol, qty)
+    execution/futures_trader.py:107  order = self.client.create_market_sell_order(symbol, pos["qty"])
+    execution/futures_trader.py:109  order = self.client.create_market_buy_order(symbol, pos["qty"])
+    execution/multi_exchange.py:147  return ex.create_market_buy_order(symbol, amount_or_qty)
+    execution/multi_exchange.py:149  return ex.create_market_sell_order(symbol, amount_or_qty)
+    live/live_runner.py:60  order = self.exchange.create_market_buy_order(symbol, qty)
+    live/live_runner.py:68  order = self.exchange.create_market_sell_order(symbol, qty)
+    features/safety.py:100  create_market_buy_order = 6
+
+  LIMIT-Orders: 0 Fundstellen
+    (keine)
+
+  create_order(...) generisch: 0 Fundstellen
+    (keine)
+
+  postOnly / timeInForce: 0 Fundstellen
+    (keine)
+
+  ERGEBNIS F1a
+    Market-Aufrufe : 13
+    Limit-Aufrufe  : 0
+    Limit im Bot unterstuetzt: NEIN
+
+====================================================================================================
+ F1b  GEBUEHREN - was steht im Code, was in config.json?
+====================================================================================================
+
+  Fundstellen im Quelltext
+    execution/engine.py:243  slippage_pct = random.uniform(0.02, 0.08) / 100
+    execution/engine.py:252  fee_rate = 0.001  # 0.10% Standard Binance
+    execution/engine.py:281  result.slippage_pct = round(slippage_pct * 100, 4)
+    execution/engine.py:317  result.slippage_pct = round(slippage_pct * 100, 4)
+    execution/fill_reconciler.py:68  slippage_pct = abs((trade_price - expected) / expected) * 100
+    backtest/ausstieg_backtest.py:59  GEBUEHR = 0.001          # 0.1 % je Seite
+    backtest/ausstieg_backtest.py:60  SLIPPAGE = 0.0005        # 0.05 % je Seite
+    backtest/engine.py:122  self.slippage = SlippageModel(base_bps=5)
+    backtest/fees.py:9  "binance":    {"maker": 0.10, "taker": 0.10, "bnb_discount": 0.075},
+    backtest/fees.py:10  "coinbase":   {"maker": 0.40, "taker": 0.60},
+    backtest/fees.py:11  "kraken":     {"maker": 0.16, "taker": 0.26},
+    backtest/fees.py:12  "bybit":      {"maker": 0.10, "taker": 0.10},
+    backtest/fees.py:13  "okx":        {"maker": 0.08, "taker": 0.10},
+    backtest/fees.py:26  def calculate(self, amount_usd, order_type="taker"):
+    backtest/fees.py:31  fee_pct = self.fees.get(order_type, self.fees.get("taker", 0.1))
+    backtest/fees.py:38  buy_fee = self.calculate(amount_usd, "taker")
+    backtest/fees.py:39  sell_fee = self.calculate(amount_usd, "taker")
+    backtest/fees.py:44  fee = self.fees.get("taker", 0.1)
+    backtest/slippage.py:13  def __init__(self, base_bps=5, volume_impact=True):
+    backtest/slippage.py:18  self.base_bps = base_bps
+
+  config.json - Suche nach Gebuehren-/Slippage-Schluesseln
+    KEIN einziger Gebuehren- oder Slippage-Schluessel vorhanden.
+    (config.json Top-Level-Bloecke: exchange, risk, trading, modes, rebalance, ai, telegram, dashboard, version)
+
+  ERGEBNIS F1b - die Reibung, wie sie im Code steht
+    Paper-Pfad  (execution/engine.py:251)  Gebuehr 0,100 % je Seite
+    Paper-Pfad  (execution/engine.py:243)  Slippage U(0,02;0,08) % je Seite, Erwartungswert 0,050 %
+    Harness     (backtest/ausstieg_backtest.py:59/60) 0,100 % + 0,050 %
+    Tabelle     (backtest/fees.py:9) binance maker 0,10 / taker 0,10
+    -> Rundenreibung = 2 x (0,100 + 0,050) = 0,300 %  [deckt sich mit der bisher angenommenen Zahl]
+
+====================================================================================================
+ F1c  BREAK-EVEN-TREFFERQUOTE P(auf) je Reibungsniveau
+====================================================================================================
+
+  Modell: symmetrisches First-Touch-Rennen wie E2, Schranken +-2.5 %.
+    Gewinn je Treffer  = +B, Verlust je Fehltreffer = -B, Reibung c je Runde.
+    Break-even: p*B - (1-p)*B = c   ->   p = 0,5 + c/(2B)
+
+  Vergleichswerte aus E2 (BEFUNDE.md, Befund 9/10):
+    gemessen J2 47,66 %   |   95-%-KI-Obergrenze J2 52,56 %
+    gemessen J1 50,69 %   |   95-%-KI-Obergrenze J1 57,69 %
+
+     Reibung/Runde  P(auf) noetig  Luecke zu 47,66%  J2-Obergr. reicht?  J1-Obergr. reicht?
+    ------------------------------------------------------------------------------------------
+             0.30%         56.00%            +8.34pp                nein                  JA  <- Ist
+             0.20%         54.00%            +6.34pp                nein                  JA
+             0.15%         53.00%            +5.34pp                nein                  JA
+             0.10%         52.00%            +4.34pp                  JA                  JA
+             0.05%         51.00%            +3.34pp                  JA                  JA
+             0.00%         50.00%            +2.34pp                  JA                  JA
+
+  UMKEHRUNG - welche Reibung waere noetig, damit der gemessene Wert traegt?
+    J2 Punktschaetzer 47,66 %  -> c = -0.1170 %   (negativ: es muesste eine Praemie GEZAHLT werden)
+    J2 KI-Obergrenze  52,56 %  -> c = 0.1280 %
+    J1 KI-Obergrenze  57,69 %  -> c = 0.3845 %
+
+  ERREICHBARE UNTERGRENZEN nach den Zahlen im Projekt
+    Szenario                                       c/Runde  P(auf) noetig   >52,56%?  Beleg
+    ----------------------------------------------------------------------------------------------------
+    Ist (Market, Standardgebuehr)                   0.300%         56.00% REICHT NICHT  engine.py:243/251
+    Market + BNB-Rabatt 0,075 %                     0.250%         55.00% REICHT NICHT  fees.py:9 bnb_discount
+    Limit/Maker, Gebuehr unveraendert 0,10 %        0.200%         54.00% REICHT NICHT  fees.py:9 maker == taker
+    Limit/Maker + BNB-Rabatt                        0.150%         53.00% REICHT NICHT  fees.py:9 kombiniert
+
+====================================================================================================
+ F1d  HORIZONT - mediane absolute Bewegung gegen feste Rundenreibung
+====================================================================================================
+
+  Reibung je Runde: 0.30 % (fix, unabhaengig vom Horizont).
+  |Bewegung| = |Close(t+h)/Close(t) - 1|, ueberlappende Fenster auf 15m-Kerzen.
+  Quote = Median(|Bewegung|) / Reibung. Quote > 1 heisst: die typische Bewegung
+  ist groesser als die Kosten - es heisst NICHT, dass sie in die richtige Richtung geht.
+
+  Jahr 2  2025-07..2026-07
+    Coin               1 h         4 h        24 h        72 h         7 d
+    ----------------------------------------------------------------------
+    BTC              0.20%       0.40%       1.23%       2.38%       3.61%
+    ETH              0.28%       0.56%       1.77%       3.50%       4.99%
+    SOL              0.34%       0.70%       2.09%       3.85%       5.36%
+    ADA              0.38%       0.76%       2.30%       4.12%       6.01%
+    AVAX             0.36%       0.74%       2.10%       3.91%       5.51%
+    LINK             0.36%       0.72%       2.05%       3.65%       5.36%
+    DOT              0.40%       0.80%       2.15%       4.11%       6.10%
+    DOGE             0.34%       0.70%       2.05%       3.67%       5.19%
+    NEAR             0.49%       0.99%       2.68%       4.94%       8.04%
+    UNI              0.43%       0.87%       2.39%       4.19%       6.74%
+    ATOM             0.37%       0.73%       1.99%       3.59%       5.92%
+    ----------------------------------------------------------------------
+
+    Horizont    Median|Bew|    Quote       P25       P75  Anteil >0,30%  noetige P(auf)
+    ------------------------------------------------------------------------------------
+    1 h               0.35%     1.17     0.15%     0.68%          55.9%          92.91%
+    4 h               0.71%     2.36     0.31%     1.41%          75.5%          71.14%
+    24 h              2.03%     6.78     0.89%     3.77%          91.3%          57.38%
+    72 h              3.72%    12.39     1.73%     6.64%          95.6%          54.04%
+    7 d               5.55%    18.49     2.54%    10.15%          96.9%          52.70%
+
+  Jahr 1  2024-07..2025-07
+    Coin               1 h         4 h        24 h        72 h         7 d
+    ----------------------------------------------------------------------
+    BTC              0.22%       0.44%       1.25%       2.33%       3.43%
+    ETH              0.33%       0.69%       1.89%       3.69%       5.68%
+    SOL              0.44%       0.92%       2.49%       4.56%       7.38%
+    ADA              0.48%       0.99%       2.58%       4.84%       8.06%
+    AVAX             0.51%       1.06%       2.90%       5.59%       8.67%
+    LINK             0.51%       1.01%       2.88%       5.44%       8.17%
+    DOT              0.46%       0.92%       2.53%       4.79%       7.71%
+    DOGE             0.49%       1.00%       2.81%       4.83%       7.80%
+    NEAR             0.59%       1.16%       3.21%       6.12%       9.01%
+    UNI              0.54%       1.11%       2.94%       5.49%       9.21%
+    ATOM             0.47%       0.94%       2.63%       4.99%       7.77%
+    ----------------------------------------------------------------------
+
+    Horizont    Median|Bew|    Quote       P25       P75  Anteil >0,30%  noetige P(auf)
+    ------------------------------------------------------------------------------------
+    1 h               0.45%     1.49     0.20%     0.86%          63.4%          83.67%
+    4 h               0.91%     3.02     0.40%     1.75%          80.8%          66.55%
+    24 h              2.50%     8.34     1.12%     4.65%          92.9%          56.00%
+    72 h              4.67%    15.58     2.12%     8.59%          96.2%          53.21%
+    7 d               7.34%    24.48     3.12%    13.09%          97.5%          52.04%
+
+  LESART
+    Die letzte Spalte beantwortet F1d direkt: haelt man eine Position
+    so lange, dass die typische Bewegung dem Median entspricht, und
+    setzt die Schranken auf diesen Median, dann braucht es diese
+    Trefferquote, um die 0,30 % Reibung zu decken. Je laenger der
+    Horizont, desto naeher rueckt sie an 50 %.
+
+====================================================================================================
+ ENDE F1
+====================================================================================================

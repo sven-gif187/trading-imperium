@@ -1,0 +1,68 @@
+====================================================================================================
+ BLOCK 2 - IST +31,44 $ UEBER 49 TAGE AUSSERGEWOEHNLICH?
+ Kein Trial. Deskriptive Streuungsmessung.
+====================================================================================================
+
+  Jahr 2  2025-07..2026-07
+    317 rollierende 49-Tage-Fenster, 1480 Trades
+    reibungsfreie P&L je Fenster:
+      Minimum     -224.21 $
+      5.  Perz.   -182.41 $
+      25. Perz.    -47.43 $
+      Median       -13.05 $
+      75. Perz.     +0.00 $
+      95. Perz.     +0.29 $
+      Maximum       +9.73 $
+      Mittelwert   -42.89 $
+    Anteil Fenster mit positiver reibungsfreier P&L: 5.4 %
+    >>> LIVE-WERT +31.44 $ liegt im 100.0. Perzentil (AUSSERHALB der Spannweite)
+    BTC-Halten ueber dieselben Fenster: Median -42.50 $, Spanne -158.37 bis +102.49 $
+      Live-Halten-Wert +16.54 $ liegt im 75.7. Perzentil
+
+  Jahr 1  2024-07..2025-07
+    317 rollierende 49-Tage-Fenster, 783 Trades
+    reibungsfreie P&L je Fenster:
+      Minimum     -126.46 $
+      5.  Perz.    -95.53 $
+      25. Perz.    -34.55 $
+      Median        +0.00 $
+      75. Perz.     +0.00 $
+      95. Perz.     +0.00 $
+      Maximum      +23.89 $
+      Mittelwert   -21.81 $
+    Anteil Fenster mit positiver reibungsfreier P&L: 3.8 %
+    >>> LIVE-WERT +31.44 $ liegt im 100.0. Perzentil (AUSSERHALB der Spannweite)
+    BTC-Halten ueber dieselben Fenster: Median +43.50 $, Spanne -115.12 bis +310.12 $
+      Live-Halten-Wert +16.54 $ liegt im 33.1. Perzentil
+
+====================================================================================================
+ NACHTRAG - nur Fenster MIT Trades (die Nullfenster verzerren)
+====================================================================================================
+
+  Viele Fenster enthalten gar keine Eintritte (F&G-Filter,
+  in J1 nur 43 Einstiegstage). Sie stehen mit exakt 0,00 $ in der
+  Verteilung und ziehen Median und Perzentile kuenstlich zur Null.
+  Das Live-Fenster hatte unstrittig Handelstaetigkeit - der faire
+  Vergleich ist deshalb die bedingte Verteilung.
+
+  Jahr 2: 191 Fenster mit Trades (Median 437 Trades je Fenster)
+    Spanne -224.21 bis +9.73 $, Median -39.96 $
+    Anteil >= +31.44 $: 0.0 % -> Live-Wert im 100.0. Perzentil
+  Jahr 1: 142 Fenster mit Trades (Median 198 Trades je Fenster)
+    Spanne -126.46 bis +23.89 $, Median -36.49 $
+    Anteil >= +31.44 $: 0.0 % -> Live-Wert im 100.0. Perzentil
+
+====================================================================================================
+ BEIDE JAHRE ZUSAMMEN
+====================================================================================================
+
+  634 Fenster gesamt
+  Spanne -224.21 $ bis +23.89 $
+  Median +0.00 $, Mittelwert -32.35 $
+  Anteil Fenster >= +31.44 $: 0.0 %
+
+  >>> +31.44 $ liegt im 100.0. Perzentil der Backtest-Verteilung.
+  >>> AUSSERHALB der Spannweite.
+
+  URTEIL: Erklaerung (a) traegt NICHT allein - der Live-Wert liegt am Rand 
+          oder ausserhalb. Modellunterschiede pruefen.

@@ -1,0 +1,665 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Lernpfad Programmieren</title>
+<style>
+  :root{
+    --grund:#0d1117; --karte:#161b22; --rand:#30363d; --text:#e6edf3;
+    --matt:#8b949e; --gruen:#26a69a; --rot:#ef5350; --blau:#58a6ff;
+    --gelb:#d29922; --violett:#a78bfa;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--grund);color:var(--text);
+       font:15px/1.65 "Segoe UI",system-ui,sans-serif;display:flex;height:100vh;overflow:hidden}
+
+  /* ---- linke Spalte: Inhaltsverzeichnis ---- */
+  #liste{width:280px;flex:none;background:var(--karte);border-right:1px solid var(--rand);
+         overflow-y:auto;padding:14px 0}
+  #liste h1{font-size:15px;margin:0 16px 4px;letter-spacing:.3px}
+  #liste .unter{font-size:12px;color:var(--matt);margin:0 16px 14px}
+  .kapitel{padding:9px 16px;cursor:pointer;border-left:3px solid transparent;
+           font-size:13.5px;display:flex;gap:9px;align-items:flex-start}
+  .kapitel:hover{background:#1c2128}
+  .kapitel.an{background:#1c2128;border-left-color:var(--blau)}
+  .kapitel .nr{color:var(--matt);font:12px Consolas,monospace;flex:none;width:20px}
+  .kapitel.fertig .nr::before{content:"✓";color:var(--gruen)}
+  .kapitel.fertig .nr{font-size:0}
+
+  /* ---- rechte Spalte: Inhalt ---- */
+  #inhalt{flex:1;overflow-y:auto;padding:26px 34px 90px}
+  #inhalt h2{font-size:24px;margin:0 0 4px}
+  #inhalt h3{font-size:16px;margin:26px 0 8px;color:var(--blau)}
+  #inhalt p{margin:11px 0;max-width:74ch}
+  #inhalt ul,#inhalt ol{max-width:74ch}
+  #inhalt li{margin:5px 0}
+  .warum{border-left:3px solid var(--gelb);background:#1c1a12;
+         padding:10px 14px;margin:16px 0;max-width:74ch}
+  .warum b{color:var(--gelb)}
+  pre{background:#010409;border:1px solid var(--rand);border-radius:7px;
+      padding:12px 14px;overflow-x:auto;font:13px/1.55 Consolas,monospace;
+      max-width:74ch}
+  code{font:13px Consolas,monospace;background:#010409;padding:1px 5px;
+       border-radius:4px;border:1px solid var(--rand)}
+  pre code{background:none;border:none;padding:0}
+  .k{color:#ff7b72}   /* Schluesselwort */
+  .s{color:#a5d6ff}   /* Text */
+  .z{color:#79c0ff}   /* Zahl */
+  .c{color:#8b949e;font-style:italic}  /* Kommentar */
+  .f{color:#d2a8ff}   /* Funktion */
+
+  .aufgabe{border:1px solid var(--gruen);border-radius:8px;padding:14px 16px;
+           margin:20px 0;max-width:74ch;background:#0f1a17}
+  .aufgabe h4{margin:0 0 8px;color:var(--gruen);font-size:14px}
+
+  /* ---- Probierfeld ---- */
+  .probier{margin:18px 0;max-width:74ch}
+  .probier textarea{width:100%;height:130px;background:#010409;color:var(--text);
+      border:1px solid var(--rand);border-radius:7px;padding:11px;
+      font:13px/1.5 Consolas,monospace;resize:vertical}
+  .probier .knopfreihe{display:flex;gap:8px;margin-top:8px;align-items:center}
+  .ausgabe{background:#010409;border:1px solid var(--rand);border-left:3px solid var(--blau);
+      border-radius:6px;padding:10px 13px;margin-top:9px;
+      font:13px/1.6 Consolas,monospace;white-space:pre-wrap;min-height:20px}
+  .ausgabe.fehler{border-left-color:var(--rot);color:#ffa198}
+
+  button{background:#21262d;color:var(--text);border:1px solid var(--rand);
+      border-radius:6px;padding:7px 14px;cursor:pointer;font-size:13px}
+  button:hover{background:#30363d}
+  button.haupt{background:#1f6feb;border-color:#1f6feb;color:#fff}
+  button.haupt:hover{background:#388bfd}
+
+  #fussleiste{position:fixed;bottom:0;left:280px;right:0;
+      background:var(--karte);border-top:1px solid var(--rand);
+      padding:10px 34px;display:flex;gap:10px;align-items:center}
+  #fortschritt{color:var(--matt);font-size:12.5px;margin-left:auto}
+</style>
+
+<div id="liste">
+  <h1>Programmieren lernen</h1>
+  <div class="unter">am eigenen Chartlabor</div>
+  <div class="kapitel" style="border-left-color:var(--gruen)"
+       onclick="location.href='chartlabor.html'">
+    <span class="nr">↩</span><span>Zurück zum Chart</span>
+  </div>
+  <div id="kapitel"></div>
+</div>
+
+<div id="inhalt"></div>
+
+<div id="fussleiste">
+  <button id="zurueck">← Zurück</button>
+  <button id="weiter" class="haupt">Weiter →</button>
+  <button id="erledigt">Als erledigt markieren</button>
+  <span id="fortschritt"></span>
+</div>
+
+<script>
+"use strict";
+// ===================================================================
+// LERNPFAD
+// -------------------------------------------------------------------
+// Kein Kurs ueber Programmieren im Allgemeinen, sondern ueber DIESEN
+// Code. Jede Lektion zeigt eine echte Stelle aus chartlabor.html und
+// eine Aufgabe, deren Ergebnis man sofort im Chart sieht.
+//
+// Das Probierfeld fuehrt echtes JavaScript aus - im Browser, ohne
+// Server, ohne Claude. Wer hier tippt, verbraucht nichts.
+// ===================================================================
+
+const LEKTIONEN = [
+{
+  titel: "Was Code eigentlich ist",
+  text: `
+<p>Ein Programm ist eine <b>Liste von Anweisungen</b>, die von oben nach unten
+abgearbeitet wird. Mehr nicht. Was es schwierig aussehen lässt, sind die
+Abkürzungen, die sich Programmierer angewöhnt haben.</p>
+
+<p>Dein Chartlabor besteht aus ungefähr 700 solcher Zeilen. Hier eine davon,
+aus <code>chartlabor.html</code>:</p>
+
+<pre><code><span class="k">const</span> FIB_STUFEN = [<span class="z">0</span>, <span class="z">.236</span>, <span class="z">.382</span>, <span class="z">.5</span>, <span class="z">.618</span>, <span class="z">.786</span>, <span class="z">1</span>, <span class="z">1.272</span>, <span class="z">1.618</span>];</code></pre>
+
+<p>Auf Deutsch: <i>„Merke dir unter dem Namen FIB_STUFEN diese neun Zahlen."</i></p>
+
+<ul>
+<li><code>const</code> heißt „das hier ändert sich nicht mehr" (von <i>constant</i>)</li>
+<li><code>FIB_STUFEN</code> ist der <b>Name</b>, den du selbst vergibst</li>
+<li><code>[ ... ]</code> ist eine <b>Liste</b> (Fachwort: Array)</li>
+<li><code>;</code> beendet die Anweisung, wie ein Punkt im Satz</li>
+</ul>
+
+<div class="warum"><b>Warum GROSSBUCHSTABEN?</b> Reine Gewohnheit unter
+Programmierern: Namen in Großbuchstaben sagen „das ist eine feste Einstellung,
+die oben in der Datei steht". Der Computer ist das egal — es hilft dem
+Menschen, der den Code später liest. Dir zum Beispiel.</div>
+
+<h3>Probier es aus</h3>
+<p>Unten ist ein echtes Probierfeld. Der Code darin läuft wirklich.
+Drücke <b>Ausführen</b>.</p>
+`,
+  code: `const FIB_STUFEN = [0, .236, .382, .5, .618, .786, 1, 1.272, 1.618];
+
+zeige("Die Liste hat " + FIB_STUFEN.length + " Einträge");
+zeige("Der fünfte Eintrag ist " + FIB_STUFEN[4]);
+zeige("Das sind " + (FIB_STUFEN[4] * 100) + " Prozent");`,
+  aufgabe: `Ändere <code>FIB_STUFEN[4]</code> in <code>FIB_STUFEN[0]</code> und führe erneut aus.
+Was kommt heraus — und warum nicht 23,6 %?
+<br><br><b>Auflösung:</b> Programmierer zählen ab <b>null</b>. Der „fünfte" Eintrag
+hat die Nummer 4. Das ist die häufigste Stolperfalle überhaupt und hat einen
+eigenen Namen: <i>off-by-one</i>, der Fehler um eins.`
+},
+{
+  titel: "Werte ändern — deine Farben",
+  text: `
+<p>Jetzt änderst du zum ersten Mal etwas Echtes. In
+<code>chartlabor.html</code> steht diese Tabelle:</p>
+
+<pre><code><span class="k">const</span> FARBEN = [
+  [<span class="s">"gruen"</span>,   <span class="s">"Grün"</span>,    <span class="s">"#26a69a"</span>],
+  [<span class="s">"rot"</span>,     <span class="s">"Rot"</span>,     <span class="s">"#ef5350"</span>],
+  [<span class="s">"violett"</span>, <span class="s">"Violett"</span>, <span class="s">"#a78bfa"</span>],
+  [<span class="s">"gelb"</span>,    <span class="s">"Gelb"</span>,    <span class="s">"#d29922"</span>],
+  [<span class="s">"grau"</span>,    <span class="s">"Grau"</span>,    <span class="s">"#8b949e"</span>],
+];</code></pre>
+
+<p>Eine <b>Liste von Listen</b>. Jede Zeile hat drei Angaben: den internen
+Namen, die Beschriftung auf dem Knopf, und den Farbwert.</p>
+
+<p>Grau kam am 07.09. dazu — zusammen mit der <b>Füllung</b>. Grau und
+„kräftig" ergeben einen ausgegrauten Bereich. Du siehst hier gut, was eine
+Liste wert ist: <b>eine Zeile mehr, und der Knopf ist da.</b> Niemand musste
+dafür einen Knopf bauen — die Leiste liest die Liste.</p>
+
+<h3>Was ist #26a69a?</h3>
+<p>Eine Farbe in drei Portionen, als Hexadezimalzahl: <b>26</b> Rot,
+<b>a6</b> Grün, <b>9a</b> Blau. Jede Portion geht von <code>00</code>
+(nichts) bis <code>ff</code> (voll). Also viel Grün, mittel Blau, wenig Rot
+— ein Blaugrün.</p>
+
+<div class="warum"><b>Warum Hexadezimal?</b> Weil 16 Ziffern (0-9 und a-f)
+genau zwei Stellen je Farbportion brauchen — <code>00</code> bis
+<code>ff</code> sind 256 Stufen. Mit normalen Zahlen wäre es
+<code>rgb(38,166,154)</code>, das geht auch, ist nur länger.</div>
+`,
+  code: `// Eine Farbe zerlegen
+const farbe = "#26a69a";
+const rot   = parseInt(farbe.slice(1,3), 16);
+const gruen = parseInt(farbe.slice(3,5), 16);
+const blau  = parseInt(farbe.slice(5,7), 16);
+
+zeige("Rot:   " + rot);
+zeige("Grün:  " + gruen);
+zeige("Blau:  " + blau);
+zeigeFarbe(farbe, "So sieht das aus");`,
+  aufgabe: `<b>Am echten Chartlabor:</b> Öffne <code>chartlabor.html</code> in einem
+Texteditor (Rechtsklick → Öffnen mit → Editor), suche <code>FARBEN</code>
+und ändere bei Violett den Wert <code>#a78bfa</code> in <code>#ff00ff</code>.
+Speichern, im Browser <b>F5</b> drücken, einen Kasten in Violett zeichnen.
+<br><br>Danach wieder zurückändern — oder behalten, wenn es dir besser gefällt.
+Genau so entsteht Software: ändern, ansehen, entscheiden.`
+},
+{
+  titel: "Listen erweitern — eine Fibonacci-Stufe dazu",
+  text: `
+<p>Du wolltest Fibonacci-Level zeichnen. Die gibt es schon — aber welche
+Stufen angezeigt werden, bestimmst <b>du</b>.</p>
+
+<p>Manche Händler benutzen zusätzlich die Stufe <b>0,886</b> (ein tiefer
+Rücklauf, der oft noch hält) und <b>2,618</b> als weit entferntes Ziel.
+Beides einzubauen ist eine Zeile Arbeit.</p>
+
+<pre><code><span class="c">// vorher</span>
+<span class="k">const</span> FIB_STUFEN = [<span class="z">0</span>, <span class="z">.236</span>, <span class="z">.382</span>, <span class="z">.5</span>, <span class="z">.618</span>, <span class="z">.786</span>, <span class="z">1</span>, <span class="z">1.272</span>, <span class="z">1.618</span>];
+
+<span class="c">// nachher</span>
+<span class="k">const</span> FIB_STUFEN = [<span class="z">0</span>, <span class="z">.236</span>, <span class="z">.382</span>, <span class="z">.5</span>, <span class="z">.618</span>, <span class="z">.786</span>, <span class="z">.886</span>, <span class="z">1</span>, <span class="z">1.272</span>, <span class="z">1.618</span>, <span class="z">2.618</span>];</code></pre>
+
+<p>Der Rest des Programms muss <b>nicht</b> angefasst werden. Der Code, der
+die Linien zeichnet, geht die Liste einfach durch — egal wie lang sie ist:</p>
+
+<pre><code>FIB_STUFEN.<span class="f">forEach</span>(s =&gt; {
+  <span class="k">const</span> p = z.a.p + spanne * s;   <span class="c">// Preis dieser Stufe</span>
+  <span class="c">// ... Linie zeichnen ...</span>
+});</code></pre>
+
+<div class="warum"><b>Das ist die wichtigste Idee überhaupt.</b> Gut gebauter
+Code trennt die <i>Einstellungen</i> (welche Stufen) von der <i>Mechanik</i>
+(wie gezeichnet wird). Dann reicht eine Zahl in einer Liste, statt zehn Stellen
+im Programm zu suchen. Wenn dir jemals Code begegnet, wo du für eine neue
+Stufe an fünf Stellen etwas ändern musst — der ist schlecht gebaut.</div>
+
+<h3>Und die Farben?</h3>
+<p>Seit die Stufen wie bei TradingView jede ihre eigene Farbe haben, gibt es
+eine zweite Tabelle:</p>
+
+<pre><code><span class="k">const</span> FIB_FARBEN = {
+  <span class="z">0</span>:     <span class="s">"#9598a1"</span>,   <span class="c">// Grau</span>
+  <span class="z">0.236</span>: <span class="s">"#f23645"</span>,   <span class="c">// Rot</span>
+  <span class="c">// ...</span>
+};
+<span class="k">const</span> FIB_RUECKFALL = <span class="s">"#8b949e"</span>;</code></pre>
+
+<p><b>Wichtig:</b> Du musst dort <i>nichts</i> eintragen. Fügst du oben eine
+neue Stufe hinzu, für die keine Farbe hinterlegt ist, nimmt das Programm
+<code>FIB_RUECKFALL</code> — die Stufe wird gezeichnet, nur in Grau.</p>
+
+<div class="warum"><b>Warum das so gebaut ist.</b> Eine Tabelle, in die man
+<i>eintragen muss</i>, wird irgendwann vergessen — und dann fehlt eine Linie,
+ohne dass jemand eine Fehlermeldung sieht. Eine Tabelle mit Rückfallwert kann
+man vergessen, ohne Schaden anzurichten. <b>Baue Dinge so, dass Vergessen
+harmlos ist.</b></div>
+`,
+  code: `const spanne_tief = 61705;   // 0 %
+const spanne_hoch = 81479;   // 100 %
+const spanne = spanne_hoch - spanne_tief;
+
+const STUFEN = [0, .382, .5, .618, .786, .886, 1];
+
+STUFEN.forEach(s => {
+  const preis = spanne_tief + spanne * s;
+  zeige((s*100).toFixed(1).padStart(5) + " %   " + preis.toFixed(0) + " $");
+});`,
+  aufgabe: `Füge in der Liste <code>STUFEN</code> den Wert <code>1.618</code> hinzu
+und führe aus. Rechne die Zeile von Hand nach:
+<code>61705 + 19774 × 1,618 = ?</code>
+<br><br>Stimmt deine Rechnung mit der Ausgabe überein, hast du verstanden,
+was das Programm tut. <b>Das ist die Gegenprobe</b> — und die wichtigste
+Gewohnheit in diesem ganzen Projekt.`
+},
+{
+  titel: "Funktionen — Arbeit, die einen Namen hat",
+  text: `
+<p>Eine <b>Funktion</b> ist ein Stück Arbeit, dem man einen Namen gibt, damit
+man es immer wieder benutzen kann, ohne es neu zu schreiben.</p>
+
+<p>Im Chartlabor rechnet diese Funktion den gleitenden Durchschnitt
+(EMA) aus:</p>
+
+<pre><code><span class="k">function</span> <span class="f">ema</span>(werte, n){
+  <span class="k">const</span> k = <span class="z">2</span>/(n+<span class="z">1</span>);
+  <span class="k">let</span> v = <span class="k">null</span>;
+  <span class="k">for</span>(<span class="k">let</span> i=<span class="z">0</span>; i&lt;werte.length; i++){
+    v = (v===<span class="k">null</span>) ? werte[i] : werte[i]*k + v*(<span class="z">1</span>-k);
+  }
+  <span class="k">return</span> v;
+}</code></pre>
+
+<ul>
+<li><code>function ema(werte, n)</code> — Name und was reingeht: eine Liste
+Kurse und eine Länge</li>
+<li><code>return</code> — was rauskommt</li>
+<li>Aufruf: <code>ema(kurse, 50)</code> gibt den EMA 50 zurück</li>
+</ul>
+
+<h3>Was rechnet der EMA?</h3>
+<p>Einen Durchschnitt, bei dem <b>neue Kurse schwerer wiegen</b> als alte.
+Das <code>k</code> steuert wie stark: bei <code>n=50</code> ist
+<code>k = 2/51 ≈ 0,039</code>. Jeder neue Kurs geht also zu 3,9 % ein,
+der bisherige Durchschnitt zu 96,1 %.</p>
+
+<div class="warum"><b>Warum nicht einfach Summe geteilt durch Anzahl?</b>
+Das wäre der einfache Durchschnitt (SMA), den gibt es auch. Der EMA reagiert
+schneller auf Wendepunkte, dafür zappelt er mehr. Beides hat seine Berechtigung
+— und welcher besser ist, entscheidet man <b>durch Messen</b>, nicht durch
+Meinung.</div>
+`,
+  code: `function ema(werte, n){
+  const k = 2/(n+1);
+  let v = null;
+  for(let i=0; i<werte.length; i++){
+    v = (v===null) ? werte[i] : werte[i]*k + v*(1-k);
+  }
+  return v;
+}
+
+function sma(werte){
+  let s = 0;
+  for(const w of werte) s += w;
+  return s / werte.length;
+}
+
+const kurse = [100,102,101,105,110,108,115,120,118,125];
+
+zeige("Einfacher Durchschnitt : " + sma(kurse).toFixed(2));
+zeige("EMA mit n=3            : " + ema(kurse,3).toFixed(2));
+zeige("EMA mit n=9            : " + ema(kurse,9).toFixed(2));
+zeige("");
+zeige("Der EMA mit n=3 hängt näher am letzten Kurs (125),");
+zeige("weil er die alten Werte schneller vergisst.");`,
+  aufgabe: `Ändere die letzte Zahl in <code>kurse</code> von <code>125</code> auf
+<code>90</code> und führe aus. Beobachte, welcher der drei Werte sich am
+stärksten bewegt — und überlege, warum das so sein muss.`
+},
+{
+  titel: "Bedingungen — wann ist eine Kerze grün?",
+  text: `
+<p>Ein <code>if</code> ist eine Weiche: <i>wenn das zutrifft, mach dies,
+sonst jenes.</i></p>
+
+<p>So entscheidet dein Chartlabor die Farbe jeder einzelnen Kerze:</p>
+
+<pre><code><span class="k">const</span> auf = k.c &gt;= k.o;
+ctx.strokeStyle = ctx.fillStyle = auf ? <span class="s">"#26a69a"</span> : <span class="s">"#ef5350"</span>;</code></pre>
+
+<p><code>k.c</code> ist der Schlusskurs (<i>close</i>), <code>k.o</code> der
+Eröffnungskurs (<i>open</i>). Schloss die Kerze höher als sie öffnete, ist sie
+grün, sonst rot.</p>
+
+<p>Das <code>? :</code> ist eine Kurzschreibweise. Ausgeschrieben:</p>
+
+<pre><code><span class="k">if</span>(k.c &gt;= k.o){
+  farbe = <span class="s">"#26a69a"</span>;   <span class="c">// grün</span>
+} <span class="k">else</span> {
+  farbe = <span class="s">"#ef5350"</span>;   <span class="c">// rot</span>
+}</code></pre>
+
+<div class="warum"><b>Achte auf das <code>&gt;=</code> statt <code>&gt;</code>.</b>
+Eine Kerze, die genau auf dem Eröffnungskurs schließt, wird damit grün. Das ist
+eine <b>Entscheidung</b>, keine Naturgesetz — und genau solche Kleinigkeiten
+sind es, an denen sich zwei Programme unterscheiden, die angeblich dasselbe tun.</div>
+`,
+  code: `const kerzen = [
+  {o:100, c:105}, {o:105, c:103}, {o:103, c:103},
+  {o:103, c:110}, {o:110, c:98},
+];
+
+kerzen.forEach((k,i) => {
+  const auf = k.c >= k.o;
+  const richtung = auf ? "AUF " : "AB  ";
+  const prozent = ((k.c-k.o)/k.o*100).toFixed(2);
+  zeige("Kerze " + (i+1) + ": " + k.o + " -> " + k.c
+        + "  " + richtung + " " + prozent + "%");
+  zeigeFarbe(auf ? "#26a69a" : "#ef5350", "Kerze " + (i+1));
+});`,
+  aufgabe: `Die dritte Kerze öffnet und schließt bei 103 — sie gilt als AUF.
+Ändere <code>&gt;=</code> in <code>&gt;</code> und führe erneut aus.
+<br><br>Jetzt ist sie rot. <b>Welche Variante ist richtig?</b> Beide.
+Wichtig ist nur, dass man weiß, welche man gewählt hat — sonst wundert man
+sich später über Zahlen, die nicht zusammenpassen.`
+},
+{
+  titel: "Schleifen — 3308 Kerzen zeichnen",
+  text: `
+<p>Eine <b>Schleife</b> wiederholt Anweisungen. Ohne sie müsstest du für
+3308 Kerzen 3308 Zeilen schreiben.</p>
+
+<pre><code><span class="k">for</span>(<span class="k">let</span> i = <span class="z">0</span>; i &lt; kerzen.length; i++){
+  <span class="c">// hier passiert etwas mit kerzen[i]</span>
+}</code></pre>
+
+<p>Drei Teile, durch Semikolon getrennt:</p>
+<ol>
+<li><code>let i = 0</code> — womit fangen wir an</li>
+<li><code>i &lt; kerzen.length</code> — wie lange machen wir weiter</li>
+<li><code>i++</code> — was passiert nach jedem Durchgang (i wird eins größer)</li>
+</ol>
+
+<h3>Die Falle</h3>
+<p>Schreibt man versehentlich <code>i &lt;= kerzen.length</code>, läuft die
+Schleife einen Durchgang zu weit und greift auf eine Kerze zu, die es nicht
+gibt. Das Programm stürzt entweder ab oder rechnet still falsch.</p>
+
+<div class="warum"><b>Genau so ein Fehler ist mir heute unterlaufen.</b>
+Beim Suchen der Elliott-Wendepunkte hatte ich <code>break</code> an der
+falschen Stelle: die Schleife stieg aus, <i>bevor</i> das Ergebnis gespeichert
+war. Im Sekundenchart kam dadurch gar nichts heraus. Aufgefallen ist es nur,
+weil ich alle acht Zeitraster durchgetestet habe — bei sieben davon
+funktionierte es.</div>
+`,
+  code: `const kerzen = [100, 102, 101, 105, 110];
+
+zeige("--- richtig ---");
+for(let i = 0; i < kerzen.length; i++){
+  zeige("Kerze " + i + ": " + kerzen[i]);
+}
+
+zeige("");
+zeige("--- einen zu weit ---");
+for(let i = 0; i <= kerzen.length; i++){
+  zeige("Kerze " + i + ": " + kerzen[i]);
+}
+zeige("");
+zeige("Der letzte Wert ist 'undefined' - so heißt bei JavaScript");
+zeige("etwas, das es nicht gibt. Ein Absturz wäre besser: den");
+zeige("würde man sofort bemerken.");`,
+  aufgabe: `Baue die zweite Schleife so um, dass sie <b>rückwärts</b> läuft — von der
+letzten Kerze zur ersten.
+<br><br><b>Hilfe:</b> Anfang <code>let i = kerzen.length - 1</code>,
+Bedingung <code>i >= 0</code>, Schritt <code>i--</code>.`
+},
+{
+  titel: "Fehler finden — der Fall von heute",
+  text: `
+<p>Das Wichtigste am Programmieren ist nicht das Schreiben. Es ist das
+<b>Finden von Fehlern, die keine Fehlermeldung erzeugen</b>.</p>
+
+<h3>Was heute passiert ist</h3>
+<p>Ich habe die Kerzendaten so abgelegt:</p>
+
+<pre><code>BTCUSDT_<span class="s">1M</span>.json   <span class="c">// Monatskerzen  (M gross)</span>
+BTCUSDT_<span class="s">1m</span>.json   <span class="c">// Minutenkerzen (m klein)</span></code></pre>
+
+<p>Bei Binance sind das zwei verschiedene Zeitraster. <b>Auf Windows sind es
+dieselbe Datei.</b> Windows unterscheidet keine Groß- und Kleinschreibung in
+Dateinamen. Der Minuten-Abruf hat die Monatskerzen überschrieben — lautlos,
+ohne Fehlermeldung.</p>
+
+<h3>Warum es aufgefallen ist</h3>
+<p>Weil die Prüfung nicht gefragt hat <i>„ist die Datei da?"</i>, sondern
+<i>„enthält sie das Richtige?"</i>:</p>
+
+<pre><code>1M    <span class="z">43202</span> Kerzen  ab 7.8.2026     <span class="c">&lt;-- 109 erwartet, ab 2017</span></code></pre>
+
+<p>Eine Existenzprüfung hätte „alles in Ordnung" gemeldet. Die Datei war ja da.</p>
+
+<div class="warum"><b>Die Regel, die daraus folgt</b> — sie steht schon in
+deiner <code>CLAUDE.md</code>: <i>Werte ansehen, nicht ihre Anzahl.</i>
+Prüfmuster: Dinge, die identisch sein <b>dürfen</b>, aber nicht identisch sein
+<b>sollten</b>. Zwei Zeitraster mit exakt gleicher Kerzenzahl sind verdächtig.
+Zwei Kurse zu verschiedenen Zeitpunkten auch.</div>
+`,
+  code: `// So sah die kaputte Prüfung aus
+function pruefungAlt(dateien){
+  return dateien.every(d => d.existiert);
+}
+
+// So sieht die gute aus
+function pruefungGut(dateien){
+  return dateien.every(d =>
+    d.existiert && d.intervall === d.erwartet && d.anzahl > 0
+  );
+}
+
+const zustand = [
+  {name:"1d",   existiert:true, intervall:"1d", erwartet:"1d", anzahl:3308},
+  {name:"1M",   existiert:true, intervall:"1m", erwartet:"1M", anzahl:43202},
+];
+
+zeige("Alte Prüfung sagt : " + (pruefungAlt(zustand) ? "alles in Ordnung" : "Fehler!"));
+zeige("Gute Prüfung sagt : " + (pruefungGut(zustand) ? "alles in Ordnung" : "Fehler!"));
+zeige("");
+zustand.forEach(d => {
+  const ok = d.intervall === d.erwartet;
+  zeige((ok ? "OK  " : "!!  ") + d.name + ": Datei sagt '" + d.intervall +
+        "', erwartet '" + d.erwartet + "'");
+});`,
+  aufgabe: `Ergänze <code>pruefungGut</code> um eine weitere Bedingung: keine zwei
+Einträge dürfen dieselbe <code>anzahl</code> haben.
+<br><br><b>Hilfe:</b> <code>new Set(dateien.map(d => d.anzahl)).size === dateien.length</code>
+— ein <i>Set</i> wirft Doppelte weg, also verrät die Länge, ob es welche gab.`
+},
+{
+  titel: "Dein eigenes Werkzeug bauen",
+  text: `
+<p>Jetzt der ganze Weg. Du baust ein neues Zeichenwerkzeug in dein
+Chartlabor: eine <b>senkrechte Linie</b>, um einen Zeitpunkt zu markieren.</p>
+
+<h3>Schritt 1 — in die Werkzeugliste eintragen</h3>
+<p>Suche in <code>chartlabor.html</code> nach <code>const WERKZEUG</code>
+und füge eine Zeile hinzu:</p>
+<pre><code><span class="k">const</span> WERKZEUG = [
+  [<span class="s">"zeiger"</span>,   <span class="s">"Zeiger"</span>],
+  <span class="c">// ... die anderen ...</span>
+  [<span class="s">"senk"</span>,     <span class="s">"Senkrechte"</span>],   <span class="c">// &lt;-- neu</span>
+];</code></pre>
+<p>Speichern, <b>F5</b> — der Knopf ist da. Er tut nur noch nichts.</p>
+
+<h3>Schritt 2 — das Zeichnen beibringen</h3>
+<p>Suche <code>function zeichnungMalen</code>. Dort steht für jede Art ein
+Block. Füge deinen dazu:</p>
+<pre><code>  <span class="k">if</span>(z.art===<span class="s">"senk"</span>){
+    ctx.strokeStyle = F;
+    ctx.<span class="f">beginPath</span>();
+    ctx.<span class="f">moveTo</span>(xa, plotO);
+    ctx.<span class="f">lineTo</span>(xa, plotU);
+    ctx.<span class="f">stroke</span>();
+  }</code></pre>
+
+<p>Was passiert da:</p>
+<ul>
+<li><code>xa</code> ist der Bildpunkt, an dem du geklickt hast</li>
+<li><code>plotO</code> und <code>plotU</code> sind oberer und unterer Rand
+des Chartbereichs</li>
+<li><code>beginPath / moveTo / lineTo / stroke</code> — Stift ansetzen,
+hinfahren, ziehen, sichtbar machen</li>
+</ul>
+
+<h3>Schritt 3 — ausprobieren</h3>
+<p>Speichern, F5, Werkzeug „Senkrechte" wählen, auf den Chart ziehen.</p>
+
+<div class="warum"><b>Wenn nichts passiert:</b> Drücke <b>F12</b>, gehe auf
+„Konsole". Dort stehen Fehlermeldungen. Ein vergessenes <code>}</code> oder
+ein Komma zu wenig — die Meldung sagt dir die Zeilennummer. Das ist kein
+Versagen, das ist der normale Arbeitsablauf. Auch bei mir.</div>
+`,
+  code: `// Das Zeichnen auf einer Leinwand ist wie mit einem Stift arbeiten.
+// Hier simuliert, damit du die Reihenfolge siehst:
+
+const stift = { x:0, y:0, unten:false, spur:[] };
+
+function beginPath(){ stift.spur = []; zeige("beginPath()  - neuer Zug"); }
+function moveTo(x,y){ stift.x=x; stift.y=y; zeige(\`moveTo(\${x},\${y})  - hinfahren, ohne zu malen\`); }
+function lineTo(x,y){ stift.spur.push([stift.x,stift.y,x,y]); stift.x=x; stift.y=y;
+                      zeige(\`lineTo(\${x},\${y})  - Strecke vormerken\`); }
+function stroke(){ zeige("stroke()  - jetzt erst wird gemalt: " + stift.spur.length + " Strecke(n)"); }
+
+// Eine Senkrechte von oben nach unten
+beginPath();
+moveTo(300, 10);
+lineTo(300, 400);
+stroke();
+
+zeige("");
+zeige("Ohne stroke() bliebe der Chart leer - das ist der Fehler,");
+zeige("den man beim ersten eigenen Werkzeug fast immer macht.");`,
+  aufgabe: `Baue die Senkrechte wirklich in dein Chartlabor ein, wie oben beschrieben.
+<br><br>Wenn sie steht: mach sie <b>gestrichelt</b>. Vor <code>beginPath()</code>
+die Zeile <code>ctx.setLineDash([5,4]);</code> einfügen und danach
+<code>ctx.setLineDash([]);</code> — sonst sind alle folgenden Linien auch
+gestrichelt.
+<br><br><b>Das ist übrigens ein echter Fehlertyp:</b> eine Einstellung setzen
+und vergessen zurückzusetzen. Er trifft immer etwas ganz anderes als die
+Stelle, an der man ihn gemacht hat.`
+},
+];
+
+// ===================================================================
+// Anzeige
+// ===================================================================
+let aktuell = 0;
+let fertig = new Set();
+
+try{ fertig = new Set(JSON.parse(localStorage.getItem("lernpfad_fertig")) || []); }catch(e){}
+
+function listeBauen(){
+  const box = document.getElementById("kapitel");
+  box.innerHTML = "";
+  LEKTIONEN.forEach((l,n)=>{
+    const d = document.createElement("div");
+    d.className = "kapitel" + (n===aktuell?" an":"") + (fertig.has(n)?" fertig":"");
+    d.innerHTML = `<span class="nr">${n+1}</span><span>${l.titel}</span>`;
+    d.onclick = ()=>{ aktuell=n; anzeigen(); };
+    box.appendChild(d);
+  });
+  const p = Math.round(fertig.size/LEKTIONEN.length*100);
+  document.getElementById("fortschritt").textContent =
+    `${fertig.size} von ${LEKTIONEN.length} erledigt · ${p} %`;
+}
+
+function anzeigen(){
+  const l = LEKTIONEN[aktuell];
+  const inhalt = document.getElementById("inhalt");
+  inhalt.innerHTML = `
+    <h2>${aktuell+1}. ${l.titel}</h2>
+    ${l.text}
+    <div class="probier">
+      <textarea id="feld" spellcheck="false"></textarea>
+      <div class="knopfreihe">
+        <button class="haupt" id="ausfuehren">Ausführen</button>
+        <button id="zuruecksetzen">Zurücksetzen</button>
+      </div>
+      <div class="ausgabe" id="ausgabe">(noch nichts ausgeführt)</div>
+    </div>
+    <div class="aufgabe">
+      <h4>Aufgabe</h4>
+      ${l.aufgabe}
+    </div>`;
+  document.getElementById("feld").value = l.code;
+  document.getElementById("ausfuehren").onclick = ausfuehren;
+  document.getElementById("zuruecksetzen").onclick = ()=>{
+    document.getElementById("feld").value = LEKTIONEN[aktuell].code;
+  };
+  inhalt.scrollTop = 0;
+  listeBauen();
+}
+
+function ausfuehren(){
+  const feld = document.getElementById("feld");
+  const box = document.getElementById("ausgabe");
+  const zeilen = [];
+  box.className = "ausgabe";
+  const zeige = t => zeilen.push(String(t));
+  // Farbfelder werden als eigener Eintrag gemerkt, nicht als Text mit
+  // Trennzeichen. Die erste Fassung baute eine Zeichenkette mit "__"
+  // dazwischen und zerlegte sie danach wieder - das ging schief, sobald
+  // ein Text selbst zwei Unterstriche enthielt.
+  const zeigeFarbe = (hex,text="") => zeilen.push({hex, text});
+
+  const sicher = t => String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+
+  try{
+    // Bewusst new Function statt eval: der Code sieht nur zeige und
+    // zeigeFarbe, nicht die Variablen dieser Seite. Ein Tippfehler
+    // kann den Lernpfad damit nicht durcheinanderbringen.
+    new Function("zeige","zeigeFarbe", feld.value)(zeige, zeigeFarbe);
+    box.innerHTML = zeilen.length
+      ? zeilen.map(z=>{
+          if(typeof z === "object" && z.hex){
+            return `<span style="display:inline-block;width:13px;height:13px;`+
+                   `background:${sicher(z.hex)};border:1px solid #30363d;`+
+                   `border-radius:3px;vertical-align:-2px;margin-right:7px"></span>`+
+                   `${sicher(z.hex)}  ${sicher(z.text)}`;
+          }
+          return sicher(z);
+        }).join("\n")
+      : "(kein Ergebnis - benutze zeige(...) um etwas auszugeben)";
+  }catch(e){
+    box.className = "ausgabe fehler";
+    box.textContent = e.name + ": " + e.message +
+      "\n\nDas ist normal. Lies die Meldung, sie sagt meist genau, was fehlt.";
+  }
+}
+
+document.getElementById("weiter").onclick = ()=>{
+  if(aktuell < LEKTIONEN.length-1){ aktuell++; anzeigen(); }
+};
+document.getElementById("zurueck").onclick = ()=>{
+  if(aktuell > 0){ aktuell--; anzeigen(); }
+};
+document.getElementById("erledigt").onclick = ()=>{
+  fertig.has(aktuell) ? fertig.delete(aktuell) : fertig.add(aktuell);
+  try{ localStorage.setItem("lernpfad_fertig", JSON.stringify([...fertig])); }catch(e){}
+  listeBauen();
+};
+
+anzeigen();
+</script>

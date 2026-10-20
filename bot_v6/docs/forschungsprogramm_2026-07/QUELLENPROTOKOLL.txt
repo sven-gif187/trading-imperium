@@ -1,0 +1,41 @@
+2026-07-30T18:45:51Z  BTCUSDT 1d  3270 Zeilen  2017-08-17..2026-07-30  Quelle: data-api.binance.vision/api/v3/klines
+2026-07-30T18:46:00Z  ETHUSDT 1d  3270 Zeilen  2017-08-17..2026-07-30  Quelle: data-api.binance.vision/api/v3/klines
+2026-07-30T18:46:09Z  SOLUSDT 1d  2180 Zeilen  2020-08-11..2026-07-30  Quelle: data-api.binance.vision/api/v3/klines
+2026-07-30T18:46:19Z  ADAUSDT 1d  3027 Zeilen  2018-04-17..2026-07-30  Quelle: data-api.binance.vision/api/v3/klines
+2026-07-30T18:46:25Z  AVAXUSDT 1d  2138 Zeilen  2020-09-22..2026-07-30  Quelle: data-api.binance.vision/api/v3/klines
+2026-07-30T18:46:33Z  LINKUSDT 1d  2753 Zeilen  2019-01-16..2026-07-30  Quelle: data-api.binance.vision/api/v3/klines
+2026-07-30T18:46:39Z  DOTUSDT 1d  2173 Zeilen  2020-08-18..2026-07-30  Quelle: data-api.binance.vision/api/v3/klines
+2026-07-30T18:46:46Z  DOGEUSDT 1d  2583 Zeilen  2019-07-05..2026-07-30  Quelle: data-api.binance.vision/api/v3/klines
+2026-07-30T18:46:53Z  NEARUSDT 1d  2116 Zeilen  2020-10-14..2026-07-30  Quelle: data-api.binance.vision/api/v3/klines
+2026-07-30T18:46:59Z  UNIUSDT 1d  2143 Zeilen  2020-09-17..2026-07-30  Quelle: data-api.binance.vision/api/v3/klines
+2026-07-30T18:47:06Z  ATOMUSDT 1d  2650 Zeilen  2019-04-29..2026-07-30  Quelle: data-api.binance.vision/api/v3/klines
+2026-07-30T18:47:15Z  XRPUSDT 1d  3010 Zeilen  2018-05-04..2026-07-30  Quelle: data-api.binance.vision/api/v3/klines
+2026-07-30T18:48:07Z  BTCUSDT 4h  19602 Zeilen  2017-08-17..2026-07-30  Quelle: data-api.binance.vision/api/v3/klines
+2026-07-30T18:48:59Z  ETHUSDT 4h  19602 Zeilen  2017-08-17..2026-07-30  Quelle: data-api.binance.vision/api/v3/klines
+2026-07-30T18:49:00Z  BTCUSDT funding  500 Zeilen  2026-02-14..2026-07-30  Quelle: fapi.binance.com/fapi/v1/fundingRate
+2026-07-30T18:49:01Z  ETHUSDT funding  500 Zeilen  2026-02-14..2026-07-30  Quelle: fapi.binance.com/fapi/v1/fundingRate
+2026-07-30T18:49:01Z  SOLUSDT funding  500 Zeilen  2026-02-14..2026-07-30  Quelle: fapi.binance.com/fapi/v1/fundingRate
+2026-07-30T18:49:02Z  ADAUSDT funding  500 Zeilen  2026-02-14..2026-07-30  Quelle: fapi.binance.com/fapi/v1/fundingRate
+2026-07-30T18:49:03Z  AVAXUSDT funding  500 Zeilen  2026-02-14..2026-07-30  Quelle: fapi.binance.com/fapi/v1/fundingRate
+2026-07-30T18:49:04Z  LINKUSDT funding  500 Zeilen  2026-02-14..2026-07-30  Quelle: fapi.binance.com/fapi/v1/fundingRate
+2026-07-30T18:49:04Z  DOTUSDT funding  500 Zeilen  2026-02-14..2026-07-30  Quelle: fapi.binance.com/fapi/v1/fundingRate
+2026-07-30T18:49:05Z  DOGEUSDT funding  500 Zeilen  2026-02-14..2026-07-30  Quelle: fapi.binance.com/fapi/v1/fundingRate
+2026-07-30T18:49:05Z  NEARUSDT funding  500 Zeilen  2026-02-14..2026-07-30  Quelle: fapi.binance.com/fapi/v1/fundingRate
+2026-07-30T18:49:06Z  UNIUSDT funding  500 Zeilen  2026-02-14..2026-07-30  Quelle: fapi.binance.com/fapi/v1/fundingRate
+2026-07-30T18:49:06Z  ATOMUSDT funding  500 Zeilen  2026-02-14..2026-07-30  Quelle: fapi.binance.com/fapi/v1/fundingRate
+2026-07-30T18:49:07Z  XRPUSDT funding  500 Zeilen  2026-02-14..2026-07-30  Quelle: fapi.binance.com/fapi/v1/fundingRate
+2026-07-30T18:49:08Z  FRED DTWEXBGS  5366 Zeilen  Quelle: fred.stlouisfed.org fredgraph.csv
+2026-07-30T18:49:08Z  FRED DTWEXAFEGS  5366 Zeilen  Quelle: fred.stlouisfed.org fredgraph.csv
+2026-07-30T18:57:37Z  KORREKTUR: Funding-Erstdateien waren auf ~500 juengste Eintraege verkuerzt (startTime=0-Fehler). Neuabruf mit 90-Tage-Fenstern ab 2019-09-01.
+2026-07-30T18:57:37Z  BTCUSDT funding v2  7547 Zeilen  2019-09-10..2026-07-30  Quelle: fapi.binance.com/fapi/v1/fundingRate (Fenster-Pagination)
+2026-07-30T18:57:37Z  ETHUSDT funding v2  7313 Zeilen  2019-11-27..2026-07-30  Quelle: fapi.binance.com/fapi/v1/fundingRate (Fenster-Pagination)
+2026-07-30T18:57:37Z  SOLUSDT funding v2  6514 Zeilen  2020-09-13..2026-07-30  Quelle: fapi.binance.com/fapi/v1/fundingRate (Fenster-Pagination)
+2026-07-30T18:57:37Z  ADAUSDT funding v2  7153 Zeilen  2020-01-19..2026-07-30  Quelle: fapi.binance.com/fapi/v1/fundingRate (Fenster-Pagination)
+2026-07-30T18:57:37Z  AVAXUSDT funding v2  6412 Zeilen  2020-09-22..2026-07-30  Quelle: fapi.binance.com/fapi/v1/fundingRate (Fenster-Pagination)
+2026-07-30T18:57:37Z  LINKUSDT funding v2  7160 Zeilen  2020-01-17..2026-07-30  Quelle: fapi.binance.com/fapi/v1/fundingRate (Fenster-Pagination)
+2026-07-30T18:57:37Z  DOTUSDT funding v2  6512 Zeilen  2020-08-20..2026-07-30  Quelle: fapi.binance.com/fapi/v1/fundingRate (Fenster-Pagination)
+2026-07-30T18:57:37Z  DOGEUSDT funding v2  6635 Zeilen  2020-07-10..2026-07-30  Quelle: fapi.binance.com/fapi/v1/fundingRate (Fenster-Pagination)
+2026-07-30T18:57:37Z  NEARUSDT funding v2  6346 Zeilen  2020-10-14..2026-07-30  Quelle: fapi.binance.com/fapi/v1/fundingRate (Fenster-Pagination)
+2026-07-30T18:57:37Z  UNIUSDT funding v2  6428 Zeilen  2020-09-17..2026-07-30  Quelle: fapi.binance.com/fapi/v1/fundingRate (Fenster-Pagination)
+2026-07-30T18:57:37Z  ATOMUSDT funding v2  7099 Zeilen  2020-02-06..2026-07-30  Quelle: fapi.binance.com/fapi/v1/fundingRate (Fenster-Pagination)
+2026-07-30T18:57:37Z  XRPUSDT funding v2  7193 Zeilen  2020-01-06..2026-07-30  Quelle: fapi.binance.com/fapi/v1/fundingRate (Fenster-Pagination)

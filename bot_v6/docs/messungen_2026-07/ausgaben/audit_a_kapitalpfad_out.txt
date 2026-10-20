@@ -1,0 +1,71 @@
+====================================================================================================
+ BLOCK A - REICHWEITE DER KAPITALERSCHOEPFUNG
+ Read-only, kein Trial. Stand 03.08.2026
+====================================================================================================
+
+  Jahr 2
+    Nominalzeitraum      366 Tage (2025-07-29 .. 2026-07-29)
+    Erster Eintritt      2025-09-26
+    LETZTER Eintritt     2026-02-15
+    Gehandelte Spanne    143 Tage = 39.1 % des Nominaljahres
+    Tage MIT Eintritt    104 (28.4 % der Kalendertage)
+    Trades               1480
+    Netto-P&L            -450.56 $
+    Endkapital (bar)     49.44 $  (Handelsschwelle: 50.00 $)
+    Eigenkapital erstmals unter 50 $: 2025-11-16
+    BTC-Halten NOMINAL   -227.50 $
+    BTC-Halten IST-SPANNE-186.48 $  (nur 2025-09-26..2026-02-15)
+
+  Jahr 1
+    Nominalzeitraum      366 Tage (2024-07-29 .. 2025-07-29)
+    Erster Eintritt      2024-08-05
+    LETZTER Eintritt     2025-04-16
+    Gehandelte Spanne    255 Tage = 69.7 % des Nominaljahres
+    Tage MIT Eintritt    43 (11.7 % der Kalendertage)
+    Trades               783
+    Netto-P&L            -313.44 $
+    Endkapital (bar)     186.56 $  (Handelsschwelle: 50.00 $)
+    Eigenkapital erstmals unter 50 $: 2025-03-11
+    BTC-Halten NOMINAL   +380.63 $
+    BTC-Halten IST-SPANNE+277.41 $  (nur 2024-08-05..2025-04-16)
+
+====================================================================================================
+ A4 - F3-BENCHMARK: nominal gegen tatsaechlich gehandelt
+====================================================================================================
+
+    Jahr        Bot P&L   Halten NOM   Diff NOM   Halten IST   Diff IST
+    --------------------------------------------------------------------
+    Jahr 2     -450.56$     -227.50$   -223.06$     -186.48$   -264.08$
+    Jahr 1     -313.44$     +380.63$   -694.07$     +277.41$   -590.85$
+
+    'Diff NOM' ist die bisher berichtete F3-Zahl (Bot minus
+    Halten ueber das volle Jahr). 'Diff IST' vergleicht nur den
+    Zeitraum, in dem der Bot ueberhaupt handelte.
+
+    ACHTUNG: Auch 'Diff IST' ist keine saubere Korrektur. Der Bot
+    haelt in seiner Spanne nicht durchgehend Positionen, und sein
+    Einsatz schrumpft mit dem Kapital. Eine belastbare Benchmark
+    braucht konstanten Einsatz - das bricht den Kontrollanker.
+    Beide Zahlen sind daher Naeherungen, keine Ersatzmessung.
+
+====================================================================================================
+ A2 - DATENBASIS DER GATE-BATTERIEN (Gegenprobe)
+====================================================================================================
+
+    Die Gate-Batterien T-016..T-033 laufen auf einer ANDEREN Datenbasis:
+      Harness (E1/E2/E5/G2):  data_store/backtest/*_15m.csv, 2024-07..2026-07
+      Gate-Batterien:         docs/forschungsprogramm_2026-07/daten/klines_1d/,
+                              2017-08..2023-12
+    Zeitliche Ueberschneidung: KEINE.
+
+    Zusaetzlich kennen die Gate-Skripte keinen Kapitalpfad. Belege:
+      batterie_h1.py netto_evs():   (exit/entry - 1)*100 - c
+        -> reine Prozentrechnung je Runde, kein Eigenkapital, keine
+           Positionsgroesse, keine Mindestbetragsschwelle.
+      batterie_h1.py runden_aus_signal(): erzeugt Runden allein aus der
+        Signalserie; es gibt keine Bedingung, die eine Runde wegen
+        fehlenden Kapitals unterdruecken koennte.
+      batterie_h5.py und neubewertung_v12.py nutzen dieselben Funktionen.
+
+    Eine Kapitalerschoepfung ist in dieser Konstruktion nicht moeglich.
+    

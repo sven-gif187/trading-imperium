@@ -1,0 +1,56 @@
+====================================================================================================
+ H2-BATTERIE  T-025..T-028  |  Register v1.0/v1.1  |  Seed 20260730
+ Funding-Historie ab 2019-09/11; Entwicklungszeitraum bis 2023-12-31
+====================================================================================================
+
+  T-025  E-neg (Long nach Kapitulations-Funding) | BTCUSDT   Events=30 (nach 14d-De-Overlap)
+    Horizont  Event-Mittel  Placebo-Mittel   Plc 5.P  Plc 95.P
+          1d       -1.057%         +0.037%   -0.845%   +1.127%
+          3d       +0.144%         +0.487%   -1.272%   +2.519%
+          7d       +3.554%         +1.284%   -1.844%   +5.572%
+         14d       +4.899%         +2.449%   -1.521%   +8.044%
+    Segmente (7d brutto): S-B: +5.352% (n=12)  S-C: +2.544% (n=14)
+    7d NETTO K-BASIS : EV +2.954%  KI [+0.101 ; +5.652]  p=0.0185
+    7d NETTO K-MAKER : EV +3.294%  KI [+0.441 ; +5.992]  p=0.0095
+    Placebo 7d: echt +3.554% vs 95.P +5.572%  Rang 88. Perzentil -> NICHT geschlagen
+    URTEIL T-025: REJECTED (Placebo)
+
+  T-026  E-neg (Long nach Kapitulations-Funding) | ETHUSDT   Events=25 (nach 14d-De-Overlap)
+    Horizont  Event-Mittel  Placebo-Mittel   Plc 5.P  Plc 95.P
+          1d       +1.793%         +0.449%   -1.052%   +1.986%
+          3d       +2.153%         +0.202%   -1.907%   +3.068%
+          7d       +4.214%         +2.062%   -2.791%   +9.860%
+         14d       +4.427%         +3.414%   -1.401%   +9.458%
+    Segmente (7d brutto): S-B: +14.191% (n=4)  S-C: +2.626% (n=20)
+    7d NETTO K-BASIS : EV +3.614%  KI [-1.412 ; +8.880]  p=0.0865
+    7d NETTO K-MAKER : EV +3.954%  KI [-1.072 ; +9.220]  p=0.0665
+    Placebo 7d: echt +4.214% vs 95.P +9.860%  Rang 85. Perzentil -> NICHT geschlagen
+    URTEIL T-026: INCONCLUSIVE (n<30)
+
+  T-027  E-pos (Warnsignal bei Ueberhitzung) | BTCUSDT   Events=16 (nach 14d-De-Overlap)
+    Horizont  Event-Mittel  Placebo-Mittel   Plc 5.P  Plc 95.P
+          1d       -0.649%         +0.120%   -1.286%   +1.635%
+          3d       +0.775%         +0.679%   -2.074%   +3.752%
+          7d       -0.556%         +1.754%   -2.551%   +5.567%
+         14d       -1.917%         +2.565%   -3.986%   +9.078%
+    Segmente (7d brutto): S-B: -0.523% (n=15)
+    Placebo 7d: echt -0.556% vs 5.P -2.551%  Rang-p (einseitig, schlechter=Info) = 0.200
+    URTEIL T-027: INCONCLUSIVE (n<30)
+
+  T-028  E-pos (Warnsignal bei Ueberhitzung) | ETHUSDT   Events=18 (nach 14d-De-Overlap)
+    Horizont  Event-Mittel  Placebo-Mittel   Plc 5.P  Plc 95.P
+          1d       +2.435%         +0.073%   -1.487%   +2.271%
+          3d       +5.582%         +0.672%   -2.662%   +4.497%
+          7d       +5.927%         +1.955%   -2.861%   +7.633%
+         14d       +7.784%         +4.049%   -3.577%  +12.916%
+    Segmente (7d brutto): S-B: +5.927% (n=18)
+    Placebo 7d: echt +5.927% vs 5.P -2.861%  Rang-p (einseitig, schlechter=Info) = 0.925
+    URTEIL T-028: INCONCLUSIVE (n<30)
+
+====================================================================================================
+ p-WERTE FUER DIE GEMEINSAME FDR
+====================================================================================================
+    T-025  p=0.0185  REJECTED (Placebo)       neg BTCUSDT
+    T-026  p=0.0865  INCONCLUSIVE (n<30)      neg ETHUSDT
+    T-027  p=0.2000  INCONCLUSIVE (n<30)      pos BTCUSDT
+    T-028  p=0.9250  INCONCLUSIVE (n<30)      pos ETHUSDT

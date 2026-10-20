@@ -1,0 +1,104 @@
+====================================================================================================
+ MESSUNG F1e - Maker statt Taker auf den realen Trades
+ Snapshot: eingangsdaten/trades_v5_snapshot_2026-07-30.json
+====================================================================================================
+
+  Journal: 950 verwertbare Eintraege (524 BUY / 426 SELL)
+  Eintraege OHNE Gebuehrenfeld: 581 (61.2 %) - bekannte Protokolluecke, app.py:1860-1865
+  Geschlossene Positionen: 419   offene: 5 (ADA/USDC, AVAX/USDC, DOT/USDC, ETH/USDC, SOL/USDC)
+  Geister-Verkaeufe (ohne Bestand, NICHT als Erloes gewertet): 2
+    SOL/USDC   2026-06-13T16:23:08  0.000000 Stueck  0.00 $
+    SOL/USDC   2026-06-26T16:01:57  1.701317 Stueck  123.78 $
+  Umgeschlagenes Volumen (geschlossene Pos.): Kauf 30,730.08 $ / Verkauf 30,730.79 $ = 61,460.86 $ Gesamtnotional
+
+  OFFENE POSITIONEN - Bewertung zum letzten Kerzen-Close (2026-07-29)
+    Coin                Menge   Einstand $       Kurs $     Wert $  unreal. P&L $
+    ------------------------------------------------------------------------------
+    ADA/USDC       320.779720       0.1611       0.1665      53.41          +1.73
+    AVAX/USDC        8.129881       6.4426       6.4640      52.55          +0.17
+    DOT/USDC        68.127421       0.7646       0.7720      52.59          +0.51
+    ETH/USDC         0.027408    1911.3959    1916.4900      52.53          +0.14
+    SOL/USDC         0.711654      73.5857      74.1300      52.75          +0.39
+    ------------------------------------------------------------------------------
+    SUMME                                                                   +2.94
+    Diese Zahl ist NICHT in den Szenarien unten enthalten - dort stehen
+    ausschliesslich realisierte Ergebnisse geschlossener Positionen.
+
+====================================================================================================
+ F1e-1  P&L der geschlossenen Positionen je Kostenmodell
+====================================================================================================
+
+    Szenario                                                  P&L $  Gebuehren $      vs S1
+    ----------------------------------------------------------------------------------------
+    S0  Ist, Gebuehr aus dem Journal (unvollstaendig)        -26.16        26.87          -
+    S1  Ist, Gebuehr konsistent 0,100 % Taker                -60.75        61.46      Basis
+    S2  Maker 0,100 % (fees.py:9: = Taker), Market-Slippage     -60.75        61.46      +0.00
+    S3  Limit, keine Slippage, Gebuehr 0,100 %               -30.02        61.46     +30.73
+    S4  Limit, keine Slippage, Gebuehr 0,075 % (BNB)         -14.66        46.10     +46.10
+    S5  Gebuehr 0 %, keine Slippage (physikalische Grenze)     +31.44         0.00     +92.19
+
+    Slippage-Bandbreite (Unsicherheit ueber das je Trade gezogene s):
+      s = 0,02 % (Untergrenze engine.py:243)     Ist    -42.32 $   Limit    -30.02 $   Ersparnis   +12.29 $
+      s = 0,05 % (Erwartungswert)                Ist    -60.75 $   Limit    -30.02 $   Ersparnis   +30.73 $
+      s = 0,08 % (Obergrenze engine.py:243)      Ist    -79.19 $   Limit    -30.02 $   Ersparnis   +49.17 $
+      (Der Limit-Wert haengt nicht von s ab - dort gibt es keine Slippage.)
+
+    Kostenanteile bezogen auf S1
+      Gebuehren 0,100 % auf 61,460.86 $ Notional :    61.46 $
+      Slippage  0,050 % auf 61,460.86 $ Notional :    30.73 $
+      Summe Reibung                                    :    92.19 $
+      P&L ohne jede Reibung (S5)                       :   +31.44 $
+
+    GESAMTBILD - realisiert PLUS offene Positionen
+      Szenario                                              realisiert     offen    gesamt
+      ------------------------------------------------------------------------------------
+      S0  Ist, Gebuehr aus dem Journal (unvollstaendig)         -26.16     +2.94    -23.22
+      S1  Ist, Gebuehr konsistent 0,100 % Taker                 -60.75     +2.94    -57.81
+      S2  Maker 0,100 % (fees.py:9: = Taker), Market-Slippage      -60.75     +2.94    -57.81
+      S3  Limit, keine Slippage, Gebuehr 0,100 %                -30.02     +2.94    -27.08
+      S4  Limit, keine Slippage, Gebuehr 0,075 % (BNB)          -14.66     +2.94    -11.72
+      S5  Gebuehr 0 %, keine Slippage (physikalische Grenze)      +31.44     +2.94    +34.38
+      Die offenen Positionen sind in allen Szenarien gleich angesetzt -
+      ihr Ergebnis haengt vom Ausstieg ab, den es noch nicht gibt.
+
+====================================================================================================
+ F1e-2  Wie viele Limit-Orders waeren NICHT gefuellt worden?
+====================================================================================================
+
+  Geschaetzt auf den 15m-Kerzen beider Jahre. Eine Limit-Order gilt
+  als beruehrt, wenn der Kurs sie innerhalb des Wartefensters erreicht.
+  Beruehrung ist die OBERGRENZE der Fuellquote: Warteschlangenposition,
+  Teilfuellung und Ordergroesse sind hier nicht abgebildet.
+
+  Jahr 2  2025-07..2026-07
+    Wartefenster   Variante             Fill BUY  Fill SELL  nicht gefuellt |  E[r] alle  E[r] gefuellt   Selektion
+    ------------------------------------------------------------------------------------------------------------
+    15 min         am Close                95.3%      95.0%            4.7% |    -0.002%        -0.021%     -0.019%
+    15 min         0,05 % passiver         79.3%      78.6%           20.7% |    -0.002%        -0.026%     -0.024%
+    1 h            am Close                97.7%      97.6%            2.3% |    -0.008%        -0.027%     -0.019%
+    1 h            0,05 % passiver         89.9%      89.4%           10.1% |    -0.008%        -0.030%     -0.022%
+    4 h            am Close                98.9%      98.8%            1.1% |    -0.034%        -0.052%     -0.019%
+    4 h            0,05 % passiver         95.3%      94.9%            4.7% |    -0.034%        -0.055%     -0.021%
+
+  Jahr 1  2024-07..2025-07
+    Wartefenster   Variante             Fill BUY  Fill SELL  nicht gefuellt |  E[r] alle  E[r] gefuellt   Selektion
+    ------------------------------------------------------------------------------------------------------------
+    15 min         am Close                92.1%      92.2%            7.9% |    +0.002%        -0.037%     -0.038%
+    15 min         0,05 % passiver         79.5%      79.4%           20.5% |    +0.002%        -0.039%     -0.041%
+    1 h            am Close                96.1%      96.2%            3.9% |    +0.006%        -0.033%     -0.039%
+    1 h            0,05 % passiver         89.7%      89.6%           10.3% |    +0.006%        -0.035%     -0.041%
+    4 h            am Close                98.1%      98.1%            1.9% |    +0.024%        -0.015%     -0.039%
+    4 h            0,05 % passiver         95.0%      94.9%            5.0% |    +0.024%        -0.018%     -0.041%
+
+  LESART
+    'Selektion' ist die Differenz zwischen der Rendite auf allen
+    Zeitpunkten und der Rendite nur auf den gefuellten BUY-Faellen,
+    gerechnet ab dem Limitpreis. Ist sie negativ, wird bevorzugt
+    dann gefuellt, wenn der Kurs weiterfaellt - der Preisvorteil der
+    Limit-Order wird dadurch teilweise oder ganz aufgezehrt.
+    Die 0,05-%-Variante zeigt beides zugleich: hoehere Ersparnis,
+    niedrigere Fuellquote, staerkere Selektion.
+
+====================================================================================================
+ ENDE F1e
+====================================================================================================

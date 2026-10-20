@@ -1,0 +1,38 @@
+====================================================================================================
+ GATE-1-GESAMTAUSWERTUNG  |  BH-FDR q=0,10 ueber 13 H1/H2-Trials
+====================================================================================================
+
+  BH: groesstes k mit p(k) <= k*q/m: k=8 -> Signifikanzschwelle p <= 0.0470
+
+  Trial         p    FDR  Urteil (Kriterien)             Name
+  ------------------------------------------------------------------------------------------
+  T-022    0.0000     JA  REJECTED (Segment)             R1 Faber | Portfolio
+  T-023    0.0000     JA  REJECTED (Segment, Placebo)    R2 MOP | Portfolio
+  T-024    0.0000     JA  CONFIRMED*                     R3 Donchian | Portfolio
+  T-016    0.0060     JA  INCONCLUSIVE (n<12)            R1 Faber | BTC
+  T-021    0.0115     JA  CONFIRMED*                     R3 Donchian | ETH
+  T-020    0.0135     JA  CONFIRMED*                     R3 Donchian | BTC
+  T-025    0.0185     JA  REJECTED (Placebo)             H2 E-neg | BTC
+  T-018    0.0470     JA  INCONCLUSIVE (n<12)            R2 MOP | BTC
+  T-026    0.0865   nein  INCONCLUSIVE (n<30)            H2 E-neg | ETH
+  T-027    0.2000   nein  INCONCLUSIVE (n<30)            H2 E-pos | BTC
+  T-019    0.2180   nein  INCONCLUSIVE (n<12)            R2 MOP | ETH
+  T-017    0.3355   nein  INCONCLUSIVE (n<12)            R1 Faber | ETH
+  T-028    0.9250   nein  INCONCLUSIVE (n<30)            H2 E-pos | ETH
+
+  T-029 H3: NICHT AUSGEFUEHRT (Universum 12 < 30, Registerbedingung nicht erfuellt; Trial unverbraucht)
+  T-030 H4: REJECTED (Calmar-KI enthaelt 0; EV-Differenz signifikant negativ) - siehe batterie_h4_out.txt
+
+====================================================================================================
+ GATE 1: POSITIV - 3 Trial(s) CONFIRMED nach FDR
+    T-024  R3 Donchian | Portfolio
+    T-021  R3 Donchian | ETH
+    T-020  R3 Donchian | BTC
+====================================================================================================
+
+  Verbrauchte Trials dieser Batterie: T-016..T-028 (13) + T-030 (1) = 14.
+  T-029 unverbraucht. Budget 15 -> 1 Trial verbleibt.
+  Naechster Schritt laut Programm: Walk-Forward-Protokoll + Einfrieren der
+  Regel + 90-Tage-Forward-Paper (Gate 2). Ein Bericht der Regel auf der
+  kontaminierten Zeit 2024-26 waere eine weitere Auswertung und braucht
+  eine Registerversion v1.2 mit Freigabe.

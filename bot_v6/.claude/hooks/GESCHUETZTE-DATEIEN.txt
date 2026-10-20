@@ -1,0 +1,13 @@
+# GESCHUETZTE DATEIEN — hier wird nicht hineingeschrieben.
+#
+# Eine Zeile = ein Stueck Pfad. Kommt es im Zielpfad vor, wird der
+# Schreibversuch abgelehnt. Gross-/Kleinschreibung egal.
+# Zeilen mit # sind Kommentare.
+#
+# Diese Liste erweitern: Zeile dazuschreiben, speichern, fertig.
+# Kein Neustart noetig.
+
+# Die Forschungsdatenbank. Bewusst abgekoppelt (CLAUDE.md Abschnitt 4,
+# Entscheidung vom 13.08.2026). Am 19.08. waere hier fast etwas
+# hineingeschrieben worden.
+forschung.db

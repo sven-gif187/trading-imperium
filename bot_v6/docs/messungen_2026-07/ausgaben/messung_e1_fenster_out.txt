@@ -1,0 +1,4 @@
+Fenster ab 2026-05-01:  V0  Harness-Regeln:      Trades= 780  NK= 19  Rate=  2.4%
+Fenster ab 2026-05-01:  V5n Live-nahe Frequenz:  Trades= 780  NK=128  Rate= 16.4%
+Fenster ab 2026-04-01:  V0  Harness-Regeln:      Trades= 985  NK= 24  Rate=  2.4%
+Fenster ab 2026-04-01:  V5n Live-nahe Frequenz:  Trades= 998  NK=154  Rate= 15.4%

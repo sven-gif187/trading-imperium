@@ -1,0 +1,50 @@
+AUDIT BUG-LISTE - read-only, keine Aenderung
+Projekt: C:\Users\<BENUTZER>\Desktop\trading_imperium_v6(21)
+
+================================================================================================
+ 2.4  E8-Nachkauf-Stop - ist er ueberhaupt noch noetig?
+================================================================================================
+  position_size_pct          = 20.0   (data_store/config.json)
+  max_exposure_per_coin_pct  = 25.0   (data_store/config.json)
+  dca_max_levels             = 3   (data_store/config.json)
+
+  Rechnung app.py:1814-1818: blockiert wird, wenn
+  (aktueller Coin-Wert + Nachkaufbetrag) / Equity * 100 > 25.0
+  Eine frische Position bindet 20.0 % der Equity. Ein Nachkauf gleicher Groesse
+  ergibt 40 % -> BLOCKIERT (Schwelle 25.0 %).
+  Erst ab einer Positionsgroesse unter 12.5 % waere ein erster Nachkauf moeglich;
+  rechnerisch passen 1.25 Positionsgroessen unter die Coin-Grenze.
+
+  Journal: 954 Eintraege, 2026-06-10T20:53 .. 2026-07-31T02:02
+  Erstkaeufe: 426   Nachkaeufe: 100
+  Nachkaeufe je Coin: {'ADA/USDC': 46, 'SOL/USDC': 20, 'XRP/USDC': 15, 'ETH/USDC': 14, 'AVAX/USDC': 4, 'DOT/USDC': 1}
+  Letzte Nachkauf-Tage: [('2026-07-16', 2), ('2026-07-18', 1), ('2026-07-20', 2), ('2026-07-24', 2), ('2026-07-28', 1), ('2026-07-29', 2)]
+
+  Im aktuellen system.log:
+    'Exposure-Limit ... kein Nachkauf'  5116 mal
+    'Nachkauf-Limit erreicht'           0 mal
+
+================================================================================================
+ 2.6  Werden Gebuehren aus ccxt-Metadaten gezogen?
+================================================================================================
+  Dateien mit ccxt-Import UND Gebuehrenzugriff: 3
+    docs\forschungsprogramm_2026-07\code\db_fill_migration.py:165  "ccxt.bybit().fees meldet maker 0,01 % / taker 0,075 % - fuer EU-Spot beides falsch "
+    docs\forschungsprogramm_2026-07\code\db_scan_architektur.py:86  "ccxt.bybit().fees meldet maker 0,01 / taker 0,075 % - fuer EU-Spot "
+    docs\messungen_2026-07\code\audit_bugliste.py:128  r"\.fees\b|fetch_trading_fees|fetchTradingFees|"
+
+================================================================================================
+ 3.1  Logvolumen-Hochrechnung fuer die drei neuen Logzeilen
+================================================================================================
+  Datei: data_store/system.log, 102332 Zeilen, 12512389 Bytes
+  Zeitraum: 2026-08-03T04:39:05 .. 2026-08-04T04:40:27
+    [SIGNAL] ... -> BUY            30965
+    [SIGNAL] ... SELL               5989
+    [RISK] gesamt                   2995
+    [RISK] mit 'BUY'                   0
+    Zeilen mit Sleep-Mode           7598
+    Zeilen mit Kill-Switch             0
+
+  Mittlere Zeilenlaenge: 122 Byte
+  Eine zusaetzliche Ablehnungszeile je BUY-Intent:
+    + 30965 Zeilen  =  +2.81 MB ueber denselben Zeitraum
+    Logwachstum: 11.93 MB -> 14.74 MB (+23.5 %)

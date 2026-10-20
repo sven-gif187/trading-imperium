@@ -1,0 +1,82 @@
+WERKZEUGVALIDIERUNG A/B - kein Trial, keine Hypothese
+Frage: wie stark verzerrt der Harness, bevor eine Strategie bewertet wird?
+
+================================================================================================
+ BLOCKER 1 - KAPITALTOD, Jahr J2
+================================================================================================
+
+  Datenbasis: 11 Coins, 385440 15m-Kerzen
+
+  Kennzahl                      A prozentual      B konstant      Differenz
+  --------------------------------------------------------------------------
+  Trades                               1480            937     -543.0000
+  Trefferquote %                      39.66          39.59       -0.0677
+  R/R                                 0.497          0.520        0.0228
+  EV in R                           -0.4061        -0.3980        0.0080
+  Summe $                           -450.56        -490.01      -39.4466
+  Gebuehren $                        115.68         130.31       14.6327
+  Haltedauer h                          7.1            7.4        0.2852
+
+  Endkapital A: 49.44$
+  Endkapital B: 9.99$
+
+  Einstiege, die die PROZENTUALE Regel wegen Kapitalmangel
+  abgelehnt haette (in B mitgezaehlt): 190127
+  Trade-Differenz: -543 (-36.7 %)
+
+  LESART: Was hier als Differenz steht, ist KEINE Aussage ueber
+  die Strategie. Es ist der Anteil des Ergebnisses, der allein
+  von der Einsatzregel des Werkzeugs kommt.
+
+================================================================================================
+ BLOCKER 1 - KAPITALTOD, Jahr J1
+================================================================================================
+
+  Datenbasis: 11 Coins, 385440 15m-Kerzen
+
+  Kennzahl                      A prozentual      B konstant      Differenz
+  --------------------------------------------------------------------------
+  Trades                                783            681     -102.0000
+  Trefferquote %                      41.51          40.68       -0.8315
+  R/R                                 0.646          0.673        0.0269
+  EV in R                           -0.3167        -0.3194       -0.0027
+  Summe $                           -313.44        -346.31      -32.8741
+  Gebuehren $                        106.94         125.70       18.7537
+  Haltedauer h                          5.3            5.2       -0.1062
+
+  Endkapital A: 186.56$
+  Endkapital B: 153.69$
+
+  Einstiege, die die PROZENTUALE Regel wegen Kapitalmangel
+  abgelehnt haette (in B mitgezaehlt): 6471
+  Trade-Differenz: -102 (-13.0 %)
+
+  LESART: Was hier als Differenz steht, ist KEINE Aussage ueber
+  die Strategie. Es ist der Anteil des Ergebnisses, der allein
+  von der Einsatzregel des Werkzeugs kommt.
+
+================================================================================================
+ BLOCKER 2 - LOOK-AHEAD, Zusammenfassung aus dem Zwischenstand
+================================================================================================
+
+  48 Tests. Delta = P(auf) OHNE Look-ahead minus MIT.
+  Negativ heisst: der Look-ahead hat P(auf) UEBERSCHAETZT.
+
+  Strategie          Jahr Barriere       mit LA  ohne LA     Delta
+  BOLLINGER_BOUNCE   J1   +/-2,5%/72h    49.33%   44.56%    -4.77pp
+  BOLLINGER_BOUNCE   J2   +/-2,5%/72h    50.07%   46.99%    -3.08pp
+  RSI_OVERSOLD       J1   +/-2,5%/72h    48.32%   47.21%    -1.10pp
+  RSI_OVERSOLD       J2   +/-2,5%/72h    49.09%   48.28%    -0.81pp
+  BOLLINGER_BOUNCE   J1   +/-5%/7d       49.03%   48.38%    -0.65pp
+  ...
+  RSI_DIVERGENZ      J2   +/-2,5%/72h    40.97%   41.62%    +0.65pp
+  TSI                J1   +/-2,5%/72h    53.33%   54.00%    +0.67pp
+  RSI_DIVERGENZ      J1   +/-2,5%/72h    45.84%   46.92%    +1.07pp
+
+  Deltas negativ: 16 von 48 (33 %)
+  Groesster Betrag: 4.77 pp
+  Mittleres Delta:  -0.13 pp
+
+  LESART: Der Look-ahead hat die Ergebnisse ueberwiegend zu GUT
+  aussehen lassen. Die negativen Urteile werden dadurch
+  bestaetigt, nicht entwertet.

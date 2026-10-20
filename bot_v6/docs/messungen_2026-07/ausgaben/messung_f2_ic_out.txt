@@ -1,0 +1,401 @@
+================================================================================================================
+ MESSUNG F2 - FEATURE-SCREEN: sitzt irgendwo Information?
+ Stand 30.07.2026 - Datenbasis wie PRUEFSUMMEN.txt
+================================================================================================================
+
+================================================================================================================
+ F2a  INVENTAR - was rechnet das System, was ist rekonstruierbar?
+================================================================================================================
+
+  REKONSTRUIERBAR aus data_store/backtest (15m-Kerzen + F&G)
+      # Feature                  Quelle                                   Status  
+    ----------------------------------------------------------------------------------
+      1 RSI(14)                  agents/signal_agent.py:71                aktiv   
+      2 MACD - Signal            agents/signal_agent.py:82                aktiv   
+      3 MACD-Linie               data/market_data.py:65                   aktiv   
+      4 Close/EMA20 - 1          agents/signal_agent.py:95                aktiv   
+      5 Close/EMA50 - 1          agents/v4_strategies.py:105              aktiv   
+      6 EMA20/EMA50 - 1          agents/signal_agent.py:95                aktiv   
+      7 ADX(14)                  agents/signal_agent.py:100               aktiv   
+      8 ATR(14)/Close            data/market_data.py:70                   aktiv   
+      9 Lage in den BBaendern    agents/signal_agent.py:113               aktiv   
+     10 BBand-Breite             data/market_data.py:67                   aktiv   
+     11 Fear & Greed (Tag)       agents/signal_agent.py:104               aktiv   
+     12 F&G Tagesaenderung       abgeleitet aus fear_greed                aktiv   
+     13 Volumen/SMA20            agents/signal_agent.py:126               aktiv   
+     14 RSI-Divergenz bullisch   features/rsi_divergence.py:24            aktiv   
+     15 Close/VWAP(120) - 1      features/vwap_agent.py:29                aktiv   
+     16 +DI - -DI                features/regime_detection.py:42          aktiv   
+     17 Abstand zu Fib 61,8 %    agents/v4_strategies.py:186              aktiv   
+     18 Close/Close[-5] - 1      app.py:747                               aktiv   
+     19 Close/Hoch(20) - 1       agents/v4_strategies.py:154              tot     
+     20 StochRSI(14)             features/indicators.py:69                n.verdr.
+     21 TSI                      features/indicators.py:74                tot     
+     22 TSI - TSI_signal         features/indicators.py:74                tot     
+     23 OBV-Steigung(20)         features/indicators.py:57                n.verdr.
+     24 Vola(14) der Renditen    features/indicators.py:36                n.verdr.
+     25 (High-Low)/Close         features/indicators.py:39                n.verdr.
+
+    aktiv       = steht im Kauf-Entscheidungspfad
+    n.verdr.    = wird im Projekt berechnet, aber von keiner
+                  Kaufregel gelesen (features/indicators.py::
+                  calc_all_indicators ist in app.py:64 importiert
+                  und wird NIRGENDS aufgerufen)
+    tot         = die Regel liest eine DataFrame-Spalte, die der
+                  Snapshot nie enthaelt -> Regel feuert nie
+
+  NICHT PRUEFBAR (nur live / nicht archiviert / toter Pfad)
+    Feature                Quelle                                       Grund
+    --------------------------------------------------------------------------------------------------------
+    orderbook_imbalance    data/orderbook_depth.py / app.py:1658        Orderbuch-Tiefe wird live abgefragt, nicht archiviert
+    whale_score            data/whale_alerts.py / app.py:1584           Whale-Alerts nur live, kein Verlauf im Projekt
+    reddit_score           data/reddit_sentiment.py / app.py:1585       Reddit-Sentiment nur live
+    capitol_score          data/capitol_trades.py / app.py:1582         Capitol-Trades nur live
+    funding_score          data/funding_rates.py / app.py:1583          Funding-Rates nur live, keine Historie abgelegt
+    onchain_score          data/onchain_analytics.py / app.py:1605      On-Chain/NUPL nur live
+    news_sentiment         data/news_data.py / app.py:1600              News-Score nur live
+    dxy_filter             data/dxy_filter.py                           DXY-Reihe nicht im Projekt abgelegt
+    ensemble               models/ensemble_signal.py / app.py:1629      Aggregat der obigen Quellen - erbt deren Nichtpruefbarkeit
+    mtf_score              features/multi_timeframe.py:39               braucht 5m-Kerzen; im Projekt liegen nur 15m
+    ema200                 features/indicators.py:14                    braucht 200 Balken, der Bot holt 120 (config.json candle_limit)
+    ichimoku               agents/v4_strategies.py:127                  TOTER PFAD: Spalten ICH_* werden nirgends erzeugt
+    vol_high_gate          agents/v4_strategies.py:148                  TOTER PFAD: Spalte Vol_high wird nirgends erzeugt
+
+    Rekonstruierbar: 25   Nicht pruefbar: 13
+
+  ... berechne Features Jahr 2 ...
+
+================================================================================================================
+ F2b/c  INFORMATION COEFFICIENT + BH-FDR  -  Jahr 2  2025-07..2026-07
+================================================================================================================
+
+  IC = Mittel der 11 coinweisen Spearman-Korrelationen (Feature(t) gegen Rendite t->t+h).
+  p_roh  auf allen Beobachtungen | p_eff auf n_eff = (Balken/h) x 1,3 (E5 Befund 16)
+  q_*    = Benjamini-Hochberg ueber ALLE 75 Tests dieses Jahres
+
+    Feature                    Hor       IC  +/11    n_eff      p_roh     q_roh     p_eff     q_eff   sig
+    ----------------------------------------------------------------------------------------------------------
+    Close/VWAP(120) - 1       24 h  -0.0937  0/11      467 6.100e-184    0.0000    0.0429    0.1439   (*)
+    Abstand zu Fib 61,8 %     24 h  -0.0901  0/11      467 6.061e-170    0.0000    0.0518    0.1439   (*)
+    EMA20/EMA50 - 1           24 h  -0.0722  0/11      471 9.515e-111    0.0000    0.1176    0.2845   (*)
+    Close/EMA50 - 1           24 h  -0.0671  0/11      471  1.054e-95    0.0000    0.1463    0.3429   (*)
+    Close/VWAP(120) - 1        4 h  -0.0580  0/11     2807  1.122e-71    0.0000    0.0021    0.0225    **
+    Abstand zu Fib 61,8 %      4 h  -0.0541  0/11     2807  1.968e-62    0.0000    0.0042    0.0347    **
+    MACD-Linie                24 h  -0.0503  1/11      472  1.022e-54    0.0000    0.2756    0.5905   (*)
+    Vola(14) der Renditen     24 h  -0.0486  1/11      473  3.502e-51    0.0000    0.2922    0.5994   (*)
+    Close/EMA50 - 1            4 h  -0.0473  0/11     2830  1.211e-48    0.0000    0.0118    0.0611   (*)
+    EMA20/EMA50 - 1            4 h  -0.0460  0/11     2830  5.040e-46    0.0000    0.0144    0.0675   (*)
+    RSI(14)                   24 h  -0.0457  2/11      472  1.514e-45    0.0000    0.3215    0.5994   (*)
+    F&G Tagesaenderung        24 h  +0.0454 11/11      473  5.440e-45    0.0000    0.3246    0.5994   (*)
+    TSI                       24 h  -0.0450  3/11      473  3.301e-44    0.0000    0.3290    0.5994   (*)
+    MACD-Linie                 4 h  -0.0440  0/11     2838  1.820e-42    0.0000    0.0189    0.0836   (*)
+    Close/EMA20 - 1           24 h  -0.0427  0/11      472  5.363e-40    0.0000    0.3542    0.6031   (*)
+    ATR(14)/Close             24 h  -0.0420  1/11      473  8.527e-39    0.0000    0.3619    0.6031   (*)
+    TSI                        4 h  -0.0408  0/11     2846  7.995e-37    0.0000    0.0294    0.1161   (*)
+    RSI(14)                    4 h  -0.0390  0/11     2841  9.009e-34    0.0000    0.0374    0.1403   (*)
+    F&G Tagesaenderung         4 h  +0.0376 11/11     2846  1.791e-31    0.0000    0.0449    0.1439   (*)
+    Close/EMA20 - 1            4 h  -0.0370  0/11     2840  2.105e-30    0.0000    0.0490    0.1439   (*)
+    BBand-Breite              24 h  -0.0353  0/11      472  7.657e-28    0.0000    0.4440    0.7044   (*)
+    RSI(14)                    1 h  -0.0331  0/11    11370  8.752e-25    0.0000    0.0004    0.0123    **
+    Close/EMA20 - 1            1 h  -0.0329  0/11    11363  1.810e-24    0.0000    0.0004    0.0123    **
+    Lage in den BBaendern     24 h  -0.0327  3/11      472  3.646e-24    0.0000    0.4779    0.7125   (*)
+    RSI-Divergenz bullisch    24 h  +0.0322 10/11      473  1.721e-23    0.0000    0.4845    0.7125   (*)
+    Close/VWAP(120) - 1        1 h  -0.0321  0/11    11233  4.490e-23    0.0000    0.0007    0.0123    **
+    Abstand zu Fib 61,8 %      1 h  -0.0321  0/11    11233  4.541e-23    0.0000    0.0007    0.0123    **
+    Lage in den BBaendern      4 h  -0.0315  0/11     2840  1.621e-22    0.0000    0.0935    0.2417   (*)
+    Lage in den BBaendern      1 h  -0.0314  0/11    11363  2.214e-22    0.0000    0.0008    0.0123    **
+    Close/EMA50 - 1            1 h  -0.0309  0/11    11324  9.559e-22    0.0000    0.0010    0.0124    **
+    OBV-Steigung(20)           4 h  -0.0303  0/11     2840  4.976e-21    0.0000    0.1059    0.2648   (*)
+    Fear & Greed (Tag)        24 h  -0.0281  1/11      473  3.246e-18    0.0000    0.5425    0.7336   (*)
+    Close/Close[-5] - 1        1 h  -0.0278  0/11    11382  5.527e-18    0.0000    0.0030    0.0279    **
+    (High-Low)/Close          24 h  -0.0266  0/11      473  1.657e-16    0.0000    0.5639    0.7336   (*)
+    StochRSI(14)               1 h  -0.0257  0/11    11370  1.750e-15    0.0000    0.0062    0.0460    **
+    MACD-Linie                 1 h  -0.0254  0/11    11356  3.236e-15    0.0000    0.0067    0.0460    **
+    TSI                        1 h  -0.0250  0/11    11388  7.984e-15    0.0000    0.0076    0.0474    **
+    Close/Close[-5] - 1       24 h  -0.0249  1/11      473  1.170e-14    0.0000    0.5890    0.7336   (*)
+    EMA20/EMA50 - 1            1 h  -0.0238  0/11    11324  1.842e-13    0.0000    0.0114    0.0611   (*)
+    OBV-Steigung(20)           1 h  -0.0235  0/11    11362  3.092e-13    0.0000    0.0122    0.0611   (*)
+    Close/Close[-5] - 1        4 h  -0.0234  0/11     2844  3.606e-13    0.0000    0.2117    0.4810   (*)
+    MACD - Signal              4 h  -0.0219  0/11     2838  1.182e-11    0.0000    0.2439    0.5380   (*)
+    Close/Hoch(20) - 1         1 h  -0.0213  0/11    11363  3.639e-11    0.0000    0.0229    0.0955   (*)
+    +DI - -DI                  4 h  -0.0192  0/11     2842  2.667e-09    0.0000    0.3066    0.5994   (*)
+    TSI - TSI_signal           1 h  -0.0186  0/11    11388  7.192e-09    0.0000    0.0467    0.1439   (*)
+    +DI - -DI                  1 h  -0.0184  0/11    11371  1.225e-08    0.0000    0.0502    0.1439   (*)
+    MACD - Signal              1 h  -0.0183  0/11    11356  1.405e-08    0.0000    0.0512    0.1439   (*)
+    Close/Hoch(20) - 1         4 h  -0.0182  1/11     2840  1.560e-08    0.0000    0.3313    0.5994   (*)
+    TSI - TSI_signal           4 h  -0.0181  0/11     2846  2.098e-08    0.0000    0.3356    0.5994   (*)
+    F&G Tagesaenderung         1 h  +0.0177 11/11    11388  3.763e-08    0.0000    0.0586    0.1570   (*)
+    ADX(14)                    4 h  +0.0145  8/11     2842  6.523e-06    0.0000    0.4385    0.7044   (*)
+    RSI-Divergenz bullisch     4 h  +0.0141 10/11     2846  1.140e-05    0.0000    0.4508    0.7044   (*)
+    ADX(14)                   24 h  +0.0139  5/11      473  1.657e-05    0.0000    0.7631    0.8873   (*)
+    +DI - -DI                 24 h  -0.0135  4/11      473  2.704e-05    0.0000    0.7690    0.8873   (*)
+    Volumen/SMA20              4 h  +0.0119  8/11     2840  2.199e-04    0.0003    0.5255    0.7336   (*)
+    StochRSI(14)               4 h  -0.0102  3/11     2841  1.626e-03    0.0022    0.5882    0.7336   (*)
+    Vola(14) der Renditen      4 h  -0.0099  3/11     2842  2.112e-03    0.0028    0.5974    0.7336   (*)
+    ATR(14)/Close              4 h  -0.0097  2/11     2842  2.717e-03    0.0035    0.6065    0.7336   (*)
+    Vola(14) der Renditen      1 h  -0.0087  1/11    11371  6.675e-03    0.0085    0.3511    0.6031   (*)
+    TSI - TSI_signal          24 h  -0.0087  4/11      473  7.075e-03    0.0088    0.8505    0.9161   (*)
+    StochRSI(14)              24 h  -0.0086  4/11      472  7.464e-03    0.0092    0.8515    0.9161   (*)
+    OBV-Steigung(20)          24 h  -0.0084  4/11      472  9.047e-03    0.0109    0.8550    0.9161   (*)
+    BBand-Breite               4 h  -0.0079  5/11     2840  1.442e-02    0.0172    0.6742    0.8026   (*)
+    Close/Hoch(20) - 1        24 h  -0.0074  4/11      472  2.170e-02    0.0254    0.8724    0.9215   (*)
+    ATR(14)/Close              1 h  -0.0067  1/11    11371  3.843e-02    0.0443    0.4767    0.7125   (*)
+    Volumen/SMA20              1 h  +0.0060  9/11    11363  6.188e-02    0.0703    0.5210    0.7336      
+    ADX(14)                    1 h  +0.0058  6/11    11371  6.994e-02    0.0783    0.5333    0.7336      
+    MACD - Signal             24 h  +0.0055  7/11      472  8.701e-02    0.0960    0.9047    0.9391      
+    BBand-Breite               1 h  -0.0052  3/11    11363  1.057e-01    0.1149    0.5782    0.7336      
+    RSI-Divergenz bullisch     1 h  +0.0052  8/11    11388  1.080e-01    0.1157    0.5806    0.7336      
+    (High-Low)/Close           4 h  +0.0043  7/11     2846  1.829e-01    0.1932    0.8190    0.9161      
+    (High-Low)/Close           1 h  +0.0023  7/11    11388  4.820e-01    0.5021    0.8090    0.9161      
+    Volumen/SMA20             24 h  -0.0013  5/11      472  6.845e-01    0.7032    0.9773    0.9773      
+    Fear & Greed (Tag)         1 h  -0.0010  4/11    11388  7.536e-01    0.7638    0.9141    0.9391      
+    Fear & Greed (Tag)         4 h  -0.0009  4/11     2846  7.750e-01    0.7750    0.9608    0.9738      
+    ----------------------------------------------------------------------------------------------------------
+    Tests: 75 | p_roh < 0,05: 65 | BH-FDR q_roh < 0,05: 65 | BH-FDR q_eff < 0,05: 12
+    Bei reinem Zufall zu erwarten (p<0,05): 3.8 Treffer
+    ** = haelt auch der effektiven Stichprobe stand
+    (*) = nur mit der naiven Stichprobe signifikant -> Artefakt
+
+  ... berechne Features Jahr 1 ...
+
+================================================================================================================
+ F2b/c  INFORMATION COEFFICIENT + BH-FDR  -  Jahr 1  2024-07..2025-07
+================================================================================================================
+
+  IC = Mittel der 11 coinweisen Spearman-Korrelationen (Feature(t) gegen Rendite t->t+h).
+  p_roh  auf allen Beobachtungen | p_eff auf n_eff = (Balken/h) x 1,3 (E5 Befund 16)
+  q_*    = Benjamini-Hochberg ueber ALLE 75 Tests dieses Jahres
+
+    Feature                    Hor       IC  +/11    n_eff      p_roh     q_roh     p_eff     q_eff   sig
+    ----------------------------------------------------------------------------------------------------------
+    BBand-Breite              24 h  +0.0527 11/11      472  5.950e-60    0.0000    0.2531    0.8487   (*)
+    Vola(14) der Renditen     24 h  +0.0492 11/11      472  1.848e-52    0.0000    0.2861    0.8487   (*)
+    Close/Close[-5] - 1        1 h  -0.0358  0/11    11380  1.108e-28    0.0000    0.0001    0.0100    **
+    ATR(14)/Close             24 h  +0.0339 10/11      472  7.454e-26    0.0000    0.4618    0.9839   (*)
+    StochRSI(14)               1 h  -0.0328  0/11    11368  2.588e-24    0.0000    0.0005    0.0133    **
+    TSI                       24 h  +0.0328  9/11      473  3.046e-24    0.0000    0.4771    0.9839   (*)
+    Close/EMA20 - 1            1 h  -0.0325  0/11    11362  7.122e-24    0.0000    0.0005    0.0133    **
+    BBand-Breite               4 h  +0.0325 11/11     2840  7.777e-24    0.0000    0.0837    0.4829   (*)
+    (High-Low)/Close           4 h  +0.0306 11/11     2846  2.399e-21    0.0000    0.1031    0.4834   (*)
+    Abstand zu Fib 61,8 %     24 h  -0.0296  0/11      467  8.925e-20    0.0000    0.5242    0.9839   (*)
+    Close/Hoch(20) - 1         1 h  -0.0295  0/11    11362  5.150e-20    0.0000    0.0016    0.0307    **
+    (High-Low)/Close           1 h  +0.0285 11/11    11387  9.600e-19    0.0000    0.0024    0.0357    **
+    Close/VWAP(120) - 1       24 h  -0.0279  2/11      467  9.069e-18    0.0000    0.5479    0.9839   (*)
+    (High-Low)/Close          24 h  +0.0274 11/11      473  1.788e-17    0.0000    0.5516    0.9839   (*)
+    Lage in den BBaendern      1 h  -0.0272  0/11    11362  3.522e-17    0.0000    0.0038    0.0471    **
+    MACD - Signal             24 h  -0.0268  1/11      472  9.593e-17    0.0000    0.5609    0.9839   (*)
+    ATR(14)/Close              4 h  +0.0263 11/11     2841  3.457e-16    0.0000    0.1611    0.7108   (*)
+    Fear & Greed (Tag)        24 h  -0.0252  1/11      472  6.725e-15    0.0000    0.5856    0.9839   (*)
+    RSI(14)                    1 h  -0.0232  0/11    11368  6.729e-13    0.0000    0.0135    0.1449   (*)
+    Vola(14) der Renditen      4 h  +0.0227  9/11     2841  2.017e-12    0.0000    0.2269    0.8487   (*)
+    Close/EMA50 - 1            1 h  -0.0218  0/11    11323  1.522e-11    0.0000    0.0204    0.1913   (*)
+    Close/VWAP(120) - 1        4 h  -0.0217  0/11     2807  2.479e-11    0.0000    0.2515    0.8487   (*)
+    Abstand zu Fib 61,8 %      4 h  -0.0205  0/11     2807  2.639e-10    0.0000    0.2776    0.8487   (*)
+    Close/EMA20 - 1            4 h  -0.0196  3/11     2840  1.171e-09    0.0000    0.2959    0.8487   (*)
+    TSI - TSI_signal           1 h  -0.0191  0/11    11387  2.826e-09    0.0000    0.0411    0.3427   (*)
+    ATR(14)/Close              1 h  +0.0184 11/11    11370  1.128e-08    0.0000    0.0497    0.3725   (*)
+    Close/EMA50 - 1            4 h  -0.0178  2/11     2830  3.562e-08    0.0000    0.3437    0.9065   (*)
+    Close/VWAP(120) - 1        1 h  -0.0172  0/11    11232  1.167e-07    0.0000    0.0686    0.4674   (*)
+    TSI - TSI_signal          24 h  -0.0170  2/11      473  1.326e-07    0.0000    0.7120    0.9839   (*)
+    MACD - Signal              1 h  -0.0166  0/11    11354  2.749e-07    0.0000    0.0773    0.4829   (*)
+    Abstand zu Fib 61,8 %      1 h  -0.0157  0/11    11232  1.235e-06    0.0000    0.0955    0.4834   (*)
+    Volumen/SMA20             24 h  +0.0157 10/11      472  1.170e-06    0.0000    0.7337    0.9839   (*)
+    Close/Hoch(20) - 1         4 h  -0.0154  4/11     2840  1.913e-06    0.0000    0.4132    0.9839   (*)
+    BBand-Breite               1 h  +0.0153 11/11    11362  1.953e-06    0.0000    0.1019    0.4834   (*)
+    ADX(14)                    4 h  +0.0153 10/11     2841  2.081e-06    0.0000    0.4149    0.9839   (*)
+    RSI(14)                   24 h  +0.0152  8/11      472  2.315e-06    0.0000    0.7409    0.9839   (*)
+    Close/Close[-5] - 1       24 h  -0.0151  1/11      473  2.990e-06    0.0000    0.7437    0.9839   (*)
+    MACD-Linie                24 h  +0.0138  7/11      472  2.031e-05    0.0000    0.7655    0.9839   (*)
+    StochRSI(14)              24 h  -0.0127  3/11      472  7.970e-05    0.0002    0.7825    0.9839   (*)
+    Vola(14) der Renditen      1 h  +0.0124 11/11    11370  1.168e-04    0.0002    0.1854    0.7725   (*)
+    MACD-Linie                 4 h  -0.0123  5/11     2838  1.309e-04    0.0002    0.5111    0.9839   (*)
+    ADX(14)                    1 h  +0.0121 11/11    11370  1.846e-04    0.0003    0.1987    0.7842   (*)
+    Close/Hoch(20) - 1        24 h  -0.0119  5/11      472  2.303e-04    0.0004    0.7966    0.9839   (*)
+    OBV-Steigung(20)           4 h  -0.0119  3/11     2839  2.385e-04    0.0004    0.5279    0.9839   (*)
+    Close/Close[-5] - 1        4 h  -0.0118  3/11     2844  2.464e-04    0.0004    0.5288    0.9839   (*)
+    OBV-Steigung(20)           1 h  -0.0105  2/11    11361  1.073e-03    0.0017    0.2609    0.8487   (*)
+    Fear & Greed (Tag)         4 h  -0.0104  2/11     2838  1.205e-03    0.0019    0.5780    0.9839   (*)
+    RSI-Divergenz bullisch     4 h  +0.0103  7/11     2846  1.371e-03    0.0021    0.5824    0.9839   (*)
+    ADX(14)                   24 h  +0.0098  7/11      472  2.324e-03    0.0036    0.8312    0.9839   (*)
+    F&G Tagesaenderung        24 h  +0.0098  7/11      471  2.424e-03    0.0036    0.8319    0.9839   (*)
+    +DI - -DI                  1 h  -0.0096  2/11    11370  2.875e-03    0.0042    0.3055    0.8487   (*)
+    EMA20/EMA50 - 1            4 h  -0.0093  4/11     2830  4.168e-03    0.0060    0.6225    0.9839   (*)
+    MACD-Linie                 1 h  -0.0088  4/11    11354  6.609e-03    0.0093    0.3505    0.9065   (*)
+    RSI(14)                    4 h  -0.0087  4/11     2841  6.700e-03    0.0093    0.6413    0.9839   (*)
+    Close/EMA20 - 1           24 h  -0.0081  5/11      472  1.252e-02    0.0171    0.8613    0.9839   (*)
+    EMA20/EMA50 - 1           24 h  +0.0078  8/11      471  1.531e-02    0.0205    0.8652    0.9839   (*)
+    Volumen/SMA20              1 h  +0.0071 10/11    11362  2.687e-02    0.0354    0.4468    0.9839   (*)
+    MACD - Signal              4 h  -0.0068  4/11     2838  3.445e-02    0.0442    0.7163    0.9839   (*)
+    StochRSI(14)               4 h  -0.0068  4/11     2841  3.477e-02    0.0442    0.7168    0.9839   (*)
+    Lage in den BBaendern     24 h  -0.0060  5/11      472  6.347e-02    0.0793    0.8967    0.9839      
+    Lage in den BBaendern      4 h  -0.0058  4/11     2840  6.992e-02    0.0860    0.7555    0.9839      
+    +DI - -DI                  4 h  +0.0050  6/11     2841  1.223e-01    0.1479    0.7906    0.9839      
+    RSI-Divergenz bullisch    24 h  +0.0047  7/11      473  1.429e-01    0.1701    0.9183    0.9839      
+    F&G Tagesaenderung         4 h  +0.0036  8/11     2830  2.707e-01    0.3172    0.8499    0.9839      
+    F&G Tagesaenderung         1 h  +0.0034  8/11    11324  2.880e-01    0.3323    0.7149    0.9839      
+    TSI                        1 h  -0.0030  5/11    11387  3.472e-01    0.3946    0.7466    0.9839      
+    EMA20/EMA50 - 1            1 h  -0.0027  5/11    11323  3.993e-01    0.4469    0.7720    0.9839      
+    TSI - TSI_signal           4 h  -0.0026  5/11     2846  4.243e-01    0.4680    0.8908    0.9839      
+    Close/EMA50 - 1           24 h  -0.0025  6/11      471  4.322e-01    0.4698    0.9562    0.9862      
+    Volumen/SMA20              4 h  +0.0022  8/11     2840  4.916e-01    0.5267    0.9059    0.9839      
+    OBV-Steigung(20)          24 h  -0.0016  7/11      472  6.288e-01    0.6642    0.9730    0.9862      
+    RSI-Divergenz bullisch     1 h  -0.0013  4/11    11387  6.765e-01    0.7047    0.8860    0.9839      
+    +DI - -DI                 24 h  -0.0012  6/11      472  7.212e-01    0.7409    0.9801    0.9862      
+    TSI                        4 h  +0.0003  6/11     2846  9.199e-01    0.9323    0.9862    0.9862      
+    Fear & Greed (Tag)         1 h  -0.0002  6/11    11356  9.492e-01    0.9492    0.9825    0.9862      
+    ----------------------------------------------------------------------------------------------------------
+    Tests: 75 | p_roh < 0,05: 59 | BH-FDR q_roh < 0,05: 59 | BH-FDR q_eff < 0,05: 6
+    Bei reinem Zufall zu erwarten (p<0,05): 3.8 Treffer
+    ** = haelt auch der effektiven Stichprobe stand
+    (*) = nur mit der naiven Stichprobe signifikant -> Artefakt
+
+================================================================================================================
+ F2d  STABILITAET - gleiches Vorzeichen in BEIDEN Jahren?
+================================================================================================================
+
+    Feature                    Hor     IC J2     IC J1   Vorz.  |IC| min  q_eff J2  q_eff J1
+    ------------------------------------------------------------------------------------------
+    Vola(14) der Renditen     24 h   -0.0486   +0.0492 WECHSEL    0.0486    0.5994    0.8487
+    BBand-Breite              24 h   -0.0353   +0.0527 WECHSEL    0.0353    0.7044    0.8487
+    ATR(14)/Close             24 h   -0.0420   +0.0339 WECHSEL    0.0339    0.6031    0.9839
+    TSI                       24 h   -0.0450   +0.0328 WECHSEL    0.0328    0.5994    0.9839
+    Close/EMA20 - 1            1 h   -0.0329   -0.0325  gleich    0.0325    0.0123    0.0133   <== haelt beides
+    Abstand zu Fib 61,8 %     24 h   -0.0901   -0.0296  gleich    0.0296    0.1439    0.9839
+    Close/VWAP(120) - 1       24 h   -0.0937   -0.0279  gleich    0.0279    0.1439    0.9839
+    Close/Close[-5] - 1        1 h   -0.0278   -0.0358  gleich    0.0278    0.0279    0.0100   <== haelt beides
+    Lage in den BBaendern      1 h   -0.0314   -0.0272  gleich    0.0272    0.0123    0.0471   <== haelt beides
+    (High-Low)/Close          24 h   -0.0266   +0.0274 WECHSEL    0.0266    0.7336    0.9839
+    StochRSI(14)               1 h   -0.0257   -0.0328  gleich    0.0257    0.0460    0.0133   <== haelt beides
+    Fear & Greed (Tag)        24 h   -0.0281   -0.0252  gleich    0.0252    0.7336    0.9839
+    RSI(14)                    1 h   -0.0331   -0.0232  gleich    0.0232    0.0123    0.1449
+    Close/EMA50 - 1            1 h   -0.0309   -0.0218  gleich    0.0218    0.0124    0.1913
+    Close/VWAP(120) - 1        4 h   -0.0580   -0.0217  gleich    0.0217    0.0225    0.8487
+    Close/Hoch(20) - 1         1 h   -0.0213   -0.0295  gleich    0.0213    0.0955    0.0307
+    Abstand zu Fib 61,8 %      4 h   -0.0541   -0.0205  gleich    0.0205    0.0347    0.8487
+    Close/EMA20 - 1            4 h   -0.0370   -0.0196  gleich    0.0196    0.1439    0.8487
+    TSI - TSI_signal           1 h   -0.0186   -0.0191  gleich    0.0186    0.1439    0.3427
+    Close/EMA50 - 1            4 h   -0.0473   -0.0178  gleich    0.0178    0.0611    0.9065
+    Close/VWAP(120) - 1        1 h   -0.0321   -0.0172  gleich    0.0172    0.0123    0.4674
+    MACD - Signal              1 h   -0.0183   -0.0166  gleich    0.0166    0.1439    0.4829
+    Abstand zu Fib 61,8 %      1 h   -0.0321   -0.0157  gleich    0.0157    0.0123    0.4834
+    Close/Hoch(20) - 1         4 h   -0.0182   -0.0154  gleich    0.0154    0.5994    0.9839
+    RSI(14)                   24 h   -0.0457   +0.0152 WECHSEL    0.0152    0.5994    0.9839
+    Close/Close[-5] - 1       24 h   -0.0249   -0.0151  gleich    0.0151    0.7336    0.9839
+    ADX(14)                    4 h   +0.0145   +0.0153  gleich    0.0145    0.7044    0.9839
+    MACD-Linie                24 h   -0.0503   +0.0138 WECHSEL    0.0138    0.5905    0.9839
+    MACD-Linie                 4 h   -0.0440   -0.0123  gleich    0.0123    0.0836    0.9839
+    OBV-Steigung(20)           4 h   -0.0303   -0.0119  gleich    0.0119    0.2648    0.9839
+    Close/Close[-5] - 1        4 h   -0.0234   -0.0118  gleich    0.0118    0.4810    0.9839
+    OBV-Steigung(20)           1 h   -0.0235   -0.0105  gleich    0.0105    0.0611    0.8487
+    RSI-Divergenz bullisch     4 h   +0.0141   +0.0103  gleich    0.0103    0.7044    0.9839
+    Vola(14) der Renditen      4 h   -0.0099   +0.0227 WECHSEL    0.0099    0.7336    0.8487
+    ADX(14)                   24 h   +0.0139   +0.0098  gleich    0.0098    0.8873    0.9839
+    F&G Tagesaenderung        24 h   +0.0454   +0.0098  gleich    0.0098    0.5994    0.9839
+    ATR(14)/Close              4 h   -0.0097   +0.0263 WECHSEL    0.0097    0.7336    0.7108
+    +DI - -DI                  1 h   -0.0184   -0.0096  gleich    0.0096    0.1439    0.8487
+    EMA20/EMA50 - 1            4 h   -0.0460   -0.0093  gleich    0.0093    0.0675    0.9839
+    MACD-Linie                 1 h   -0.0254   -0.0088  gleich    0.0088    0.0460    0.9065
+    Vola(14) der Renditen      1 h   -0.0087   +0.0124 WECHSEL    0.0087    0.6031    0.7725
+    RSI(14)                    4 h   -0.0390   -0.0087  gleich    0.0087    0.1403    0.9839
+    TSI - TSI_signal          24 h   -0.0087   -0.0170  gleich    0.0087    0.9161    0.9839
+    StochRSI(14)              24 h   -0.0086   -0.0127  gleich    0.0086    0.9161    0.9839
+    Close/EMA20 - 1           24 h   -0.0427   -0.0081  gleich    0.0081    0.6031    0.9839
+    BBand-Breite               4 h   -0.0079   +0.0325 WECHSEL    0.0079    0.8026    0.4829
+    EMA20/EMA50 - 1           24 h   -0.0722   +0.0078 WECHSEL    0.0078    0.2845    0.9839
+    Close/Hoch(20) - 1        24 h   -0.0074   -0.0119  gleich    0.0074    0.9215    0.9839
+    MACD - Signal              4 h   -0.0219   -0.0068  gleich    0.0068    0.5380    0.9839
+    StochRSI(14)               4 h   -0.0102   -0.0068  gleich    0.0068    0.7336    0.9839
+    ATR(14)/Close              1 h   -0.0067   +0.0184 WECHSEL    0.0067    0.7125    0.3725
+    Volumen/SMA20              1 h   +0.0060   +0.0071  gleich    0.0060    0.7336    0.9839
+    Lage in den BBaendern     24 h   -0.0327   -0.0060  gleich    0.0060    0.7125    0.9839
+    Lage in den BBaendern      4 h   -0.0315   -0.0058  gleich    0.0058    0.2417    0.9839
+    ADX(14)                    1 h   +0.0058   +0.0121  gleich    0.0058    0.7336    0.7842
+    MACD - Signal             24 h   +0.0055   -0.0268 WECHSEL    0.0055    0.9391    0.9839
+    BBand-Breite               1 h   -0.0052   +0.0153 WECHSEL    0.0052    0.7336    0.4834
+    +DI - -DI                  4 h   -0.0192   +0.0050 WECHSEL    0.0050    0.5994    0.9839
+    RSI-Divergenz bullisch    24 h   +0.0322   +0.0047  gleich    0.0047    0.7125    0.9839
+    (High-Low)/Close           4 h   +0.0043   +0.0306  gleich    0.0043    0.9161    0.4834
+    F&G Tagesaenderung         4 h   +0.0376   +0.0036  gleich    0.0036    0.1439    0.9839
+    F&G Tagesaenderung         1 h   +0.0177   +0.0034  gleich    0.0034    0.1570    0.9839
+    TSI                        1 h   -0.0250   -0.0030  gleich    0.0030    0.0474    0.9839
+    EMA20/EMA50 - 1            1 h   -0.0238   -0.0027  gleich    0.0027    0.0611    0.9839
+    TSI - TSI_signal           4 h   -0.0181   -0.0026  gleich    0.0026    0.5994    0.9839
+    Close/EMA50 - 1           24 h   -0.0671   -0.0025  gleich    0.0025    0.3429    0.9862
+    (High-Low)/Close           1 h   +0.0023   +0.0285  gleich    0.0023    0.9161    0.0357
+    Volumen/SMA20              4 h   +0.0119   +0.0022  gleich    0.0022    0.7336    0.9839
+    OBV-Steigung(20)          24 h   -0.0084   -0.0016  gleich    0.0016    0.9161    0.9862
+    RSI-Divergenz bullisch     1 h   +0.0052   -0.0013 WECHSEL    0.0013    0.7336    0.9839
+    Volumen/SMA20             24 h   -0.0013   +0.0157 WECHSEL    0.0013    0.9773    0.9839
+    +DI - -DI                 24 h   -0.0135   -0.0012  gleich    0.0012    0.8873    0.9862
+    Fear & Greed (Tag)         4 h   -0.0009   -0.0104  gleich    0.0009    0.9738    0.9839
+    TSI                        4 h   -0.0408   +0.0003 WECHSEL    0.0003    0.1161    0.9862
+    Fear & Greed (Tag)         1 h   -0.0010   -0.0002  gleich    0.0002    0.9391    0.9862
+    ------------------------------------------------------------------------------------------
+    Vorzeichen gleich: 56 von 75 (75 %)
+    Erwartung bei reinem Zufall: 50 %
+    Davon zusaetzlich in BEIDEN Jahren mit q_eff < 0,05: 4
+      Close/EMA20 - 1            1 h  IC -0.0329 / -0.0325
+      Close/Close[-5] - 1        1 h  IC -0.0278 / -0.0358
+      Lage in den BBaendern      1 h  IC -0.0314 / -0.0272
+      StochRSI(14)               1 h  IC -0.0257 / -0.0328
+
+    ACHTUNG zur 75-%-Quote: die 75 Tests sind nicht unabhaengig.
+    Viele Features messen dieselbe Groesse (Close/EMA20,
+    Close/EMA50, Lage im BBand, StochRSI, VWAP-Abstand sind alle
+    Varianten von 'Kurs relativ zum juengsten Mittel'). Eine
+    Vorzeichenkonstanz von 75 % beweist daher KEINE 56 unabhaengigen
+    stabilen Befunde, sondern im Kern eine Handvoll.
+
+================================================================================================================
+ F2e  OEKONOMISCHE SCHWELLE - traegt der IC die Reibung?
+================================================================================================================
+
+  Noetige Trefferquote im +-2,5-%-Barrierentest bei 0,30 % Reibung: 56 % (F1c)
+  Zugehoeriger Spearman-IC unter bivariat-normaler Naeherung: 0.1792
+  Naeherung, keine Messung: sie bildet das Vorzeichen einer Rendite ueber FESTEN
+  Horizont ab, nicht das First-Touch-Rennen aus E2. Sie taugt als Groessenordnung.
+
+  Untergrenze Reibung nach F1c (Limit + BNB) 0,15 % -> P(auf) 53 % -> IC 0.0899
+
+  AUSWAHL: die drei staerksten Features, die (i) in beiden Jahren
+  dasselbe Vorzeichen haben UND (ii) in beiden Jahren die BH-FDR
+  auf der effektiven Stichprobe ueberstehen. Nur diese sind
+  ueberhaupt Kandidaten - alles andere ist nach F2c/F2d Rauschen.
+
+    Feature                    Hor     IC J2     IC J1  impl. Treffer J2  reicht fuer 56 %?
+    ------------------------------------------------------------------------------------------
+    Close/EMA20 - 1            1 h   -0.0329   -0.0325            51.10%               NEIN
+    Close/Close[-5] - 1        1 h   -0.0278   -0.0358            50.93%               NEIN
+    Lage in den BBaendern      1 h   -0.0314   -0.0272            51.05%               NEIN
+    'impl. Treffer' auf |IC| gerechnet - das Vorzeichen sagt nur,
+    in welche Richtung man handeln muesste, nicht wie stark.
+
+    KOSTENVERGLEICH AM PASSENDEN HORIZONT (F1d)
+      Close/EMA20 - 1           1 h: Median|Bewegung| 0.35 % -> noetige Trefferquote 92.9 %, erreichbar laut IC 51.1 %  -> TRAEGT NICHT
+      Close/Close[-5] - 1       1 h: Median|Bewegung| 0.35 % -> noetige Trefferquote 92.9 %, erreichbar laut IC 50.9 %  -> TRAEGT NICHT
+      Lage in den BBaendern     1 h: Median|Bewegung| 0.35 % -> noetige Trefferquote 92.9 %, erreichbar laut IC 51.0 %  -> TRAEGT NICHT
+
+  DIREKTE MESSUNG statt Naeherung - Quintilanalyse am jeweiligen Horizont, je Coin normiert
+    Oberstes/unterstes Fuenftel nach Feature; mittlere Rendite
+    und Vorzeichen-Trefferquote im jeweiligen Horizont.
+
+    Jahr 2
+      Feature               Hor   Q5 E[r]   Q5 Tr%   Q1 E[r]   Q1 Tr%    Spread  Spread-Reibung
+      ----------------------------------------------------------------------------------------
+      Close/EMA20 - 1       1 h   -0.000%    45.6%   -0.005%    51.2%   +0.005%         -0.295%
+      Close/Close[-5] - 1   1 h   -0.001%    45.6%   -0.008%    51.2%   +0.007%         -0.293%
+      Lage in den BBaender  1 h   +0.009%    45.6%   +0.002%    51.7%   +0.008%         -0.292%
+
+    Jahr 1
+      Feature               Hor   Q5 E[r]   Q5 Tr%   Q1 E[r]   Q1 Tr%    Spread  Spread-Reibung
+      ----------------------------------------------------------------------------------------
+      Close/EMA20 - 1       1 h   +0.001%    47.4%   +0.027%    53.3%   -0.026%         -0.326%
+      Close/Close[-5] - 1   1 h   +0.001%    47.0%   +0.017%    53.3%   -0.017%         -0.317%
+      Lage in den BBaender  1 h   +0.008%    47.1%   +0.008%    52.9%   -0.001%         -0.301%
+
+    Spread-Reibung > 0 waere die Mindestbedingung dafuer, dass ein Long/Short-
+    Paar aus den Extremquintilen die Kosten deckt. Der Bot kann ohnehin nur Long.
+
+================================================================================================================
+ ENDE F2
+================================================================================================================

@@ -1,0 +1,127 @@
+# ===========================================================
+# .gitignore — Trading Imperium V6
+# Angelegt 11.08.2026, Aufgabe 0 (Punkt 28: keine Sicherung)
+# ===========================================================
+#
+# GRUNDSATZ: Git sichert die ARBEIT (Code, Handbücher, Doku,
+# Auswertungs-Skripte). Die DATEN (Datenbanken, Messreihen,
+# Orderbuch-Aufzeichnungen, Modelle) gehören auf eine zweite
+# Festplatte — sie sind 800 MB groß, ändern sich teils stündlich
+# und würden das Repository unbrauchbar aufblähen.
+#
+# Beides zusammen ergibt die Sicherung. Git allein genügt NICHT.
+
+# --- GEHEIMNISSE — auf keinen Fall in die Versionsgeschichte ---
+# .env enthält den Telegram-Bot-Token. Einmal committet, steht ein
+# Geheimnis für immer in der Historie, auch nach dem Löschen.
+.env
+.env.local
+*.key
+*.pem
+secrets.json
+
+# --- Datenbanken (ändern sich im Minutentakt) ---
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+
+# --- Laufzeit-Zustand des Bots ---
+# Verzeichnisinhalt raus, aber NICHT das Verzeichnis selbst - sonst schaut
+# Git gar nicht erst hinein und die Ausnahme unten wuerde nicht greifen.
+data_store/*
+v4_data/
+
+# AUSNAHME: die Konfiguration wird versioniert. Zwei Gruende:
+#   1. Unter "regel_modi" stehen die Schalterstellungen der acht Regeln.
+#      Geht der Block verloren, faellt der Schalter auf ACTIVE zurueck -
+#      und schaltet damit den Trend-Ausstieg wieder scharf, obwohl der
+#      wegen 46 Faellen zu 0 % im Plus stillgelegt wurde.
+#   2. Aenderungen an Einstellungen werden damit nachvollziehbar. Genau
+#      diese Frage liess sich am 11.08. nicht beantworten ("wurde zwischen
+#      dem 06. und 10.08. etwas verstellt?").
+# Geprueft: api_key, api_secret, telegram.token und openai_key sind alle
+# LEER - die Geheimnisse stehen in .env, und die bleibt draussen.
+!data_store/config.json
+
+# --- Protokolle ---
+*.log
+*.log.*
+logs/
+
+# --- Trainierte Modelle (Binärdateien, wöchentlich neu) ---
+*.pkl
+*.joblib
+*.h5
+
+# --- Forschungs-Aufzeichnungen: 671 MB Orderbuch-CSVs ---
+# Die AUSWERTUNGEN und Befunde (.md) bleiben drin — nur die
+# Rohdaten-Aufzeichnungen fliegen raus.
+docs/forschungsprogramm_2026-07/capture/
+*.csv.gz
+*.parquet
+
+# --- Python-Kram ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# --- Sicherungskopien und Duplikate (Teil 8.1: können ohnehin weg) ---
+*.bak
+*.bak_*
+*.bak[0-9]*
+*_backup_*
+*.hooks_*
+_archive_*/
+full_reset_backup_*/
+
+# --- Wegwerf-Ausgaben ---
+out.txt
+out2.txt
+files.txt
+check_a.txt
+auto_export_*.txt
+
+# --- Betriebssystem ---
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Archiv der Tageskopien - der aktuelle Stand steht in ZAHLENBUCH.pdf
+zahlenbuecher/
+
+# --- [26.09.2026] vor dem ersten Upload auf GitHub ergaenzt ---
+# Jede Datei, die .env im Namen traegt - am 26.09. lag '_- Kopie.env' im
+# Hauptordner, die alte Regel '.env' deckte nur den exakten Namen.
+*.env
+*.env.*
+!.env.example
+# Kopien und Konfliktdateien (OneDrive, Windows-Explorer)
+*Kopie*
+*- Copy*
+_onedrive_konflikte/
+*.luecke_*
+*.nullbyte_*
+# Sicherungen vor Eingriffen (*.vor_*, *.sicherung_*) - bleiben lokal
+*.vor_*
+*.sicherung_*
+ENTWICKLERHANDBUCH.md.bak*
+# Grosse Kursdaten des Chartlabors (bis 26 MB je Datei) und Teil-Exporte
+chartlabor/daten/
+chartlabor/teilen/
+# Projektkopien von Claude Code (Befund 73)
+.claude/worktrees/
+.claude/settings.local.json
+# Dateien mit Telegram-Zugang im Klartext (Befund 96 und Ergaenzung 26.09.)
+# - erst hochladen, wenn der Zugang gewechselt und aus .env gelesen wird
+v4_referenz/imperium_state.json
+v4_referenz/imperium_state_BACKUP.json
+v4_referenz/trading_imperium_v4_25_ALARM.py
+v4_referenz/test perplexityshit/trading_imperium_v4_20_SAFE_FINAL.py
+# alle Zustandsdateien des V4-Referenzbots (Laufzeitdaten, teils mit Zugang)
+v4_referenz/imperium_state*

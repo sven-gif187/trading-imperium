@@ -1,0 +1,93 @@
+====================================================================================================
+ H5-BATTERIE  T-031..T-033  |  Register v2.0 (freigegeben, ohne H8)
+ Crabel 1990, NR7-Kontraktion + Ausbruch  |  Seed 20260730
+ LESART: Runde 2 testet KEINE neue Richtung, sondern die Teilfrage,
+ ob Volatilitaetskontraktion die Selektivitaet liefert, die
+ Donchian fehlte.  Vorabschaetzung im Register: 10 %.
+====================================================================================================
+
+  T-031  H5 NR7-Ausbruch | BTCUSDT   Runden=134
+    Szenario         EV/Runde                 95%-KI         p
+    K-MAKER           +2.317% [  -0.174 ;   +4.979]%    0.0385
+    K-BASIS           +1.977% [  -0.514 ;   +4.639]%    0.0715
+    K-KONSERVATIV     +1.827% [  -0.664 ;   +4.489]%    0.0950
+
+    KLAUSEL A - Netto-EV je Segment muss > 0.60 % sein:
+      S-A  n=  43  EV    +2.352 %  KI [  -2.402 ;   +7.623]  ok
+      S-B  n=  41  EV    +5.037 %  KI [  -0.383 ;  +11.326]  ok
+      S-C  n=  50  EV    -0.855 %  KI [  -2.979 ;   +1.866]  FAIL
+
+    Placebo (200 Masken): 95.P +2.470 %  echt +1.977 %  Rang 86. Perz. -> NICHT geschlagen
+    Lag+1 (Look-ahead-Detektor): EV +2.010 %
+    MaxDD Regel 76.3 % vs Halten 83.2 % (kleiner)
+
+    PFLICHTKENNZAHLEN (Register v2.0 Par. 3)
+      Haltedauer Tage: Median 7  25./75. 4/12  Min/Max 1/46
+      MFE Median +4.58 %  MAE Median -4.41 %
+      realisiertes R/R: Median 0.76  25./75. 0.28/5.45
+      Trefferquote 32.1 %   Payoff 3.28   (getrennt ausgewiesen, nicht kalibriert)
+      Referenzband 23-46 Handelstage: Median liegt DARUNTER -> BEFUND
+
+    URTEIL T-031: REJECTED (Klausel A, KI enthaelt 0, Placebo)
+
+  T-032  H5 NR7-Ausbruch | ETHUSDT   Runden=126
+    Szenario         EV/Runde                 95%-KI         p
+    K-MAKER           +2.615% [  -0.194 ;   +5.844]%    0.0330
+    K-BASIS           +2.275% [  -0.534 ;   +5.504]%    0.0580
+    K-KONSERVATIV     +2.125% [  -0.684 ;   +5.354]%    0.0750
+
+    KLAUSEL A - Netto-EV je Segment muss > 0.60 % sein:
+      S-A  n=  48  EV    +1.103 %  KI [  -3.629 ;   +6.115]  ok
+      S-B  n=  37  EV    +6.509 %  KI [  +0.069 ;  +13.653]  ok
+      S-C  n=  41  EV    -0.173 %  KI [  -3.235 ;   +3.366]  FAIL
+
+    Placebo (200 Masken): 95.P +3.140 %  echt +2.275 %  Rang 81. Perz. -> NICHT geschlagen
+    Lag+1 (Look-ahead-Detektor): EV +2.016 %
+    MaxDD Regel 66.1 % vs Halten 94.0 % (kleiner)
+
+    PFLICHTKENNZAHLEN (Register v2.0 Par. 3)
+      Haltedauer Tage: Median 6  25./75. 3/13  Min/Max 1/51
+      MFE Median +5.88 %  MAE Median -6.84 %
+      realisiertes R/R: Median 0.61  25./75. 0.18/7.28
+      Trefferquote 34.1 %   Payoff 2.91   (getrennt ausgewiesen, nicht kalibriert)
+      Referenzband 23-46 Handelstage: Median liegt DARUNTER -> BEFUND
+
+    URTEIL T-032: REJECTED (Klausel A, KI enthaelt 0, Placebo)
+
+  T-033  H5 NR7-Ausbruch | 12er-Portfolio   Runden=1105   [SEKUNDAER - traegt kein Gate, Klausel B]
+    Szenario         EV/Runde                 95%-KI         p
+    K-MAKER           +4.333% [  +2.707 ;   +6.168]%    0.0000
+    K-BASIS           +3.993% [  +2.367 ;   +5.828]%    0.0000
+    K-KONSERVATIV     +3.843% [  +2.217 ;   +5.678]%    0.0000
+
+    KLAUSEL A - Netto-EV je Segment muss > 0.60 % sein:
+      S-A  n= 199  EV    +1.093 %  KI [  -1.374 ;   +3.887]  ok
+      S-B  n= 384  EV   +11.381 %  KI [  +7.249 ;  +15.914]  ok
+      S-C  n= 522  EV    -0.336 %  KI [  -1.774 ;   +1.084]  FAIL
+
+    Placebo (200 Masken): 95.P +3.420 %  echt +3.993 %  Rang 100. Perz. -> GESCHLAGEN
+    Lag+1 (Look-ahead-Detektor): EV +4.289 %
+    MaxDD Regel 82.5 % vs Halten 91.2 % (kleiner)
+
+    PFLICHTKENNZAHLEN (Register v2.0 Par. 3)
+      Haltedauer Tage: Median 7  25./75. 3/13  Min/Max 1/58
+      MFE Median +7.19 %  MAE Median -7.48 %
+      realisiertes R/R: Median 0.83  25./75. 0.23/4.35
+      Trefferquote 30.6 %   Payoff 4.06   (getrennt ausgewiesen, nicht kalibriert)
+      Referenzband 23-46 Handelstage: Median liegt DARUNTER -> BEFUND
+
+    URTEIL T-033: REJECTED (Klausel B + Kriterien)
+
+====================================================================================================
+ BH-FDR ueber die Runde-2-Trials (q=0,10)
+====================================================================================================
+
+  Schwelle p <= 0.0715 (k=3 von m=3)
+
+  T-033  p=0.0000  JA   REJECTED (Klausel B + Kriterien)   H5 NR7-Ausbruch | 12er-Portfolio
+  T-032  p=0.0580  JA   REJECTED (Klausel A, KI enthaelt 0, Placebo) H5 NR7-Ausbruch | ETHUSDT
+  T-031  p=0.0715  JA   REJECTED (Klausel A, KI enthaelt 0, Placebo) H5 NR7-Ausbruch | BTCUSDT
+
+====================================================================================================
+ GATE 2 (H5-Teil): NEGATIV - kein gate-tragender Trial CONFIRMED
+====================================================================================================

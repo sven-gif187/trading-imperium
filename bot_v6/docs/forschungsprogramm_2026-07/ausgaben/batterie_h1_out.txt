@@ -1,0 +1,130 @@
+====================================================================================================
+ H1-BATTERIE  T-016..T-024  |  Register v1.0/v1.1  |  Seed 20260730
+ Entwicklungszeitraum 2017-08-17..2023-12-31 | Ausfuehrung next-open
+ CONFIRMED* = alle Kriterien unter K-BASIS erfuellt, FDR folgt in der
+ Gesamtauswertung ueber alle 13 Batterie-Trials.
+====================================================================================================
+  BTCUSDT    2328 Tage bis 2023-12
+  ETHUSDT    2328 Tage bis 2023-12
+  SOLUSDT    1238 Tage bis 2023-12
+  ADAUSDT    2085 Tage bis 2023-12
+  AVAXUSDT   1196 Tage bis 2023-12
+  LINKUSDT   1811 Tage bis 2023-12
+  DOTUSDT    1231 Tage bis 2023-12
+  DOGEUSDT   1641 Tage bis 2023-12
+  NEARUSDT   1174 Tage bis 2023-12
+  UNIUSDT    1201 Tage bis 2023-12
+  ATOMUSDT   1708 Tage bis 2023-12
+  XRPUSDT    2068 Tage bis 2023-12
+
+  T-016  R1 Faber 10M-SMA | BTCUSDT   Runden=4
+    Szenario         EV/Runde                 95%-KI  p(einseitig)
+    K-MAKER         +137.545% [ +13.656 ; +337.282]%        0.0060
+    K-BASIS         +137.205% [ +13.316 ; +336.942]%        0.0060
+    K-KONSERVATIV   +137.055% [ +13.166 ; +336.792]%        0.0060
+    Segmente (K-BASIS): S-A: +41.089% (n=1)  S-B: +213.052% (n=2)  S-C: +81.627% (n=1)
+    Placebo (200 Masken, K-BASIS): 95.P = +271.399%  echt = +137.205%  Rang 84. Perzentil  -> NICHT geschlagen
+    Lag+1 (K-BASIS): EV/Runde = +136.026%  (Kollaps-Verdacht wenn Vorzeichen kippt und |Delta| gross)
+    MaxDD Regel 53.1%  vs Halten 83.2%  (kleiner) | Halten-Gesamtrendite +887%
+    URTEIL T-016: INCONCLUSIVE (n<12)
+
+  T-017  R1 Faber 10M-SMA | ETHUSDT   Runden=8
+    Szenario         EV/Runde                 95%-KI  p(einseitig)
+    K-MAKER         +139.769% [ -23.174 ; +447.741]%        0.3345
+    K-BASIS         +139.429% [ -23.514 ; +447.401]%        0.3355
+    K-KONSERVATIV   +139.279% [ -23.664 ; +447.251]%        0.3360
+    Segmente (K-BASIS): S-A: -19.483% (n=3)  S-B: +581.888% (n=2)  S-C: +3.368% (n=3)
+    Placebo (200 Masken, K-BASIS): 95.P = +202.724%  echt = +139.429%  Rang 91. Perzentil  -> NICHT geschlagen
+    Lag+1 (K-BASIS): EV/Runde = +140.339%  (Kollaps-Verdacht wenn Vorzeichen kippt und |Delta| gross)
+    MaxDD Regel 77.0%  vs Halten 94.0%  (kleiner) | Halten-Gesamtrendite +656%
+    URTEIL T-017: INCONCLUSIVE (n<12)
+
+  T-018  R2 MOP 12M-Momentum | BTCUSDT   Runden=4
+    Szenario         EV/Runde                 95%-KI  p(einseitig)
+    K-MAKER          +78.917% [  -1.428 ; +212.008]%        0.0470
+    K-BASIS          +78.577% [  -1.768 ; +211.668]%        0.0470
+    K-KONSERVATIV    +78.427% [  -1.918 ; +211.518]%        0.0470
+    Segmente (K-BASIS): S-A: -1.768% (n=2)  S-B: +280.152% (n=1)  S-C: +37.692% (n=1)
+    Placebo (200 Masken, K-BASIS): 95.P = +255.702%  echt = +78.577%  Rang 68. Perzentil  -> NICHT geschlagen
+    Lag+1 (K-BASIS): EV/Runde = +77.209%  (Kollaps-Verdacht wenn Vorzeichen kippt und |Delta| gross)
+    MaxDD Regel 63.3%  vs Halten 83.2%  (kleiner) | Halten-Gesamtrendite +887%
+    URTEIL T-018: INCONCLUSIVE (n<12)
+
+  T-019  R2 MOP 12M-Momentum | ETHUSDT   Runden=5
+    Szenario         EV/Runde                 95%-KI  p(einseitig)
+    K-MAKER         +135.191% [ -16.473 ; +412.896]%        0.2000
+    K-BASIS         +134.851% [ -16.813 ; +412.556]%        0.2180
+    K-KONSERVATIV   +134.701% [ -16.963 ; +412.406]%        0.2205
+    Segmente (K-BASIS): S-A: -15.306% (n=1)  S-B: +223.885% (n=3)  S-C: +17.907% (n=1)
+    Placebo (200 Masken, K-BASIS): 95.P = +304.882%  echt = +134.851%  Rang 84. Perzentil  -> NICHT geschlagen
+    Lag+1 (K-BASIS): EV/Runde = +124.734%  (Kollaps-Verdacht wenn Vorzeichen kippt und |Delta| gross)
+    MaxDD Regel 62.2%  vs Halten 94.0%  (kleiner) | Halten-Gesamtrendite +656%
+    URTEIL T-019: INCONCLUSIVE (n<12)
+
+  T-020  R3 Donchian 20/10 | BTCUSDT   Runden=28
+    Szenario         EV/Runde                 95%-KI  p(einseitig)
+    K-MAKER          +21.125% [  +1.850 ;  +53.035]%        0.0085
+    K-BASIS          +20.785% [  +1.510 ;  +52.695]%        0.0135
+    K-KONSERVATIV    +20.635% [  +1.360 ;  +52.545]%        0.0140
+    Segmente (K-BASIS): S-A: +18.989% (n=9)  S-B: +50.691% (n=8)  S-C: +0.504% (n=11)
+    Placebo (200 Masken, K-BASIS): 95.P = +17.199%  echt = +20.785%  Rang 99. Perzentil  -> GESCHLAGEN
+    Lag+1 (K-BASIS): EV/Runde = +19.365%  (Kollaps-Verdacht wenn Vorzeichen kippt und |Delta| gross)
+    MaxDD Regel 55.1%  vs Halten 83.2%  (kleiner) | Halten-Gesamtrendite +887%
+    URTEIL T-020: CONFIRMED*
+
+  T-021  R3 Donchian 20/10 | ETHUSDT   Runden=30
+    Szenario         EV/Runde                 95%-KI  p(einseitig)
+    K-MAKER          +19.549% [  +2.126 ;  +44.638]%        0.0080
+    K-BASIS          +19.209% [  +1.786 ;  +44.298]%        0.0115
+    K-KONSERVATIV    +19.059% [  +1.636 ;  +44.148]%        0.0120
+    Segmente (K-BASIS): S-A: +4.852% (n=11)  S-B: +65.147% (n=8)  S-C: +0.157% (n=11)
+    Placebo (200 Masken, K-BASIS): 95.P = +15.609%  echt = +19.209%  Rang 98. Perzentil  -> GESCHLAGEN
+    Lag+1 (K-BASIS): EV/Runde = +20.481%  (Kollaps-Verdacht wenn Vorzeichen kippt und |Delta| gross)
+    MaxDD Regel 69.1%  vs Halten 94.0%  (kleiner) | Halten-Gesamtrendite +656%
+    URTEIL T-021: CONFIRMED*
+
+  T-022  R1 Faber 10M-SMA | 12er-Portfolio (ab Listing)   Runden=50
+    Szenario         EV/Runde                 95%-KI  p(einseitig)
+    K-MAKER         +302.418% [ +40.236 ; +716.222]%        0.0000
+    K-BASIS         +302.078% [ +39.896 ; +715.882]%        0.0000
+    K-KONSERVATIV   +301.928% [ +39.746 ; +715.732]%        0.0000
+    Segmente (K-BASIS): S-A: -13.683% (n=7)  S-B: +727.429% (n=20)  S-C: +28.309% (n=23)
+    Placebo (200 Masken, K-BASIS): 95.P = +292.971%  echt = +302.078%  Rang 96. Perzentil  -> GESCHLAGEN
+    Lag+1 (K-BASIS): EV/Runde = +289.353%  (Kollaps-Verdacht wenn Vorzeichen kippt und |Delta| gross)
+    MaxDD Regel 68.5%  vs Halten 91.2%  (kleiner) | Halten-Gesamtrendite +925%
+    URTEIL T-022: REJECTED (Segment-Vorzeichen)
+
+  T-023  R2 MOP 12M-Momentum | 12er-Portfolio (ab Listing)   Runden=36
+    Szenario         EV/Runde                 95%-KI  p(einseitig)
+    K-MAKER         +183.147% [ +36.229 ; +410.977]%        0.0000
+    K-BASIS         +182.807% [ +35.889 ; +410.637]%        0.0000
+    K-KONSERVATIV   +182.657% [ +35.739 ; +410.487]%        0.0000
+    Segmente (K-BASIS): S-A: -9.492% (n=4)  S-B: +351.771% (n=17)  S-C: +42.594% (n=15)
+    Placebo (200 Masken, K-BASIS): 95.P = +439.784%  echt = +182.807%  Rang 73. Perzentil  -> NICHT geschlagen
+    Lag+1 (K-BASIS): EV/Runde = +186.063%  (Kollaps-Verdacht wenn Vorzeichen kippt und |Delta| gross)
+    MaxDD Regel 74.6%  vs Halten 91.2%  (kleiner) | Halten-Gesamtrendite +925%
+    URTEIL T-023: REJECTED (Segment-Vorzeichen, Placebo)
+
+  T-024  R3 Donchian 20/10 | 12er-Portfolio (ab Listing)   Runden=248
+    Szenario         EV/Runde                 95%-KI  p(einseitig)
+    K-MAKER          +27.010% [ +16.316 ;  +38.741]%        0.0000
+    K-BASIS          +26.670% [ +15.976 ;  +38.401]%        0.0000
+    K-KONSERVATIV    +26.520% [ +15.826 ;  +38.251]%        0.0000
+    Segmente (K-BASIS): S-A: +3.678% (n=43)  S-B: +58.821% (n=95)  S-C: +7.890% (n=110)
+    Placebo (200 Masken, K-BASIS): 95.P = +20.174%  echt = +26.670%  Rang 99. Perzentil  -> GESCHLAGEN
+    Lag+1 (K-BASIS): EV/Runde = +31.338%  (Kollaps-Verdacht wenn Vorzeichen kippt und |Delta| gross)
+    MaxDD Regel 69.0%  vs Halten 91.2%  (kleiner) | Halten-Gesamtrendite +925%
+    URTEIL T-024: CONFIRMED*
+
+====================================================================================================
+ p-WERTE FUER DIE GEMEINSAME FDR (mit H2 in der Gesamtauswertung)
+====================================================================================================
+    T-016  p=0.0060  INCONCLUSIVE (n<12)          R1 Faber 10M-SMA | BTCUSDT
+    T-017  p=0.3355  INCONCLUSIVE (n<12)          R1 Faber 10M-SMA | ETHUSDT
+    T-018  p=0.0470  INCONCLUSIVE (n<12)          R2 MOP 12M-Momentum | BTCUSDT
+    T-019  p=0.2180  INCONCLUSIVE (n<12)          R2 MOP 12M-Momentum | ETHUSDT
+    T-020  p=0.0135  CONFIRMED*                   R3 Donchian 20/10 | BTCUSDT
+    T-021  p=0.0115  CONFIRMED*                   R3 Donchian 20/10 | ETHUSDT
+    T-022  p=0.0000  REJECTED (Segment-Vorzeichen) R1 Faber 10M-SMA | 12er-Portfolio (ab Listing)
+    T-023  p=0.0000  REJECTED (Segment-Vorzeichen, Placebo) R2 MOP 12M-Momentum | 12er-Portfolio (ab Listing)
+    T-024  p=0.0000  CONFIRMED*                   R3 Donchian 20/10 | 12er-Portfolio (ab Listing)

@@ -1,0 +1,126 @@
+
+======================================================================================================================
+ G2  BARRIERENRENNEN UEBER LANGE HORIZONTE  -  Jahr 2  2025-07..2026-07
+ 1514 echte Einstiege an 104 Kalendertagen | Seed 20260730 | Bootstrap 2000 | Placebo je 20 Ziehungen
+======================================================================================================================
+
+  +/-2,5 % / 72 h
+    Rennen: 1514 | entschieden 1494 (auf 712 / ab 782) | ZENSIERT 20 (1.3 %) | Randfenster 0 (0.0 %)
+    P(auf) entschieden      =  47.66 %   95%-KI [42.29 ; 52.73] ueber 104 Tage   [REFERENZ: Soll 47.66 % -> TREFFER]
+    P(auf) nur volle Fenster=  47.66 %   (n=1494)
+    Schranken mit Zensierten: als Verlierer 47.03 % | als Gewinner 48.35 %
+    Zensierte: 12/20 (60.0 %) ueber Einstand, Median-Brutto +0.15 %
+    Placebo S1 (Jahr, 20x)  =  47.00 %   [44.95 ; 49.50]
+    Placebo S2 (Tage, 20x)  =  45.09 %   [43.35 ; 46.28]
+    Echt minus S2 (Uhrzeitwahl)     = +2.57 pp
+    Break-even c=0.30 %: noetig 56.00 % | gemessen 47.66 % | KI-Obergrenze darunter -> AUSGESCHLOSSEN
+    Break-even c=0.15 %: noetig 53.00 % | gemessen 47.66 % | KI-Obergrenze darunter -> AUSGESCHLOSSEN
+    E[r] je Runde inkl. Zensierter = -0.112 % brutto -> netto -0.412 % (c=0,30) / -0.262 % (c=0,15)
+    Unabhaengigkeit: 104 Einstiegstage, aber max. 121 nicht ueberlappende Fenster im Jahr
+
+  +/-5 % / 7 d
+    Rennen: 1514 | entschieden 1469 (auf 627 / ab 842) | ZENSIERT 45 (3.0 %) | Randfenster 0 (0.0 %)
+    P(auf) entschieden      =  42.68 %   95%-KI [35.80 ; 49.93] ueber 104 Tage
+    P(auf) nur volle Fenster=  42.68 %   (n=1469)
+    Schranken mit Zensierten: als Verlierer 41.41 % | als Gewinner 44.39 %
+    Zensierte: 17/45 (37.8 %) ueber Einstand, Median-Brutto -0.71 %
+    Placebo S1 (Jahr, 20x)  =  46.34 %   [44.05 ; 48.84]
+    Placebo S2 (Tage, 20x)  =  41.23 %   [39.96 ; 42.57]
+    Echt minus S2 (Uhrzeitwahl)     = +1.45 pp
+    Break-even c=0.30 %: noetig 53.00 % | gemessen 42.68 % | KI-Obergrenze darunter -> AUSGESCHLOSSEN
+    Break-even c=0.15 %: noetig 51.50 % | gemessen 42.68 % | KI-Obergrenze darunter -> AUSGESCHLOSSEN
+    E[r] je Runde inkl. Zensierter = -0.713 % brutto -> netto -1.013 % (c=0,30) / -0.863 % (c=0,15)
+    Unabhaengigkeit: 104 Einstiegstage, aber max. 52 nicht ueberlappende Fenster im Jahr
+
+  +/-7 % / 14 d
+    Rennen: 1514 | entschieden 1471 (auf 581 / ab 890) | ZENSIERT 43 (2.8 %) | Randfenster 0 (0.0 %)
+    P(auf) entschieden      =  39.50 %   95%-KI [32.58 ; 46.47] ueber 104 Tage
+    P(auf) nur volle Fenster=  39.50 %   (n=1471)
+    Schranken mit Zensierten: als Verlierer 38.38 % | als Gewinner 41.22 %
+    Zensierte: 22/43 (51.2 %) ueber Einstand, Median-Brutto +0.21 %
+    Placebo S1 (Jahr, 20x)  =  46.63 %   [44.08 ; 49.76]
+    Placebo S2 (Tage, 20x)  =  38.96 %   [37.71 ; 40.06]
+    Echt minus S2 (Uhrzeitwahl)     = +0.54 pp
+    Break-even c=0.30 %: noetig 52.14 % | gemessen 39.50 % | KI-Obergrenze darunter -> AUSGESCHLOSSEN
+    Break-even c=0.15 %: noetig 51.07 % | gemessen 39.50 % | KI-Obergrenze darunter -> AUSGESCHLOSSEN
+    E[r] je Runde inkl. Zensierter = -1.423 % brutto -> netto -1.723 % (c=0,30) / -1.573 % (c=0,15)
+    Unabhaengigkeit: 104 Einstiegstage, aber max. 26 nicht ueberlappende Fenster im Jahr
+
+  +/-10 % / 30 d
+    Rennen: 1514 | entschieden 1478 (auf 528 / ab 950) | ZENSIERT 36 (2.4 %) | Randfenster 0 (0.0 %)
+    P(auf) entschieden      =  35.72 %   95%-KI [28.81 ; 42.51] ueber 104 Tage
+    P(auf) nur volle Fenster=  35.72 %   (n=1478)
+    Schranken mit Zensierten: als Verlierer 34.87 % | als Gewinner 37.25 %
+    Zensierte: 20/36 (55.6 %) ueber Einstand, Median-Brutto +0.60 %
+    Placebo S1 (Jahr, 20x)  =  45.11 %   [42.41 ; 46.95]
+    Placebo S2 (Tage, 20x)  =  35.21 %   [34.24 ; 36.21]
+    Echt minus S2 (Uhrzeitwahl)     = +0.51 pp
+    Break-even c=0.30 %: noetig 51.50 % | gemessen 35.72 % | KI-Obergrenze darunter -> AUSGESCHLOSSEN
+    Break-even c=0.15 %: noetig 50.75 % | gemessen 35.72 % | KI-Obergrenze darunter -> AUSGESCHLOSSEN
+    E[r] je Runde inkl. Zensierter = -2.783 % brutto -> netto -3.083 % (c=0,30) / -2.933 % (c=0,15)
+    Unabhaengigkeit: 104 Einstiegstage, aber max. 12 nicht ueberlappende Fenster im Jahr
+
+======================================================================================================================
+ G2  BARRIERENRENNEN UEBER LANGE HORIZONTE  -  Jahr 1  2024-07..2025-07
+ 797 echte Einstiege an 43 Kalendertagen | Seed 20260730 | Bootstrap 2000 | Placebo je 20 Ziehungen
+======================================================================================================================
+
+  +/-2,5 % / 72 h
+    Rennen: 797 | entschieden 795 (auf 403 / ab 392) | ZENSIERT 2 (0.3 %) | Randfenster 0 (0.0 %)
+    P(auf) entschieden      =  50.69 %   95%-KI [43.46 ; 57.60] ueber 43 Tage   [REFERENZ: Soll 50.69 % -> TREFFER]
+    P(auf) nur volle Fenster=  50.69 %   (n=795)
+    Schranken mit Zensierten: als Verlierer 50.56 % | als Gewinner 50.82 %
+    Zensierte: 2/2 (100.0 %) ueber Einstand, Median-Brutto +0.92 %
+    Placebo S1 (Jahr, 20x)  =  50.05 %   [48.30 ; 51.85]
+    Placebo S2 (Tage, 20x)  =  51.16 %   [48.69 ; 53.21]
+    Echt minus S2 (Uhrzeitwahl)     = -0.47 pp
+    Break-even c=0.30 %: noetig 56.00 % | gemessen 50.69 % | nur KI-Obergrenze darueber -> NICHT ENTSCHEIDBAR
+    Break-even c=0.15 %: noetig 53.00 % | gemessen 50.69 % | nur KI-Obergrenze darueber -> NICHT ENTSCHEIDBAR
+    E[r] je Runde inkl. Zensierter = +0.037 % brutto -> netto -0.263 % (c=0,30) / -0.113 % (c=0,15)
+    Unabhaengigkeit: 43 Einstiegstage, aber max. 121 nicht ueberlappende Fenster im Jahr
+
+  +/-5 % / 7 d
+    Rennen: 797 | entschieden 785 (auf 409 / ab 376) | ZENSIERT 12 (1.5 %) | Randfenster 0 (0.0 %)
+    P(auf) entschieden      =  52.10 %   95%-KI [42.21 ; 61.58] ueber 43 Tage
+    P(auf) nur volle Fenster=  52.10 %   (n=785)
+    Schranken mit Zensierten: als Verlierer 51.32 % | als Gewinner 52.82 %
+    Zensierte: 7/12 (58.3 %) ueber Einstand, Median-Brutto +0.56 %
+    Placebo S1 (Jahr, 20x)  =  50.76 %   [48.23 ; 52.81]
+    Placebo S2 (Tage, 20x)  =  51.89 %   [50.40 ; 52.94]
+    Echt minus S2 (Uhrzeitwahl)     = +0.21 pp
+    Break-even c=0.30 %: noetig 53.00 % | gemessen 52.10 % | nur KI-Obergrenze darueber -> NICHT ENTSCHEIDBAR
+    Break-even c=0.15 %: noetig 51.50 % | gemessen 52.10 % | Punktschaetzer darueber
+    E[r] je Runde inkl. Zensierter = +0.206 % brutto -> netto -0.094 % (c=0,30) / +0.056 % (c=0,15)
+    Unabhaengigkeit: 43 Einstiegstage, aber max. 52 nicht ueberlappende Fenster im Jahr
+
+  +/-7 % / 14 d
+    Rennen: 797 | entschieden 786 (auf 440 / ab 346) | ZENSIERT 11 (1.4 %) | Randfenster 0 (0.0 %)
+    P(auf) entschieden      =  55.98 %   95%-KI [45.17 ; 66.87] ueber 43 Tage
+    P(auf) nur volle Fenster=  55.98 %   (n=786)
+    Schranken mit Zensierten: als Verlierer 55.21 % | als Gewinner 56.59 %
+    Zensierte: 9/11 (81.8 %) ueber Einstand, Median-Brutto +3.58 %
+    Placebo S1 (Jahr, 20x)  =  51.50 %   [49.54 ; 54.20]
+    Placebo S2 (Tage, 20x)  =  55.90 %   [54.41 ; 57.85]
+    Echt minus S2 (Uhrzeitwahl)     = +0.08 pp
+    Break-even c=0.30 %: noetig 52.14 % | gemessen 55.98 % | Punktschaetzer darueber
+    Break-even c=0.15 %: noetig 51.07 % | gemessen 55.98 % | Punktschaetzer darueber
+    E[r] je Runde inkl. Zensierter = +0.875 % brutto -> netto +0.575 % (c=0,30) / +0.725 % (c=0,15)
+    Unabhaengigkeit: 43 Einstiegstage, aber max. 26 nicht ueberlappende Fenster im Jahr
+
+  +/-10 % / 30 d
+    Rennen: 797 | entschieden 793 (auf 499 / ab 294) | ZENSIERT 4 (0.5 %) | Randfenster 0 (0.0 %)
+    P(auf) entschieden      =  62.93 %   95%-KI [52.04 ; 73.29] ueber 43 Tage
+    P(auf) nur volle Fenster=  62.93 %   (n=793)
+    Schranken mit Zensierten: als Verlierer 62.61 % | als Gewinner 63.11 %
+    Zensierte: 1/4 (25.0 %) ueber Einstand, Median-Brutto -6.16 %
+    Placebo S1 (Jahr, 20x)  =  51.48 %   [48.16 ; 55.71]
+    Placebo S2 (Tage, 20x)  =  62.57 %   [60.86 ; 64.07]
+    Echt minus S2 (Uhrzeitwahl)     = +0.35 pp
+    Break-even c=0.30 %: noetig 51.50 % | gemessen 62.93 % | Punktschaetzer darueber
+    Break-even c=0.15 %: noetig 50.75 % | gemessen 62.93 % | Punktschaetzer darueber
+    E[r] je Runde inkl. Zensierter = +2.555 % brutto -> netto +2.255 % (c=0,30) / +2.405 % (c=0,15)
+    Unabhaengigkeit: 43 Einstiegstage, aber max. 12 nicht ueberlappende Fenster im Jahr
+
+======================================================================================================================
+ ENDE G2
+======================================================================================================================

@@ -1,0 +1,12 @@
+C:\Users\<BENUTZER>\Desktop\trading_imperium_v6(21)\config
+C:\Users\<BENUTZER>\Desktop\trading_imperium_v6(21)\config.example.json
+C:\Users\<BENUTZER>\Desktop\trading_imperium_v6(21)\data_store\config.json
+C:\Users\<BENUTZER>\Desktop\trading_imperium_v6(21)\data_store\config_backups
+C:\Users\<BENUTZER>\Desktop\trading_imperium_v6(21)\data_store_BACKUP_18_05\config.json
+C:\Users\<BENUTZER>\Desktop\trading_imperium_v6(21)\data_store_BACKUP_18_05\config_backups
+C:\Users\<BENUTZER>\Desktop\trading_imperium_v6(21)\_archive_20260515_214645\_archive_20260514_084220\_archive_20260513_120828\_archiv\reset_backups\config.json.20260507_133539
+C:\Users\<BENUTZER>\Desktop\trading_imperium_v6(21)\agents\dca_advanced.py
+C:\Users\<BENUTZER>\Desktop\trading_imperium_v6(21)\risk\adaptive_sizing.py
+C:\Users\<BENUTZER>\Desktop\trading_imperium_v6(21)\risk\position_sizing.py
+C:\Users\<BENUTZER>\Desktop\trading_imperium_v6(21)\_archive_20260515_214645\fix_sizing_cap.py
+C:\Users\<BENUTZER>\Desktop\trading_imperium_v6(21)\risk\position_sizing.py

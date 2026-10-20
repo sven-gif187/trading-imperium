@@ -1,0 +1,816 @@
+# Anschluss der Regel-Schalter (v7-Befund 118) und der sechs Schutzregeln im Schatten (v7-Befund 119)
+# gebaut in trading_imperium_v6(21) am 25./26.09.2026 - zum Uebertragen nach v7 (Zeilennummern weichen dort ab)
+# Test: schalter_anschluss_test.py (43 Pruefungen, alte gegen neue Fassung)
+# Geaendert: 6 Dateien unten + config.json. NICHT geaendert: data/nupl_monitor.py, risk/exit_rules.py
+# In v6 aktiv seit dem Neustart 26.09. 01:27 (lokal)
+
+--- core/regel_schalter.py.vor_schalter_20260925	2026-08-11 17:36:32.000000000 +0200
++++ core/regel_schalter.py	2026-09-26 01:15:51.756228400 +0200
+@@ -68,6 +68,7 @@
+ import json
+ import os
+ import threading
++import time
+ 
+ try:
+     from config.settings import DATA_DIR
+@@ -75,6 +76,15 @@
+     DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(
+         os.path.abspath(__file__))), "data_store")
+ 
++try:
++    from core.logger import log
++except Exception:                                    # Notfall-Pfad (Tests)
++    class _L:
++        def info(self, m, s): print(f"[{m}] {s}")
++        def warn(self, m, s): print(f"[{m}] {s}")
++        def error(self, m, s): print(f"[{m}] {s}")
++    log = _L()
++
+ ACTIVE = "ACTIVE"
+ SHADOW = "SHADOW"
+ OFF = "OFF"
+@@ -91,8 +101,42 @@
+     "wiedereinstieg_sperre",  # 90 min kein Rueckkauf nach Exit
+     "dca_stufen",             # gestaffelter Nachkauf
+     "meta_voting",            # Gewichtung der Agenten-Stimmen
++    # [25.09.2026] Sechs Schutzregeln, die bisher NIE gewirkt haben
++    # (v7-Befund 119, in v6 genauso nachgesehen). Sie werden zuerst im
++    # SCHATTEN angeschlossen: sie rechnen und notieren, was sie getan
++    # haetten, greifen aber nicht ein. Scharf erst nach Beleg und mit
++    # eigener Epochengrenze. Sven am 25.09.: "es hat ja einen grund und
++    # sinn das wir das drinnen haben, bzw teste und belege es".
++    "drawdown_stopp",          # keine Kaeufe ab max_drawdown_pct Rueckgang
++    "notbremse_tagesreset",    # Verlustzaehler der Notbremse um 00:00 UTC auf null
++    "verlustsperre_aufhebung", # Verlustserien-Sperre bei hohem Score aufheben
++    "auto_verteidigung",       # im Abwaertstrend die 2 schlechtesten verkaufen
++    "nupl_bremse",             # NUPL aus echtem 200-Tage-Schnitt statt Ersatzwert
++    "sammel_notbremse",        # bei ausgeloester Notbremse alles schliessen
+ )
+ 
++# Was gilt, wenn ein Eintrag fehlt oder Unsinn enthaelt: immer das HEUTIGE
++# Verhalten. Die acht alten Regeln wirken heute -> ACTIVE. Die sechs
++# Schutzregeln wirkten bisher nie -> SHADOW. Mit ACTIVE als Vorgabe haette
++# ein vergessener Eintrag sie still scharf geschaltet - z. B. einen
++# ungemessenen Drawdown-Stopp, der ab 15 % Rueckgang seit dem Programmstart
++# alle Kaeufe sperrt. (Nicht "sofort": der Hoechststand beginnt bei jedem
++# Start bei 0, alte Rueckgaenge zaehlen nicht - risk/drawdown_guard.py:15.)
++VORGABE = {r: ACTIVE for r in BEKANNTE_REGELN}
++VORGABE.update({
++    "drawdown_stopp": SHADOW,
++    "notbremse_tagesreset": SHADOW,
++    "verlustsperre_aufhebung": SHADOW,
++    "auto_verteidigung": SHADOW,
++    "nupl_bremse": SHADOW,
++    "sammel_notbremse": SHADOW,
++})
++
++
++def vorgabe(regel):
++    """Zustand einer Regel, wenn nichts eingestellt ist."""
++    return VORGABE.get(str(regel), ACTIVE)
++
+ 
+ class RegelSchalter:
+     """Liest die Zustaende und nimmt die Schatten-Notizen entgegen."""
+@@ -107,8 +151,8 @@
+ 
+     # ------------------------------------------------------------------
+     def _laden(self):
+-        """Liest die Zustaende. Jeder Fehler endet bei ACTIVE."""
+-        modi = {r: ACTIVE for r in BEKANNTE_REGELN}
++        """Liest die Zustaende. Jeder Fehler endet bei der VORGABE."""
++        modi = {r: vorgabe(r) for r in BEKANNTE_REGELN}
+         try:
+             if os.path.exists(self.config_datei):
+                 with open(self.config_datei, "r", encoding="utf-8") as f:
+@@ -123,7 +167,7 @@
+                     else:
+                         self.unbekannt.add(f"{name}={wert}")
+         except Exception:
+-            pass          # kaputte Datei -> ueberall ACTIVE, also heutiges Verhalten
++            pass          # kaputte Datei -> ueberall VORGABE, also heutiges Verhalten
+         return modi
+ 
+     def neu_laden(self):
+@@ -135,8 +179,8 @@
+ 
+     # ------------------------------------------------------------------
+     def modus(self, regel):
+-        """Zustand einer Regel. Unbekannte Regel -> ACTIVE."""
+-        return self.modi.get(str(regel), ACTIVE)
++        """Zustand einer Regel. Unbekannte Regel -> ihre VORGABE."""
++        return self.modi.get(str(regel), vorgabe(regel))
+ 
+     def wirkt(self, regel):
+         """True = die Regel darf entscheiden. False = SHADOW oder OFF.
+@@ -193,3 +237,66 @@
+         if not aus:
+             return ""
+         return "NICHT scharf: " + ", ".join(aus)
++
++
++# ======================================================================
++# [25.09.2026] Modulweiter Zugriff - damit der Schalter endlich GELESEN wird
++# ======================================================================
++# Bis heute fragte genau EINE Stelle im ganzen Bot den Schalter ab:
++# runtime/exit_monitor.py fuer trend_exit. Die anderen sieben Eintraege in
++# regel_modi waren Attrappen - wer "baerenmarkt" auf OFF stellte, aenderte
++# nichts (v7-Befund 118, Ergaenzung zu Befund 11). Ein Grund dafuer: die
++# Regeln sitzen teils in Modulen ohne Zugriff auf die App (risk/engine.py).
++# app.py meldet deshalb den einen Schalter hier an, und jede Regelstelle
++# stellt dieselbe Frage: entscheidet(regel, ...).
++
++_AKTUELL = None
++_ZULETZT = {}
++_ZULETZT_LOCK = threading.Lock()
++
++
++def anmelden(schalter):
++    """app.py meldet den einen RegelSchalter an. Ein zweiter Aufruf ersetzt ihn."""
++    global _AKTUELL
++    _AKTUELL = schalter
++    with _ZULETZT_LOCK:
++        _ZULETZT.clear()
++
++
++def aktueller():
++    return _AKTUELL
++
++
++def entscheidet(regel, symbol="", haette="", grund="", preis=None,
++                pnl_pct=None, position_id="", zusatz="", sperre_s=3600):
++    """Die eine Frage an jeder Regelstelle: darf die Regel jetzt eingreifen?
++
++      ACTIVE  -> True. Die Regel greift, genau wie bisher.
++      SHADOW  -> False. Es wird notiert, was sie getan HAETTE (Tabelle
++                 schatten_regeln + eine Logzeile) - hoechstens einmal je
++                 Regel und Symbol in `sperre_s` Sekunden. Ohne diese Drossel
++                 schriebe der 12-s-Takt dieselbe Notiz tausendfach am Tag.
++      OFF     -> False, keine Notiz.
++
++    Ohne angemeldeten Schalter (Tests, Werkzeuge) gilt die VORGABE der
++    Regel, also das heutige Verhalten.
++    """
++    s = _AKTUELL
++    modus = s.modus(regel) if s is not None else vorgabe(regel)
++    if modus == ACTIVE:
++        return True
++    if modus != SHADOW:
++        return False
++    schluessel = (str(regel), str(symbol))
++    jetzt = time.time()
++    with _ZULETZT_LOCK:
++        if jetzt - _ZULETZT.get(schluessel, 0.0) < sperre_s:
++            return False
++        _ZULETZT[schluessel] = jetzt
++    log.info("SCHATTEN", f"{regel}{' ' + symbol if symbol else ''}: haette "
++                         f"{haette} ({grund})"[:300])
++    if s is not None:
++        s.notieren(regel, symbol=symbol, haette=haette, grund=grund,
++                   preis=preis, pnl_pct=pnl_pct, position_id=position_id,
++                   zusatz=zusatz)
++    return False
+--- core/regel_waechter.py.vor_schalter_20260925	2026-08-12 22:15:14.000000000 +0200
++++ core/regel_waechter.py	2026-09-25 23:59:09.101831100 +0200
+@@ -69,7 +69,7 @@
+         def error(self, m, s): print(f"[{m}] {s}")
+     log = _L()
+ 
+-from core.regel_schalter import BEKANNTE_REGELN, ACTIVE
++from core.regel_schalter import BEKANNTE_REGELN, ACTIVE, vorgabe
+ 
+ SOLL_DATEI = os.path.join(DATA_DIR, "regel_modi_soll.json")
+ CONFIG_DATEI = os.path.join(DATA_DIR, "config.json")
+@@ -79,6 +79,14 @@
+ # gemessen Geld gekostet haben.
+ RISKANT_WENN_AKTIV = {
+     "trend_exit": "46 Faelle, 0 % im Plus, Summe -36,08 $ (Messung 10.08.)",
++    # [25.09.2026] Die sechs Schutzregeln laufen im Schatten. ACTIVE ist bei
++    # ihnen eine VERHALTENSAENDERUNG und braucht eine Epochengrenze.
++    "drawdown_stopp": "sperrt alle Kaeufe ab max_drawdown_pct Rueckgang - ungemessen",
++    "notbremse_tagesreset": "loest die Notbremse taeglich - ungemessen",
++    "verlustsperre_aufhebung": "hebt Verlustserien-Sperren auf - ungemessen",
++    "auto_verteidigung": "verkauft im Abwaertstrend selbsttaetig - ungemessen",
++    "nupl_bremse": "neuer NUPL-Wert entscheidet ueber Kaufsperren - ungemessen",
++    "sammel_notbremse": "schliesst ALLE Positionen und stoppt den Bot - ungemessen",
+ }
+ 
+ 
+@@ -150,7 +158,7 @@
+ 
+         abweichungen = []
+         for regel in BEKANNTE_REGELN:
+-            s, i = soll.get(regel, ACTIVE), ist.get(regel, ACTIVE)
++            s, i = soll.get(regel, vorgabe(regel)), ist.get(regel, vorgabe(regel))
+             if s != i:
+                 abweichungen.append((regel, s, i))
+ 
+@@ -174,8 +182,8 @@
+         if fehlt:
+             zeilen += [
+                 "  Der Block \"regel_modi\" fehlt in data_store/config.json.",
+-                "  Dann faellt JEDE Regel auf ACTIVE zurueck - auch die, die",
+-                "  bewusst stillgelegt wurden.",
++                "  Dann faellt JEDE Regel auf ihre Vorgabe zurueck (die acht",
++                "  alten auf ACTIVE) - auch die, die bewusst stillgelegt wurden.",
+                 "",
+             ]
+         for regel, s, i in abweichungen:
+@@ -250,4 +258,4 @@
+         return {"soll": soll, "ist": ist,
+                 "block_fehlt": self.block_fehlt(),
+                 "abweichungen": [r for r in BEKANNTE_REGELN
+-                                 if soll.get(r, ACTIVE) != ist.get(r, ACTIVE)]}
++                                 if soll.get(r, vorgabe(r)) != ist.get(r, vorgabe(r))]}
+--- regel_waechter_bestaetigen.py.vor_schalter_20260925	2026-08-12 22:15:36.000000000 +0200
++++ regel_waechter_bestaetigen.py	2026-09-25 23:59:09.101831100 +0200
+@@ -16,7 +16,7 @@
+ """
+ import sys
+ 
+-from core.regel_schalter import RegelSchalter, BEKANNTE_REGELN, ACTIVE
++from core.regel_schalter import RegelSchalter, BEKANNTE_REGELN, ACTIVE, vorgabe
+ from core.regel_waechter import RegelWaechter, RISKANT_WENN_AKTIV
+ 
+ 
+@@ -35,8 +35,8 @@
+     print(f"{'Regel':24} {'hinterlegt':>12} {'tatsaechlich':>14}")
+     print("-" * 62)
+     for regel in BEKANNTE_REGELN:
+-        s = st["soll"].get(regel, ACTIVE)
+-        i = st["ist"].get(regel, ACTIVE)
++        s = st["soll"].get(regel, vorgabe(regel))
++        i = st["ist"].get(regel, vorgabe(regel))
+         markierung = ""
+         if s != i:
+             markierung = "  <-- abweichend"
+--- risk/engine.py.vor_schalter_20260925	2026-08-10 21:09:40.000000000 +0200
++++ risk/engine.py	2026-09-26 00:06:11.043386500 +0200
+@@ -28,6 +28,14 @@
+ from risk.drawdown_guard import DrawdownGuard
+ from risk.kill_switch import KillSwitch
+ from risk.position_sizing import PositionSizer
++from core.regel_schalter import entscheidet
++
++# [25.09.2026] Ab welchem Score eine Verlustserien-Sperre aufgehoben werden
++# darf (Regel "verlustsperre_aufhebung"). Vorher stand hier fest 50 - bei
++# einer Punkteskala von 0 bis 10 unerreichbar, die Aufhebung war tot
++# (v7-Befund 119). 8 von 10 ist ein Startwert, KEIN gemessener Wert: die
++# Regel laeuft im Schatten, erst die Notizen zeigen, ob 8 taugt.
++VERLUSTSPERRE_AUFHEBUNG_AB_SCORE = 8
+ 
+ 
+ class RiskEngine:
+@@ -66,6 +74,12 @@
+             # Wenn nur prozentual gesetzt, Default 50$ fuer Kill-Switch
+             max_loss_usd = 50.0
+         self.kill_switch = KillSwitch(max_daily_loss=max_loss_usd)
++        # [25.09.2026] risk.kill_switch_enabled wurde nie gelesen - ein
++        # Scheinschalter (v7-Befund 118). Vorgabe und heutiger Wert: true.
++        self.kill_switch_an = bool(getattr(config.risk, "kill_switch_enabled", True))
++        self._notbremse_tag = None          # UTC-Datum fuer den Tagesreset
++        self._notbremse_gemeldet = False    # Sammel-Notbremse je Ausloesung einmal
++        self.notbremse_rueckruf = None      # setzt app.py (Sammel-Notbremse)
+ 
+         self.sizer = PositionSizer(
+             default_pct=position_size_pct,
+@@ -76,7 +90,9 @@
+ 
+         # FIX 5: Coin-spezifischer Cooldown (statt global!)
+         self.coin_consecutive_losses = {}     # {symbol: count}
+-        self.coin_cooldown_override_score = 50  # Bei Score >= 50 wird Cooldown ignoriert
++        # Bei Score >= diesem Wert darf die Sperre aufgehoben werden - aber nur,
++        # wenn der Schalter verlustsperre_aufhebung auf ACTIVE steht.
++        self.coin_cooldown_override_score = VERLUSTSPERRE_AUFHEBUNG_AB_SCORE
+ 
+         # === AUTO-DEFENSE STEP 1 ===
+         self.consecutive_rejects = 0
+@@ -225,26 +241,45 @@
+         stoerungen = []
+ 
+         # 1. Kill-Switch
+-        if self.kill_switch.active:
+-            intent.status = IntentStatus.REJECTED
+-            intent.risk_reason = f"Kill-Switch: {self.kill_switch.trigger_reason}"
+-            intent.risk_approved = False
+-            log.risk("RISK", f"REJECTED {intent.side.value} {intent.symbol}: {intent.risk_reason}")
+-            return intent
+-
+-        if self.kill_switch.check():
+-            intent.status = IntentStatus.REJECTED
+-            intent.risk_reason = f"Kill-Switch ausgeloest: {self.kill_switch.trigger_reason}"
+-            intent.risk_approved = False
+-            log.risk("RISK", f"REJECTED {intent.side.value} {intent.symbol}: {intent.risk_reason}")
+-            return intent
++        # [25.09.2026] Nur noch, wenn risk.kill_switch_enabled true ist (war
++        # ein Scheinschalter). Dazu der Tagesreset und die Sammel-Notbremse,
++        # beide im Schatten - siehe _notbremse_tageswechsel/_notbremse_folgen.
++        if self.kill_switch_an:
++            self._notbremse_tageswechsel()
++            self._notbremse_folgen()
++            if self.kill_switch.active:
++                intent.status = IntentStatus.REJECTED
++                intent.risk_reason = f"Kill-Switch: {self.kill_switch.trigger_reason}"
++                intent.risk_approved = False
++                log.risk("RISK", f"REJECTED {intent.side.value} {intent.symbol}: {intent.risk_reason}")
++                return intent
++
++            if self.kill_switch.check():
++                self._notbremse_folgen()
++                intent.status = IntentStatus.REJECTED
++                intent.risk_reason = f"Kill-Switch ausgeloest: {self.kill_switch.trigger_reason}"
++                intent.risk_approved = False
++                log.risk("RISK", f"REJECTED {intent.side.value} {intent.symbol}: {intent.risk_reason}")
++                return intent
+ 
+         # 2. Drawdown-Guard
++        # [25.09.2026] update_equity() hatte keinen einzigen Aufrufer - der
++        # Hoechststand blieb 0, die Regel konnte nie greifen (v7-Befund 119).
++        # Jetzt wird der Kapitalstand bei jeder Kaufpruefung nachgefuehrt.
++        # Eingreifen darf die Regel nur mit Schalter drawdown_stopp = ACTIVE;
++        # Vorgabe ist SHADOW, dann wird nur notiert.
++        _eq_dd = portfolio.get("total_equity", 0) or 0
++        if intent.side == Side.BUY and _eq_dd > 0:
++            self.drawdown.update(_eq_dd)
+         if not self.drawdown.is_safe():
+             _g = (f"Drawdown {self.drawdown.current_drawdown_pct:.1f}% >= "
+                   f"{self.drawdown.max_drawdown_pct}%")
+-            reasons.append(_g)
+-            stoerungen.append(_g)      # echtes Warnsignal -> Pause gerechtfertigt
++            if entscheidet("drawdown_stopp", haette="alle Kaeufe sperren",
++                           grund=f"{_g} (Hoechststand "
++                                 f"{self.drawdown.peak_equity:.2f}$, jetzt "
++                                 f"{_eq_dd:.2f}$)"):
++                reasons.append(_g)
++                stoerungen.append(_g)      # echtes Warnsignal -> Pause gerechtfertigt
+ 
+         # 3. Max Positionen (aus aktivem Trading-Modus, falls verfuegbar)
+         open_count = sum(1 for p in self.open_positions.values() if p.get("active"))
+@@ -296,19 +331,39 @@
+             cooldown_threshold = self.config.cooldown_after_losses
+             if coin_losses >= cooldown_threshold:
+                 # Score-Override: Hoher Score umgeht Cooldown
++                # [25.09.2026] Schwelle 8 statt unerreichbarer 50, und nur mit
++                # Schalter verlustsperre_aufhebung = ACTIVE (Vorgabe SHADOW).
+                 intent_score = getattr(intent, 'score', 0) or 0
+-                if intent_score < self.coin_cooldown_override_score:
++                _ab = self.coin_cooldown_override_score
++                _aufheben = False
++                if intent_score >= _ab:
++                    _aufheben = entscheidet(
++                        "verlustsperre_aufhebung", symbol=intent.symbol,
++                        haette=f"Sperre aufheben, Kauf pruefen (Score {intent_score})",
++                        grund=f"{coin_losses} Verluste in Folge, Score "
++                              f"{intent_score} >= {_ab}",
++                        preis=getattr(intent, "entry_price", None))
++                if _aufheben:
++                    log.info("RISK", f"Cooldown OVERRIDE fuer {intent.symbol}: "
++                                      f"Score {intent_score} >= {_ab}")
++                elif intent_score < _ab:
+                     reasons.append(f"Cooldown: {coin_losses}x {intent.symbol} Verlust "
+-                                   f"(Score {intent_score} < {self.coin_cooldown_override_score})")
++                                   f"(Score {intent_score} < {_ab})")
+                 else:
+-                    log.info("RISK", f"Cooldown OVERRIDE fuer {intent.symbol}: "
+-                                      f"Score {intent_score} >= {self.coin_cooldown_override_score}")
++                    reasons.append(f"Cooldown: {coin_losses}x {intent.symbol} Verlust "
++                                   f"(Score {intent_score} >= {_ab}, Aufhebung "
++                                   f"nicht scharf)")
+ 
+         # 6. Zyklusphase
+         if cycle_phase in ("MID_BEAR", "DEEP_BEAR", "CAPITULATION"):
+             asset = intent.symbol.split("/")[0] if "/" in intent.symbol else ""
+             if asset not in ("BTC", "ETH") and intent.side == Side.BUY:
+-                reasons.append("Baerenmarkt: nur BTC+ETH")
++                # [25.09.2026] Schalter baerenmarkt wird jetzt gelesen.
++                if entscheidet("baerenmarkt", symbol=intent.symbol,
++                               haette="BUY blockieren",
++                               grund=f"Zyklus {cycle_phase}: nur BTC+ETH",
++                               preis=getattr(intent, "entry_price", None)):
++                    reasons.append("Baerenmarkt: nur BTC+ETH")
+ 
+         # 7. Bereits in Position
+         if intent.symbol in self.open_positions and self.open_positions[intent.symbol].get("active"):
+@@ -370,6 +425,8 @@
+             # Per-Coin Cooldown
+             if pnl < 0:
+                 self.kill_switch.add_loss(abs(pnl))
++                if self.kill_switch_an:
++                    self._notbremse_folgen()
+                 self.consecutive_losses += 1
+                 self.coin_consecutive_losses[symbol] = \
+                     self.coin_consecutive_losses.get(symbol, 0) + 1
+@@ -446,6 +503,64 @@
+         self.daily_trades = 0
+         log.info("RISK", "Tages-Reset")
+ 
++    # ------------------------------------------------------------------
++    # [25.09.2026] Notbremse: Tagesreset und Sammel-Notbremse (v7-Befund 119)
++    # ------------------------------------------------------------------
++    def _notbremse_tageswechsel(self):
++        """Tagesreset der Notbremse um 00:00 UTC - im Schatten.
++
++        Die Notbremse heisst "Tages-Verlust", zaehlte aber seit Programm-
++        start: einen automatischen Reset gab es nie, nur den Knopf im
++        Cockpit. Ob der Reset gebraucht wird, zeigen erst die Notizen -
++        deshalb Schalter notbremse_tagesreset, Vorgabe SHADOW.
++        """
++        heute = time.strftime("%Y-%m-%d", time.gmtime())
++        if self._notbremse_tag is None:
++            self._notbremse_tag = heute
++            return
++        if heute == self._notbremse_tag:
++            return
++        self._notbremse_tag = heute
++        verlust = float(self.kill_switch.daily_loss or 0)
++        if verlust <= 0 and not self.kill_switch.active:
++            return                          # nichts zurueckzusetzen
++        _was = f"Verlustzaehler {verlust:.2f}$ auf 0 setzen"
++        if self.kill_switch.active:
++            _was += " und die ausgeloeste Notbremse loesen"
++        if entscheidet("notbremse_tagesreset", haette=_was,
++                       grund=f"neuer Tag {heute} (UTC), Grenze "
++                             f"{self.kill_switch.max_daily_loss:.2f}$",
++                       sperre_s=0):
++            self.kill_switch.reset_daily()
++
++    def _notbremse_folgen(self):
++        """Sammel-Notbremse, einmal je Ausloesung - im Schatten.
++
++        Vorher tot: _close_all_positions_safety() in app.py hatte keinen
++        Aufrufer, und EVENT_KILL_SWITCH wurde nirgends gesendet. Die
++        Notbremse sperrte nur neue Kaeufe. Mit Schalter sammel_notbremse =
++        ACTIVE ruft sie den Rueckruf, den app.py setzt (alles schliessen,
++        Bot anhalten). Vorgabe SHADOW: nur notieren.
++        """
++        if not self.kill_switch.active:
++            self._notbremse_gemeldet = False
++            return
++        if self._notbremse_gemeldet:
++            return
++        self._notbremse_gemeldet = True
++        offen = [s for s, p in self.open_positions.items()
++                 if isinstance(p, dict) and p.get("active")]
++        if entscheidet("sammel_notbremse",
++                       haette=f"alle {len(offen)} Positionen schliessen und "
++                              f"den Bot anhalten",
++                       grund=f"Notbremse: {self.kill_switch.trigger_reason}",
++                       zusatz=",".join(offen), sperre_s=0):
++            if callable(self.notbremse_rueckruf):
++                self.notbremse_rueckruf(self.kill_switch.trigger_reason)
++            else:
++                log.error("RISK", "Sammel-Notbremse ist ACTIVE, aber kein "
++                                  "Rueckruf angemeldet - es wurde NICHTS geschlossen")
++
+ 
+ 
+     def is_in_sleep_mode(self) -> bool:
+@@ -499,10 +614,19 @@
+         loss_candidates.sort(key=lambda x: x["pnl_pct"])
+         to_sell = loss_candidates[:self.defense_max_sells_per_cycle]
+ 
++        # [25.09.2026] Hier stand "verkauft" - verkauft wird aber erst in
++        # app.py, und nur mit Schalter auto_verteidigung = ACTIVE. Die Zeile
++        # ist gedrosselt (einmal je Symbol in 10 Minuten): die Pruefung laeuft
++        # im 12-s-Takt je Position, seit sie Daten bekommt.
++        if not hasattr(self, "_defense_gemeldet"):
++            self._defense_gemeldet = {}
++        _jetzt = time.time()
+         for s in to_sell:
+-            log.warn("AUTO-DEFENSE",
+-                     f"{s['symbol']} verkauft @ PnL {s['pnl_pct']:+.2f}% "
+-                     f"(Bearish Market Protect)")
++            if _jetzt - self._defense_gemeldet.get(s["symbol"], 0) >= 600:
++                self._defense_gemeldet[s["symbol"]] = _jetzt
++                log.warn("AUTO-DEFENSE",
++                         f"{s['symbol']} ist Verkaufskandidat @ PnL {s['pnl_pct']:+.2f}% "
++                         f"(Bearish Market Protect)")
+ 
+         return to_sell
+ 
+--- runtime/exit_monitor.py.vor_schalter_20260925	2026-08-18 23:32:08.000000000 +0200
++++ runtime/exit_monitor.py	2026-09-26 00:02:19.037189100 +0200
+@@ -349,17 +349,44 @@
+                 # ====================================================
+                 elif not sell_reason and coin_mode == "SL":
+                     from risk.exit_rules import effektiver_trail, breakeven_verletzt
++                    # [25.09.2026] Die Schalter trailing_leiter und
++                    # breakeven_sperre werden jetzt gelesen (vorher Attrappen,
++                    # v7-Befund 118). Bei ACTIVE - dem heutigen Stand - laeuft
++                    # alles wie zuvor: Trailing hat Vorrang, sonst Breakeven.
++                    # Nur wenn das Trailing NICHT scharf ist, bekommt die
++                    # Breakeven-Sperre im selben Durchlauf ihre Chance.
++                    _schalter = getattr(self.app, "regel_schalter", None)
++
++                    def _regel_wirkt(_r):
++                        return _schalter is None or _schalter.wirkt(_r)
++
++                    def _regel_schatten(_r):
++                        return _schalter is not None and _schalter.schreibt_mit(_r)
++
+                     # Faktor am HOECHSTSTAND, nicht am aktuellen Gewinn -> Ratsche.
+                     eff_trail = effektiver_trail(hoechst_pnl_pct, trail_pct, _rr_regime)
+-                    if eff_trail > 0 and fall_from_high >= eff_trail:
++                    _trail_trifft = eff_trail > 0 and fall_from_high >= eff_trail
++                    if _trail_trifft:
+                         _up_tag = ", TREND-UP" if _rr_regime == "TRENDING_UP" else ""
+-                        sell_reason = (f"TRAILING-STOP (Fall {fall_from_high:.2f}% >= {eff_trail}%, "
+-                                       f"PnL {pnl_pct:+.2f}%, Hoch {hoechst_pnl_pct:+.2f}%{_up_tag})")
+-                        strategy = "TRAILING_STOP"
+-                    elif breakeven_verletzt(pnl_pct, hoechst_pnl_pct):
+-                        sell_reason = (f"BREAKEVEN-SPERRE (war {hoechst_pnl_pct:+.2f}%, "
+-                                       f"jetzt {pnl_pct:+.2f}%)")
+-                        strategy = "BREAKEVEN_LOCK"
++                        _tr_grund = (f"TRAILING-STOP (Fall {fall_from_high:.2f}% >= {eff_trail}%, "
++                                     f"PnL {pnl_pct:+.2f}%, Hoch {hoechst_pnl_pct:+.2f}%{_up_tag})")
++                        if _regel_wirkt("trailing_leiter"):
++                            sell_reason = _tr_grund
++                            strategy = "TRAILING_STOP"
++                        elif _regel_schatten("trailing_leiter"):
++                            self._schatten_notieren(
++                                sym, pos, "TRAILING_STOP", _tr_grund,
++                                current_price, pnl_pct, hoechst_pnl_pct)
++                    if not sell_reason and breakeven_verletzt(pnl_pct, hoechst_pnl_pct):
++                        _be_grund = (f"BREAKEVEN-SPERRE (war {hoechst_pnl_pct:+.2f}%, "
++                                     f"jetzt {pnl_pct:+.2f}%)")
++                        if _regel_wirkt("breakeven_sperre"):
++                            sell_reason = _be_grund
++                            strategy = "BREAKEVEN_LOCK"
++                        elif _regel_schatten("breakeven_sperre"):
++                            self._schatten_notieren(
++                                sym, pos, "BREAKEVEN_LOCK", _be_grund,
++                                current_price, pnl_pct, hoechst_pnl_pct)
+ 
+                 # ====================================================
+                 # 4. BEI TREFFER SOFORT SELL!
+--- app.py.vor_schalter_20260925	2026-08-20 03:42:28.000000000 +0200
++++ app.py	2026-09-26 01:28:26.873997000 +0200
+@@ -81,6 +81,7 @@
+     from agents.grid_trader import GridTrader
+     from agents.dca_advanced import AdvancedDCA
+     from risk.reentry_guard import ReentryGuard      # [E9-CHURN 29.07.]
++    from core.regel_schalter import entscheidet as _entscheidet   # [25.09.2026]
+     from data.orderbook_depth import OrderBookAnalyzer
+     from config.versioning import ConfigVersioning
+     from agents.arbitrage_agent import ArbitrageAgent
+@@ -395,6 +396,9 @@
+ 
+         # RiskEngine mit Portfolio Manager verbinden (fuer dynamische Limits!)
+         self.risk_engine.set_portfolio_manager(self.portfolio)
++        # [25.09.2026] Sammel-Notbremse anschliessen. Greift nur mit Schalter
++        # sammel_notbremse = ACTIVE; Vorgabe SHADOW -> nur notieren.
++        self.risk_engine.notbremse_rueckruf = self._sammel_notbremse_ausfuehren
+ 
+         # [E10-KAPITAL 29.07.] BTC-Sparplan als Kapital-Topf anmelden.
+         # Ohne diese Zeile fehlen seine 96.54 $ (20.7 % des Kapitals) in
+@@ -487,8 +491,12 @@
+         # Die Telemetrie wird nachgereicht, sobald sie existiert (weiter unten);
+         # ohne sie kann der Schalter zwar entscheiden, aber nicht notieren.
+         try:
+-            from core.regel_schalter import RegelSchalter
++            from core.regel_schalter import RegelSchalter, anmelden
+             self.regel_schalter = RegelSchalter()
++            # [25.09.2026] Modulweit anmelden - sonst koennen Regeln ohne
++            # Zugriff auf die App (risk/engine.py) den Schalter nicht fragen.
++            # Genau deshalb waren sieben von acht Schaltern Attrappen.
++            anmelden(self.regel_schalter)
+         except Exception as _rs_err:
+             self.regel_schalter = None
+             log.warn("SCHALTER", f"Regel-Schalter nicht geladen: "
+@@ -808,8 +816,12 @@
+                     if not _pos.get("active"):
+                         continue
+                     _entry = _pos.get("entry_price", 0)
+-                    _snap = self.market_data.snapshots.get(_sym) if hasattr(self, "market_data") else None
+-                    _cur = _snap.close if _snap else 0
++                    # [25.09.2026] Hier stand self.market_data.snapshots - ein
++                    # Attribut, das nie gesetzt wird. Die Liste blieb leer, die
++                    # Auto-Verteidigung konnte nie greifen (v7-Befund 119).
++                    # Der Kurs kommt jetzt aus derselben Quelle wie bei der
++                    # Notbremse (_close_all_positions_safety).
++                    _cur = float((self.data_agent.price_cache or {}).get(_sym, 0) or 0)
+                     _qty = _pos.get("qty", 0)
+                     if _entry > 0 and _cur > 0:
+                         _all_positions.append({
+@@ -818,19 +830,28 @@
+                         })
+ 
+                 _regime = str(self.regime_detector.current_regime) if hasattr(self, "regime_detector") else "UNKNOWN"
+-                _mtf = "NEUTRAL"
+-                if hasattr(self, "mtf_analyzer"):
+-                    try:
+-                        _mtf_res = self.mtf_analyzer.analyze("BTC/USDC")
+-                        _mtf = _mtf_res.get("direction", "NEUTRAL") if isinstance(_mtf_res, dict) else "NEUTRAL"
+-                    except Exception:
+-                        pass
++                # [25.09.2026] Hier stand self.mtf_analyzer.analyze(...) - auch
++                # dieses Attribut gibt es nicht, die Richtung blieb immer
++                # NEUTRAL. Die Mehrzeitrahmen-Richtung liegt in
++                # multi_tf.last_signals (dieselbe Quelle wie beim Trend-Ausstieg,
++                # runtime/exit_monitor.py). Sie wird nur fuer BTC berechnet -
++                # genau das verlangt diese Regel auch (Marktrichtung = BTC).
++                _mtf = str((self.multi_tf.last_signals.get("BTC/USDC", {}) or {})
++                           .get("direction", "NEUTRAL"))
+ 
+                 _defense_sells = self.risk_engine.check_auto_defense_sells(
+                     _all_positions, _regime, _mtf)
+ 
+                 for _ds in _defense_sells:
+-                    if _ds["symbol"] == symbol:
++                    # Nur mit Schalter auto_verteidigung = ACTIVE wird verkauft.
++                    # Vorgabe SHADOW: notieren, einmal je Symbol und Stunde.
++                    if _ds["symbol"] == symbol and _entscheidet(
++                            "auto_verteidigung", symbol=symbol,
++                            haette=f"verkaufen (PnL {_ds['pnl_pct']:+.2f} %)",
++                            grund=f"Regime {_regime}, BTC-Mehrzeitrahmen {_mtf}, "
++                                  f"Verlust > {self.risk_engine.defense_loss_threshold_pct} %",
++                            preis=_ds.get("current_price"),
++                            pnl_pct=_ds.get("pnl_pct")):
+                         # [BUGFIX 06.08.2026] Hier stand:
+                         #     from core.events import DecisionIntent, Side
+                         # Beide Namen sind bereits global importiert (Zeile 37).
+@@ -1042,7 +1063,11 @@
+             try:
+                 _re_ok, _re_why = self.reentry_guard.darf_kaufen(
+                     intent.symbol, snapshot.close)
+-                if not _re_ok:
++                # [25.09.2026] Schalter wiedereinstieg_sperre wird jetzt gelesen.
++                if not _re_ok and _entscheidet(
++                        "wiedereinstieg_sperre", symbol=intent.symbol,
++                        haette="BUY sperren", grund=_re_why,
++                        preis=snapshot.close):
+                     log.info("CHURN", f"{symbol}: BUY gesperrt - "
+                                       f"Wiedereinstiegs-Sperre: {_re_why}")
+                     self._telemetrie_schreiben(
+@@ -1105,7 +1130,13 @@
+                 if (hasattr(snapshot, '_df') and snapshot._df is not None
+                         and len(snapshot._df) > 5):
+                     recent_pump = (snapshot.close / snapshot._df["Close"].iloc[-5] - 1) * 100
+-                    if recent_pump > 3.0:  # Nur bei >3% Pump warten
++                    # [25.09.2026] Schalter smart_entry wird jetzt gelesen.
++                    # Nicht ACTIVE -> kein Zurueckstellen, der Kandidat laeuft weiter.
++                    if recent_pump > 3.0 and _entscheidet(
++                            "smart_entry", symbol=intent.symbol,
++                            haette="Kauf zurueckstellen, auf Ruecksetzer warten",
++                            grund=f"Pump +{recent_pump:.1f}% > 3.0 % in 5 Kerzen",
++                            preis=snapshot.close):  # Nur bei >3% Pump warten
+                         self.smart_entry.queue_entry(intent, snapshot.close)
+                         self._sig_wartet = getattr(self, "_sig_wartet", 0) + 1
+                         log.info("SIGNAL", f"{intent.symbol}: zurueckgestellt - "
+@@ -1188,7 +1219,10 @@
+             try:
+                 _rk_ok, _rk_why = self.reentry_guard.darf_kaufen(
+                     intent.symbol, intent.entry_price)
+-                if not _rk_ok:
++                if not _rk_ok and _entscheidet(
++                        "wiedereinstieg_sperre", symbol=intent.symbol,
++                        haette="BUY sperren (2. Stufe)", grund=_rk_why,
++                        preis=intent.entry_price):
+                     log.info("CHURN", f"{intent.symbol}: BUY gesperrt (2. Stufe) - "
+                                       f"Wiedereinstiegs-Sperre: {_rk_why}")
+                     intent.risk_approved = False
+@@ -2006,6 +2040,57 @@
+         self.health.report_error(source, str(error))
+ 
+     # ==========================================================
++    # [25.09.2026] Zwei Helfer fuer die im Schatten angeschlossenen
++    # Schutzregeln (v7-Befund 119). Beide werden nur wirksam, wenn der
++    # jeweilige Schalter in regel_modi auf ACTIVE steht.
++    # ==========================================================
++    def _sammel_notbremse_ausfuehren(self, grund=""):
++        """Sammel-Notbremse: alle Positionen schliessen, dann den Bot anhalten.
++
++        Wird von risk/engine.py gerufen, sobald die Notbremse ausloest UND
++        sammel_notbremse = ACTIVE ist. Laeuft in einem eigenen Faden: der
++        Aufruf kommt mitten aus der Risikopruefung, und Verkaeufe darin
++        auszufuehren waere eine Verschachtelung, die niemand getestet hat.
++        """
++        def _ablauf():
++            try:
++                log.error("KILL", f"SAMMEL-NOTBREMSE: {grund} - schliesse alle Positionen")
++                n = self._close_all_positions_safety()
++                log.error("KILL", f"SAMMEL-NOTBREMSE: {n} Position(en) geschlossen")
++            except Exception as e:
++                log.error("KILL", f"SAMMEL-NOTBREMSE: Schliessen fehlgeschlagen: {e}")
++            # EVENT_KILL_SWITCH wurde bisher nirgends gesendet; _on_kill_switch
++            # (Telegram + Anhalten) lief deshalb nie.
++            self.bus.publish(EVENT_KILL_SWITCH, {"reason": grund}, source="risk_engine")
++        threading.Thread(target=_ablauf, name="sammel_notbremse", daemon=True).start()
++
++    def _nupl_tageskurse(self):
++        """200 Tages-Schlusskurse BTC fuer den echten 200-Tage-Schnitt.
++
++        Einmal je 24 h geholt - auch nach einem Fehlschlag wird erst am
++        naechsten Tag neu versucht, statt jeden Takt die Boerse zu fragen.
++        Gibt None zurueck, wenn keine brauchbaren Daten da sind (laut
++        gemeldet), dann bleibt es beim bisherigen Ersatzwert.
++        """
++        jetzt = time.time()
++        if jetzt - getattr(self, "_nupl_kurse_ts", 0) < 86400:
++            return getattr(self, "_nupl_kurse", None)
++        self._nupl_kurse_ts = jetzt
++        self._nupl_kurse = None
++        try:
++            roh = self.data_agent.client.fetch_ohlcv("BTC/USDC", "1d", limit=200)
++            kurse = [float(k[4]) for k in (roh or []) if k and k[4]]
++            if len(kurse) >= 50:
++                self._nupl_kurse = kurse
++            else:
++                log.warn("NUPL", f"nur {len(kurse)} Tageskurse - echter "
++                                 f"200-Tage-Schnitt nicht berechenbar")
++        except Exception as e:
++            log.warn("NUPL", f"Tageskurse fuer den echten 200-Tage-Schnitt nicht "
++                             f"geholt: {str(e)[:80]}")
++        return self._nupl_kurse
++
++    # ==========================================================
+     # PERIODIC TASKS
+     # ==========================================================
+     def _close_all_positions_safety(self) -> int:
+@@ -2522,7 +2607,31 @@
+         news_score = news.get("score", 0.5) if isinstance(news, dict) else 0.5
+ 
+         # NUPL Monitor: Blockiert Kaeufe bei Euphorie
++        # [25.09.2026] Bisher bekam calculate() nie Tageskurse: der
++        # 200-Tage-Schnitt war ein Ersatzwert (80 % des BTC-Kurses beim
++        # Start) und blieb danach eingefroren (v7-Befund 119). Jetzt werden
++        # einmal am Tag 200 echte Tageskurse geholt. Wirksam nur mit
++        # Schalter nupl_bremse = ACTIVE; Vorgabe SHADOW -> einmal am Tag
++        # notieren, wie weit echter Wert und Ersatzwert auseinanderliegen.
++        _nupl_hist = self._nupl_tageskurse() if btc_price > 0 else None
++        # Erst der bisherige Weg - sein Ergebnis ist der Vergleichswert.
++        # [26.09.2026] Vorher stand der Vergleich VOR dieser Rechnung und
++        # nahm current_nupl, beim ersten Takt nach dem Start also den
++        # Platzhalter 0.3 aus NUPLMonitor.__init__ statt des Ersatzwerts.
+         nupl_data = self.nupl.calculate(btc_price)
++        if _nupl_hist:
++            _sma_echt = sum(_nupl_hist[-200:]) / min(len(_nupl_hist), 200)
++            _nupl_echt = max(-1.0, min(1.0, (btc_price - _sma_echt) / btc_price))
++            _nupl_alt = float(nupl_data.get("nupl", self.nupl.current_nupl))
++            if _entscheidet(
++                "nupl_bremse", symbol="BTC/USDC",
++                haette=(f"NUPL {_nupl_echt:.3f} (echter 200-Tage-Schnitt "
++                        f"{_sma_echt:,.0f}) statt {_nupl_alt:.3f}; Kaufsperre "
++                        f"{'ja' if _nupl_echt > 0.7 else 'nein'} statt "
++                        f"{'ja' if _nupl_alt > 0.7 else 'nein'}"),
++                grund="Ersatzwert beim Start eingefroren",
++                preis=btc_price, sperre_s=86400):
++                nupl_data = self.nupl.calculate(btc_price, price_history_200d=_nupl_hist)
+         self.state.set("nupl", nupl_data.get("nupl", 0))
+         self.state.set("nupl_zone", nupl_data.get("zone", "?"))
+         if nupl_data.get("buy_blocked"):
+@@ -2610,8 +2719,15 @@
+         # (meta_voting) kommt gleichwertig dazu.
+         ensemble_result["typ_gewichtet_score"] = ensemble_result["score"]
+         ensemble_result["meta_gewichtet_score"] = round(meta_ensemble_score, 3)
+-        ensemble_result["score"] = round(
++        _gemischt = round(
+             (ensemble_result["typ_gewichtet_score"] + meta_ensemble_score) / 2, 3)
++        # [25.09.2026] Schalter meta_voting wird jetzt gelesen. Nicht ACTIVE
++        # -> der Ensemble-Score bleibt rein typ-gewichtet.
++        if _entscheidet("meta_voting",
++                        haette=f"Ensemble-Score {_gemischt} statt "
++                               f"{ensemble_result['typ_gewichtet_score']}",
++                        grund="Meta-Voting-Gewichte einmischen (50/50)"):
++            ensemble_result["score"] = _gemischt
+ 
+         # Externe Scores fuer Signal Agent setzen
+         self.signal_agent.set_external_scores({
+@@ -2866,6 +2982,14 @@
+                                             f"({(_cur_val + fixed_amount)/total_equity*100:.1f}% > {_max_coin_pct:.0f}%)"
+                                             f" - kein Nachkauf")
+                             continue
++                        # [25.09.2026] Schalter dca_stufen wird jetzt gelesen.
++                        # Nicht ACTIVE -> kein Nachkauf auf die offene Position.
++                        if not _entscheidet(
++                                "dca_stufen", symbol=coin,
++                                haette=f"Nachkauf Stufe {_levels + 1}/{_max_levels}",
++                                grund=f"Kurs {price} <= 98 % des Einstands {entry}",
++                                preis=price):
++                            continue
+                         is_nachkauf = True
+                     else:
+                         # NEUE Position: nur wenn Platz da ist
+@@ -2882,7 +3006,10 @@
+                         # also kauft dieser Tick Sekunden spaeter teurer zurueck.
+                         try:
+                             _ok, _why = self.reentry_guard.darf_kaufen(coin, price)
+-                            if not _ok:
++                            if not _ok and _entscheidet(
++                                    "wiedereinstieg_sperre", symbol=coin,
++                                    haette="DCA-Kauf sperren", grund=_why,
++                                    preis=price):
+                                 log.info("DCA", f"{coin}: {_why}")
+                                 self._dca_telemetrie(
+                                     coin, price,
+
+# data_store/config.json -> regel_modi, sechs neue Eintraege:
+{
+  "drawdown_stopp": "SHADOW",
+  "notbremse_tagesreset": "SHADOW",
+  "verlustsperre_aufhebung": "SHADOW",
+  "auto_verteidigung": "SHADOW",
+  "nupl_bremse": "SHADOW",
+  "sammel_notbremse": "SHADOW"
+}

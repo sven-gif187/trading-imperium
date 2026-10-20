@@ -1,0 +1,174 @@
+================================================================================================================
+ MESSUNG G1 - SIND DIE F2-INDIKATOREN RICHTIG NACHGEBAUT?
+ pandas 2.3.3 | numpy 2.2.6 | pandas_ta 0.4.71b0
+ Referenz: die Projektimplementierungen selbst. Datenbasis wie F2
+ (1h-Aggregate der gepruef ten 15m-CSVs).
+================================================================================================================
+
+================================================================================================================
+ G1a  BEKANNTE ABWEICHUNGEN Nachbau vs. Projekt (vor jeder Zahl)
+================================================================================================================
+  1. pump_5: app.py:747 rechnet close/Close.iloc[-5]-1 = 4 Balken
+     zurueck. F2-Nachbau: cl[i]/cl[i-5] = 5 Balken zurueck. OFF-BY-ONE.
+  2. fib_dist_618: v4_strategies.py:46-47 nimmt tail(100) des
+     uebergebenen df. F2-Nachbau: rollende 120. FENSTERLAENGE 100 vs 120.
+  3. rsi_div_bull: rsi_divergence.py:80-84 verlangt price2 <
+     price1*(1-1%) UND rsi2 > rsi1+2 und vergleicht NUR BENACHBARTE
+     Swing-Tiefs. F2-Nachbau: beliebige Paare, ohne Mindestschwung,
+     ohne RSI-Marge. LOGIK DEUTLICH VERSCHIEDEN.
+  4. di_diff: F2 zitierte regime_detection.py:42 (ta.adx, Wilder),
+     nachgebaut wurde aber die SMA-Variante aus market_data.py:117.
+     FALSCHE PROJEKTVARIANTE ALS VORBILD.
+  5. volatilitaet: indicators.py:36 rolling.std mit ddof=1;
+     F2-Nachbau ddof=0. Konstanter Faktor sqrt(13/14) - rangneutral.
+  6. tsi: calc_tsi nutzt pandas ewm(span).mean() mit adjust=True;
+     F2-Nachbau rekursiv (adjust=False). Einschwingunterschied.
+  7. EMA/MACD/RSI/ATR: pandas_ta-Seeds vs. SMA-Seed-Rekursion des
+     Nachbaus - erwartet klein, wird gemessen.
+  8. obv_steig: eigene Konstruktion ohne Projektreferenz; nur OBV
+     selbst ist vergleichbar.
+  9. Der Live-Bot rechnet ALLES auf einem 120-Balken-Fenster
+     (candle_limit); F2 rechnete auf der vollen Serie. Der
+     Warmup-Effekt wird in Teil 2 separat beziffert.
+
+================================================================================================================
+ G1b  VOLLSERIEN-ABGLEICH  -  11 Coins, Jahr 2, ab Balken 200
+      (aggregiert: n-gewichtetes Mittel der Coin-Kennzahlen; 'max' = Maximum ueber Coins)
+================================================================================================================
+
+    F2-Feature     Referenz (Datei:Zeile)                    Pearson  Spearman     maxAbs    meanAbs   Vorz%     Urteil
+    ----------------------------------------------------------------------------------------------------------------
+    rsi_14         ta.rsi | market_data.py:62                 1.0000    1.0000   4.12e-05   3.77e-08   0.00%         ok
+    p_vs_ema20     ta.ema(20) | market_data.py:63             1.0000    1.0000   0.00e+00   0.00e+00   0.00%         ok
+    p_vs_ema50     ta.ema(50) | market_data.py:64             1.0000    1.0000   0.00e+00   0.00e+00   0.00%         ok
+    ema20_vs_50    ta.ema | market_data.py:63-64              1.0000    1.0000   0.00e+00   0.00e+00   0.00%         ok
+    macd_line      ta.macd | market_data.py:65                1.0000    1.0000   0.00e+00   0.00e+00   0.00%         ok
+    macd_hist      ta.macd | market_data.py:65-66             1.0000    1.0000   9.76e-19   7.63e-23   0.00%         ok
+    bb_pos         ta.bbands | market_data.py:67              1.0000    1.0000   2.71e-02   7.17e-03   0.57%         ok
+    bb_width       ta.bbands | market_data.py:67              1.0000    1.0000   1.57e-02   1.24e-03   0.00%         ok
+    atr_rel        ta.atr | market_data.py:70                 1.0000    1.0000   4.70e-10   5.40e-13   0.00%         ok
+    adx_14         DataAgent._adx | market_data.py:117        1.0000    1.0000   3.06e-13   1.03e-13   0.00%         ok
+    di_diff        ta.adx DMP-DMN | regime_detection.py:42   -0.5129   -0.5004   1.34e+02   2.32e+01  67.18% AUFFAELLIG
+    stoch_rsi      calc_stoch_rsi | indicators.py:69          1.0000    1.0000   2.88e-04   1.11e-07   0.13%         ok
+    tsi            calc_tsi | indicators.py:74                1.0000    1.0000   1.69e-06   2.07e-09   0.00%         ok
+    tsi_hist       calc_tsi | indicators.py:74                1.0000    1.0000   1.01e-06   8.63e-10   0.00%         ok
+    volatilitaet   rolling.std ddof=1 | indicators.py:36      1.0000    1.0000   2.43e-03   2.53e-04   0.00%         ok
+    hl_range       indicators.py:39                           1.0000    1.0000   3.81e-10   1.35e-12   0.00%         ok
+    vol_ratio_20   signal_agent.py:125-126                    1.0000    1.0000   1.05e-11   7.01e-14   0.00%         ok
+    hoch20_rel     tail(20).max | v4_strategies.py:154        1.0000    1.0000   0.00e+00   0.00e+00   0.00%         ok
+    pump_5         iloc[-5] | app.py:747                      0.8970    0.8582   2.19e-01   5.29e-03  17.07% AUFFAELLIG
+    fib_dist_618   tail(100) | v4_strategies.py:46-47         0.9530    0.9587   3.58e-01   5.92e-03   6.03% AUFFAELLIG
+    vwap_rel       VWAPAgent (120er-Fenster) | vwap_agent.py:29-34   1.0000    1.0000   3.85e-13   1.63e-14   0.00%         ok
+
+  Ohne numerischen Referenzpfad:
+    fear_greed     identische Quelle (fear_greed.json Tageswert) - kein Numerikvergleich noetig
+    fg_delta       Ableitung derselben Tageswerte - keine Projektreferenz, eigene Konstruktion
+    obv_steig      OBV-Steigung ist EIGENE Konstruktion; Projekt kennt nur OBV selbst (indicators.py:57). OBV wird verglichen, die Steigung nicht.
+    rsi_div_bull   nur fensterweise pruefbar -> Teil 2
+
+================================================================================================================
+ G1b-FENSTER  120-Balken-Fenster wie der Live-Bot  -  BTC/ETH/DOGE, Jahr 2, jede 4. Stunde
+================================================================================================================
+
+    NACHBAU gegen PROJEKT-FENSTERAUFRUF
+    Feature             n  Pearson  Spearman     maxAbs  Vorz%/Diskr%     Urteil
+    ------------------------------------------------------------------------------
+    vwap_rel         6423   0.9067    0.8918   7.31e-02         8.20% AUFFAELLIG
+    vwap_rel_exakt   6423   1.0000    1.0000   7.31e-14         0.00%         ok
+    fib_dist_618     6423   0.9590    0.9579   2.07e-01         6.41% AUFFAELLIG
+    rsi_div_bull     6423        -         -          -         6.37% AUFFAELLIG
+      Kontingenz: beide=1: 64 | nur Nachbau=1: 407 | nur Projekt=1: 2
+    pump_5           6423   0.8933    0.8462   8.12e-02        16.78% AUFFAELLIG
+
+    vwap_rel AUFGESCHLUESSELT (Rundung in vwap_agent.py:64)
+    Coin       Referenz                        n  Spearman   Vorz%
+    --------------------------------------------------------------
+    BTC        Rueckgabefeld (gerundet)     2141    1.0000   0.00%
+    ETH        Rueckgabefeld (gerundet)     2141    1.0000   0.05%
+    DOGE       Rueckgabefeld (gerundet)     2141    0.7891  24.57%
+    BTC        Agentenformel (ungerundet)   2141    1.0000   0.00%
+    ETH        Agentenformel (ungerundet)   2141    1.0000   0.00%
+    DOGE       Agentenformel (ungerundet)   2141    1.0000   0.00%
+
+    WARMUP-EFFEKT: 120er-Fensterwert gegen Vollserienwert (beides Projektweg)
+    Feature             n  Pearson  Spearman     maxAbs    meanAbs
+    --------------------------------------------------------------
+    rsi_14           6423   1.0000    1.0000   1.52e-01   8.54e-03
+    p_vs_ema20       6423   1.0000    1.0000   1.71e-06   1.21e-07
+    p_vs_ema50       6423   0.9999    0.9998   2.57e-03   2.66e-04
+    macd_hist        6423   1.0000    1.0000   1.37e-05   1.05e-06
+    adx_14           6423   1.0000    1.0000   2.84e-14   7.20e-16
+    atr_rel          6423   1.0000    1.0000   1.54e-05   3.48e-07
+    bb_pos           6423   1.0000    1.0000   1.28e-09   1.67e-11
+    Spearman hier misst, wie stark die RANGordnung leidet, wenn
+    man - wie der Live-Bot - nur 120 Balken Geschichte hat.
+
+================================================================================================================
+ G1c-HAND  RSI(14) nach Wilder - ausgeschriebener Rechenweg, BTC 1h, Balken 0-16
+================================================================================================================
+
+  Rechenweg:
+    delta_i = Close_i - Close_(i-1);  Gewinn = max(delta,0), Verlust = max(-delta,0)
+    Seed (Balken 14): avgGain = Mittel(Gewinn_1..14), avgLoss = Mittel(Verlust_1..14)
+    danach Wilder:    avg = (avg_vorher * 13 + wert_i) / 14
+    RSI = 100 - 100/(1 + avgGain/avgLoss)
+
+      i        Close      delta    Gewinn   Verlust
+      1    117500.01    -113.13      0.00    113.13
+      2    117501.71      +1.70      1.70      0.00
+      3    117576.09     +74.38     74.38      0.00
+      4    117832.10    +256.01    256.01      0.00
+      5    117941.01    +108.91    108.91      0.00
+      6    117739.52    -201.49      0.00    201.49
+      7    117848.01    +108.49    108.49      0.00
+      8    118023.59    +175.58    175.58      0.00
+      9    118152.02    +128.43    128.43      0.00
+     10    118000.02    -152.00      0.00    152.00
+     11    117990.30      -9.72      0.00      9.72
+     12    118282.01    +291.71    291.71      0.00
+     13    118132.53    -149.48      0.00    149.48
+     14    118373.17    +240.64    240.64      0.00
+
+    Seed:  avgGain = 98.9893   avgLoss = 44.7014   RSI(Balken 14) = 68.8905
+    Balken 15: delta -211.71 -> avgGain 91.9186, avgLoss 56.6306 -> RSI = 61.8775
+    Balken 16: delta -127.78 -> avgGain 85.3530, avgLoss 61.7127 -> RSI = 58.0373
+
+     Balken       Hand  pandas_ta  F2-Nachbau
+         14    68.8905    49.8498     68.8905
+         15    61.8775    44.6190     61.8775
+         16    58.0373    41.7701     58.0373
+    Hand und F2-Nachbau muessen exakt uebereinstimmen (gleiche
+    Rekursion); pandas_ta weicht frueh ab, weil sein RMA als
+    ewm(alpha=1/14) mit adjust=True startet und erst asymptotisch
+    in die Wilder-Rekursion uebergeht.
+
+================================================================================================================
+ G1d  IC-NEUBERECHNUNG mit der PROJEKTIMPLEMENTIERUNG (nur auffaellige Features)
+================================================================================================================
+
+  Auffaellig aus G1b: di_diff, fib_dist_618, pump_5, rsi_div_bull, vwap_rel
+    rsi_div_bull: kein vektorisierbarer Referenzpfad -> siehe Fenstermessung; IC-Neuberechnung nicht moeglich: NICHT ENTSCHEIDBAR
+
+    Feature         Hor  IC J2 alt  IC J2 NEU  IC J1 alt  IC J1 NEU
+    ------------------------------------------------------------------
+    di_diff          1h    -0.0184    +0.0175    -0.0096    +0.0161
+    di_diff          4h    -0.0192    +0.0292    +0.0050    +0.0127
+    di_diff         24h    -0.0135    +0.0113    -0.0012    +0.0019
+    fib_dist_618     1h    -0.0321    -0.0333    -0.0157    -0.0164
+    fib_dist_618     4h    -0.0541    -0.0556    -0.0205    -0.0173
+    fib_dist_618    24h    -0.0901    -0.0958    -0.0296    -0.0196
+    pump_5           1h    -0.0278    -0.0232    -0.0358    -0.0354
+    pump_5           4h    -0.0234    -0.0158    -0.0118    -0.0166
+    pump_5          24h    -0.0249    -0.0218    -0.0151    -0.0162
+    vwap_rel         1h    -0.0321    -0.0321    -0.0172    -0.0172
+    vwap_rel         4h    -0.0580    -0.0580    -0.0217    -0.0217
+    vwap_rel        24h    -0.0937    -0.0937    -0.0279    -0.0279
+
+  Bewertungsmassstab fuer das F2-Urteil: aendert sich fuer ein
+  auffaelliges Feature |IC| auf >= 0,090 (oekonomische Schwelle der
+  Reibungs-Untergrenze) oder kippt ein stabiler Befund das
+  Vorzeichen, ist F2 zu KORRIGIEREN. Sonst BESTAETIGT.
+
+================================================================================================================
+ ENDE G1
+================================================================================================================

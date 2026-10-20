@@ -1,0 +1,312 @@
+========================================================================================================
+ NACHTRAGSMESSUNG T-034..T-041 (Neulauf b) - tragen die blockierten
+ Strategien einen Richtungsvorteil?  Seed 20260730
+ KEINE Runde 3. Programm nach Regel 13 beendet.
+========================================================================================================
+
+  J2: 11 Coins, 8761 1h-Balken je Coin
+    Tabelle +/-2,5%/72h  fertig
+    Tabelle +/-5%/7d     fertig
+    Tabelle +/-7%/14d    fertig
+
+  ----------------------------------------------------------------------------------------------------
+  KONFLUENZ J2 - deskriptiv, keine Optimierung
+  ----------------------------------------------------------------------------------------------------
+    Paarweise Jaccard-Ueberlappung der Signalmengen (gleicher Coin, gleiche Stunde):
+      Paar                                        Jaccard    Familie
+      RSI_OVERSOLD / BOLLINGER_BOUNCE               0.219     GLEICH
+      RSI_OVERSOLD / MULTI_SIGNAL                   0.218     GLEICH
+      EMA_TREND / MACD_CROSS                        0.377     GLEICH
+      EMA_TREND / TSI                               0.524     GLEICH
+      EMA_TREND / MULTI_SIGNAL                      0.361   getrennt
+      MACD_CROSS / TSI                              0.475     GLEICH
+      MACD_CROSS / MULTI_SIGNAL                     0.487   getrennt
+      TSI / MULTI_SIGNAL                            0.302   getrennt
+
+    Zeitpunkte mit mindestens einem Signal: 90438
+      k Strategien     Zeitpunkte   Anteil   k Familien   Zeitpunkte
+      1                     18442   20.39%            1        33805
+      2                     31482   34.81%            2        47432
+      3                     18671   20.65%            3         9201
+      4                     18117   20.03%                         0
+      5                      3709    4.10%                         0
+      6                        17    0.02%                         0
+
+    P(auf) nach Zahl gleichzeitig feuernder UNABHAENGIGER Familien
+      (Barriere +/-2,5%/72h; RSI-Familie zaehlt einmal, TREND-Familie einmal, PREIS einmal)
+      Familien          n   P(auf)
+      1             32698   48.70%
+      2             46236   46.12%
+      3              8745   46.63%
+    T-034 RSI_OVERSOLD       +/-2,5%/72h  n=20129 P(auf)=49.09% KI[45.19;52.96] Plc=37.07 Schwelle=63.51% unter  [oL 48.28%]
+    T-034 RSI_OVERSOLD       +/-5%/7d     n=19079 P(auf)=46.05% KI[41.09;51.15] Plc=37.40 Schwelle=56.76% unter  [oL 46.08%]
+    T-034 RSI_OVERSOLD       +/-7%/14d    n=19004 P(auf)=46.15% KI[40.84;51.58] Plc=40.04 Schwelle=54.83% unter  [oL 46.20%]
+    T-035 EMA_TREND          +/-2,5%/72h  n=40799 P(auf)=46.28% KI[42.75;49.83] Plc=54.43 Schwelle=63.26% unter  [oL 46.57%]
+    T-035 EMA_TREND          +/-5%/7d     n=38489 P(auf)=45.27% KI[41.02;49.90] Plc=50.78 Schwelle=56.63% unter  [oL 45.29%]
+    T-035 EMA_TREND          +/-7%/14d    n=38035 P(auf)=43.85% KI[39.43;48.36] Plc=48.49 Schwelle=54.74% unter  [oL 43.85%]
+    T-036 MACD_CROSS         +/-2,5%/72h  n=38600 P(auf)=46.44% KI[42.89;49.92] Plc=53.94 Schwelle=63.42% unter  [oL 46.81%]
+    T-036 MACD_CROSS         +/-5%/7d     n=36778 P(auf)=46.10% KI[41.89;50.11] Plc=51.46 Schwelle=56.71% unter  [oL 46.14%]
+    T-036 MACD_CROSS         +/-7%/14d    n=36557 P(auf)=46.35% KI[42.00;50.57] Plc=50.29 Schwelle=54.79% unter  [oL 46.35%]
+    T-037 TSI                +/-2,5%/72h  n=27341 P(auf)=45.36% KI[41.76;49.08] Plc=56.72 Schwelle=63.32% unter  [oL 45.85%]
+    T-037 TSI                +/-5%/7d     n=25788 P(auf)=45.56% KI[41.28;49.99] Plc=53.36 Schwelle=56.66% unter  [oL 45.60%]
+    T-037 TSI                +/-7%/14d    n=25595 P(auf)=45.20% KI[40.78;49.41] Plc=51.31 Schwelle=54.76% unter  [oL 45.19%]
+    T-038 BOLLINGER_BOUNCE   +/-2,5%/72h  n= 5203 P(auf)=50.07% KI[45.83;54.74] Plc=30.15 Schwelle=63.42% unter  [oL 46.99%]
+    T-038 BOLLINGER_BOUNCE   +/-5%/7d     n= 4939 P(auf)=43.39% KI[37.86;49.25] Plc=30.52 Schwelle=56.71% unter  [oL 43.26%]
+    T-038 BOLLINGER_BOUNCE   +/-7%/14d    n= 4922 P(auf)=42.40% KI[36.42;48.58] Plc=33.53 Schwelle=54.79% unter  [oL 42.42%]
+    T-039 FIBONACCI_SUPPORT  +/-2,5%/72h  n=17791 P(auf)=47.00% KI[42.55;51.37] Plc=47.99 Schwelle=63.08% unter  [oL 47.05%]
+    T-039 FIBONACCI_SUPPORT  +/-5%/7d     n=16465 P(auf)=45.83% KI[40.49;50.93] Plc=45.97 Schwelle=56.54% unter  [oL 45.89%]
+    T-039 FIBONACCI_SUPPORT  +/-7%/14d    n=16726 P(auf)=49.55% KI[44.26;54.67] Plc=48.62 Schwelle=54.67% unter  [oL 49.56%]
+    T-040 RSI_DIVERGENZ      +/-2,5%/72h  n= 1074 P(auf)=40.97% KI[30.77;52.49] Plc=39.48 Schwelle=62.53% unter  [oL 41.62%]
+    T-040 RSI_DIVERGENZ      +/-5%/7d     n= 1027 P(auf)=39.34% KI[25.23;55.25] Plc=35.38 Schwelle=56.27% unter  [oL 39.40%]
+    T-040 RSI_DIVERGENZ      +/-7%/14d    n= 1005 P(auf)=40.80% KI[25.19;57.90] Plc=39.10 Schwelle=54.48% unter  [oL 40.80%]
+    T-041 MULTI_SIGNAL       +/-2,5%/72h  n=70712 P(auf)=47.05% KI[44.14;49.77] Plc=47.23 Schwelle=63.45% unter  [oL 47.02%]
+    T-041 MULTI_SIGNAL       +/-5%/7d     n=67269 P(auf)=45.73% KI[42.01;49.46] Plc=45.93 Schwelle=56.72% unter  [oL 45.76%]
+    T-041 MULTI_SIGNAL       +/-7%/14d    n=66851 P(auf)=46.01% KI[41.95;49.87] Plc=46.23 Schwelle=54.80% unter  [oL 46.03%]
+
+  J1: 11 Coins, 8760 1h-Balken je Coin
+    Tabelle +/-2,5%/72h  fertig
+    Tabelle +/-5%/7d     fertig
+    Tabelle +/-7%/14d    fertig
+
+  ----------------------------------------------------------------------------------------------------
+  KONFLUENZ J1 - deskriptiv, keine Optimierung
+  ----------------------------------------------------------------------------------------------------
+    Paarweise Jaccard-Ueberlappung der Signalmengen (gleicher Coin, gleiche Stunde):
+      Paar                                        Jaccard    Familie
+      RSI_OVERSOLD / BOLLINGER_BOUNCE               0.229     GLEICH
+      EMA_TREND / MACD_CROSS                        0.401     GLEICH
+      EMA_TREND / TSI                               0.519     GLEICH
+      EMA_TREND / MULTI_SIGNAL                      0.293   getrennt
+      MACD_CROSS / TSI                              0.520     GLEICH
+      MACD_CROSS / MULTI_SIGNAL                     0.592   getrennt
+      TSI / MULTI_SIGNAL                            0.323   getrennt
+
+    Zeitpunkte mit mindestens einem Signal: 85229
+      k Strategien     Zeitpunkte   Anteil   k Familien   Zeitpunkte
+      1                     26267   30.82%            1        43014
+      2                     21700   25.46%            2        36704
+      3                     16966   19.91%            3         5511
+      4                     17996   21.11%                         0
+      5                      2282    2.68%                         0
+      6                        18    0.02%                         0
+
+    P(auf) nach Zahl gleichzeitig feuernder UNABHAENGIGER Familien
+      (Barriere +/-2,5%/72h; RSI-Familie zaehlt einmal, TREND-Familie einmal, PREIS einmal)
+      Familien          n   P(auf)
+      1             42321   49.79%
+      2             36108   51.72%
+      3              5327   53.54%
+    T-034 RSI_OVERSOLD       +/-2,5%/72h  n=17242 P(auf)=48.32% KI[44.42;52.39] Plc=36.76 Schwelle=63.65% unter  [oL 47.21%]
+    T-034 RSI_OVERSOLD       +/-5%/7d     n=16842 P(auf)=49.03% KI[44.05;53.91] Plc=39.73 Schwelle=56.82% unter  [oL 48.87%]
+    T-034 RSI_OVERSOLD       +/-7%/14d    n=16991 P(auf)=51.00% KI[45.80;56.43] Plc=43.57 Schwelle=54.87% unter  [oL 50.95%]
+    T-035 EMA_TREND          +/-2,5%/72h  n=47093 P(auf)=52.33% KI[49.09;55.53] Plc=58.60 Schwelle=63.34% unter  [oL 52.64%]
+    T-035 EMA_TREND          +/-5%/7d     n=45939 P(auf)=52.15% KI[48.24;56.39] Plc=57.17 Schwelle=56.67% unter  [oL 52.20%]
+    T-035 EMA_TREND          +/-7%/14d    n=46259 P(auf)=53.67% KI[49.38;58.09] Plc=57.30 Schwelle=54.77% unter  [oL 53.68%]
+    T-036 MACD_CROSS         +/-2,5%/72h  n=39128 P(auf)=52.03% KI[48.82;55.29] Plc=58.47 Schwelle=63.41% unter  [oL 52.50%]
+    T-036 MACD_CROSS         +/-5%/7d     n=38332 P(auf)=52.49% KI[48.38;56.40] Plc=58.52 Schwelle=56.71% unter  [oL 52.59%]
+    T-036 MACD_CROSS         +/-7%/14d    n=38447 P(auf)=54.18% KI[49.91;58.20] Plc=58.79 Schwelle=54.79% unter  [oL 54.21%]
+    T-037 TSI                +/-2,5%/72h  n=29711 P(auf)=53.33% KI[49.98;56.55] Plc=62.09 Schwelle=63.37% unter  [oL 54.00%]
+    T-037 TSI                +/-5%/7d     n=29072 P(auf)=52.75% KI[48.71;57.04] Plc=60.26 Schwelle=56.69% unter  [oL 52.85%]
+    T-037 TSI                +/-7%/14d    n=29181 P(auf)=54.10% KI[49.57;58.37] Plc=59.81 Schwelle=54.78% unter  [oL 54.13%]
+    T-038 BOLLINGER_BOUNCE   +/-2,5%/72h  n= 4879 P(auf)=49.33% KI[44.29;54.62] Plc=30.76 Schwelle=63.42% unter  [oL 44.56%]
+    T-038 BOLLINGER_BOUNCE   +/-5%/7d     n= 4771 P(auf)=49.03% KI[43.01;54.97] Plc=33.64 Schwelle=56.71% unter  [oL 48.38%]
+    T-038 BOLLINGER_BOUNCE   +/-7%/14d    n= 4828 P(auf)=50.46% KI[44.25;56.94] Plc=38.36 Schwelle=54.79% unter  [oL 50.24%]
+    T-039 FIBONACCI_SUPPORT  +/-2,5%/72h  n=13956 P(auf)=51.10% KI[46.82;55.42] Plc=50.76 Schwelle=62.97% unter  [oL 51.17%]
+    T-039 FIBONACCI_SUPPORT  +/-5%/7d     n=13448 P(auf)=52.33% KI[47.04;57.36] Plc=52.08 Schwelle=56.49% unter  [oL 52.37%]
+    T-039 FIBONACCI_SUPPORT  +/-7%/14d    n=13676 P(auf)=54.72% KI[49.53;59.98] Plc=54.53 Schwelle=54.63% UEBER  [oL 54.72%]
+    T-040 RSI_DIVERGENZ      +/-2,5%/72h  n= 1119 P(auf)=45.84% KI[35.73;56.07] Plc=46.26 Schwelle=63.76% unter  [oL 46.92%]
+    T-040 RSI_DIVERGENZ      +/-5%/7d     n= 1126 P(auf)=49.91% KI[36.75;62.55] Plc=49.72 Schwelle=56.88% unter  [oL 49.73%]
+    T-040 RSI_DIVERGENZ      +/-7%/14d    n= 1134 P(auf)=55.20% KI[40.88;68.91] Plc=53.57 Schwelle=54.92% UEBER  [oL 55.20%]
+    T-041 MULTI_SIGNAL       +/-2,5%/72h  n=47326 P(auf)=51.02% KI[47.90;54.15] Plc=51.57 Schwelle=63.49% unter  [oL 50.99%]
+    T-041 MULTI_SIGNAL       +/-5%/7d     n=46380 P(auf)=51.73% KI[47.62;55.69] Plc=52.79 Schwelle=56.74% unter  [oL 51.75%]
+    T-041 MULTI_SIGNAL       +/-7%/14d    n=46609 P(auf)=53.83% KI[49.73;58.15] Plc=54.37 Schwelle=54.82% unter  [oL 53.83%]
+
+========================================================================================================
+ VORZEICHENSTABILITAET (P(auf) - 50 in beiden Jahren)
+========================================================================================================
+
+    Strategie          Kombi              J2       J1   stabil
+    BOLLINGER_BOUNCE   +/-2,5%/72h    +0.07   -0.67     nein
+    BOLLINGER_BOUNCE   +/-5%/7d       -6.61   -0.97       JA
+    BOLLINGER_BOUNCE   +/-7%/14d      -7.60   +0.46     nein
+    EMA_TREND          +/-2,5%/72h    -3.72   +2.33     nein
+    EMA_TREND          +/-5%/7d       -4.73   +2.15     nein
+    EMA_TREND          +/-7%/14d      -6.15   +3.67     nein
+    FIBONACCI_SUPPORT  +/-2,5%/72h    -3.00   +1.10     nein
+    FIBONACCI_SUPPORT  +/-5%/7d       -4.17   +2.33     nein
+    FIBONACCI_SUPPORT  +/-7%/14d      -0.45   +4.72     nein
+    MACD_CROSS         +/-2,5%/72h    -3.56   +2.03     nein
+    MACD_CROSS         +/-5%/7d       -3.90   +2.49     nein
+    MACD_CROSS         +/-7%/14d      -3.65   +4.18     nein
+    MULTI_SIGNAL       +/-2,5%/72h    -2.95   +1.02     nein
+    MULTI_SIGNAL       +/-5%/7d       -4.27   +1.73     nein
+    MULTI_SIGNAL       +/-7%/14d      -3.99   +3.83     nein
+    RSI_DIVERGENZ      +/-2,5%/72h    -9.03   -4.16       JA
+    RSI_DIVERGENZ      +/-5%/7d      -10.66   -0.09       JA
+    RSI_DIVERGENZ      +/-7%/14d      -9.20   +5.20     nein
+    RSI_OVERSOLD       +/-2,5%/72h    -0.91   -1.68       JA
+    RSI_OVERSOLD       +/-5%/7d       -3.95   -0.97       JA
+    RSI_OVERSOLD       +/-7%/14d      -3.85   +1.00     nein
+    TSI                +/-2,5%/72h    -4.64   +3.33     nein
+    TSI                +/-5%/7d       -4.44   +2.75     nein
+    TSI                +/-7%/14d      -4.80   +4.10     nein
+
+========================================================================================================
+ BH-FDR ueber alle Tests (q=0,10), einseitig H0: P(auf) <= Schwelle
+========================================================================================================
+
+  m=48 Tests, BH-Schwelle p <= 0.0000 (k=0)
+  Zufallserwartung bei p<0,05 OHNE Korrektur: 2.4 Treffer
+  Zufallserwartung bei p<0,10 OHNE Korrektur: 4.8 Treffer
+
+    Trial   Strategie          Jahr Kombi         P(auf)  Schwelle  Abstand    p roh   FDR
+    --------------------------------------------------------------------------------------------
+    T-040   RSI_DIVERGENZ      J1   +/-7%/14d     55.20%    54.92%   +0.29pp   0.4840  nein
+    T-039   FIBONACCI_SUPPORT  J1   +/-7%/14d     54.72%    54.63%   +0.09pp   0.4864  nein
+    T-036   MACD_CROSS         J1   +/-7%/14d     54.18%    54.79%   -0.61pp   0.6137  nein
+    T-037   TSI                J1   +/-7%/14d     54.10%    54.78%   -0.68pp   0.6188  nein
+    T-041   MULTI_SIGNAL       J1   +/-7%/14d     53.83%    54.82%   -0.98pp   0.6767  nein
+    T-035   EMA_TREND          J1   +/-7%/14d     53.67%    54.77%   -1.10pp   0.6898  nein
+    T-040   RSI_DIVERGENZ      J1   +/-5%/7d      49.91%    56.88%   -6.97pp   0.8552  nein
+    T-038   BOLLINGER_BOUNCE   J1   +/-7%/14d     50.46%    54.79%   -4.34pp   0.9098  nein
+    T-034   RSI_OVERSOLD       J1   +/-7%/14d     51.00%    54.87%   -3.87pp   0.9233  nein
+    T-039   FIBONACCI_SUPPORT  J1   +/-5%/7d      52.33%    56.49%   -4.16pp   0.9429  nein
+    T-040   RSI_DIVERGENZ      J2   +/-7%/14d     40.80%    54.48%  -13.68pp   0.9494  nein
+    T-037   TSI                J1   +/-5%/7d      52.75%    56.69%   -3.93pp   0.9678  nein
+    T-039   FIBONACCI_SUPPORT  J2   +/-7%/14d     49.55%    54.67%   -5.12pp   0.9731  nein
+    T-036   MACD_CROSS         J1   +/-5%/7d      52.49%    56.71%   -4.22pp   0.9803  nein
+    T-035   EMA_TREND          J1   +/-5%/7d      52.15%    56.67%   -4.52pp   0.9852  nein
+    T-040   RSI_DIVERGENZ      J2   +/-5%/7d      39.34%    56.27%  -16.93pp   0.9865  nein
+    T-041   MULTI_SIGNAL       J1   +/-5%/7d      51.73%    56.74%   -5.01pp   0.9925  nein
+    T-038   BOLLINGER_BOUNCE   J1   +/-5%/7d      49.03%    56.71%   -7.68pp   0.9941  nein
+    T-034   RSI_OVERSOLD       J1   +/-5%/7d      49.03%    56.82%   -7.80pp   0.9990  nein
+    T-034   RSI_OVERSOLD       J2   +/-7%/14d     46.15%    54.83%   -8.67pp   0.9992  nein
+    T-040   RSI_DIVERGENZ      J1   +/-2,5%/72h   45.84%    63.76%  -17.92pp   0.9997  nein
+    T-036   MACD_CROSS         J2   +/-7%/14d     46.35%    54.79%   -8.45pp   0.9999  nein
+    T-040   RSI_DIVERGENZ      J2   +/-2,5%/72h   40.97%    62.53%  -21.56pp   1.0000  nein
+    T-038   BOLLINGER_BOUNCE   J2   +/-7%/14d     42.40%    54.79%  -12.39pp   1.0000  nein
+    T-039   FIBONACCI_SUPPORT  J2   +/-5%/7d      45.83%    56.54%  -10.71pp   1.0000  nein
+    T-034   RSI_OVERSOLD       J2   +/-5%/7d      46.05%    56.76%  -10.71pp   1.0000  nein
+    T-037   TSI                J2   +/-7%/14d     45.20%    54.76%   -9.56pp   1.0000  nein
+    T-041   MULTI_SIGNAL       J2   +/-7%/14d     46.01%    54.80%   -8.79pp   1.0000  nein
+    T-038   BOLLINGER_BOUNCE   J2   +/-5%/7d      43.39%    56.71%  -13.32pp   1.0000  nein
+    T-035   EMA_TREND          J2   +/-7%/14d     43.85%    54.74%  -10.88pp   1.0000  nein
+    T-037   TSI                J2   +/-5%/7d      45.56%    56.66%  -11.10pp   1.0000  nein
+    T-035   EMA_TREND          J2   +/-5%/7d      45.27%    56.63%  -11.36pp   1.0000  nein
+    T-036   MACD_CROSS         J2   +/-5%/7d      46.10%    56.71%  -10.61pp   1.0000  nein
+    T-038   BOLLINGER_BOUNCE   J1   +/-2,5%/72h   49.33%    63.42%  -14.09pp   1.0000  nein
+    T-039   FIBONACCI_SUPPORT  J1   +/-2,5%/72h   51.10%    62.97%  -11.88pp   1.0000  nein
+    T-041   MULTI_SIGNAL       J2   +/-5%/7d      45.73%    56.72%  -10.99pp   1.0000  nein
+    T-038   BOLLINGER_BOUNCE   J2   +/-2,5%/72h   50.07%    63.42%  -13.36pp   1.0000  nein
+    T-037   TSI                J1   +/-2,5%/72h   53.33%    63.37%  -10.04pp   1.0000  nein
+    T-035   EMA_TREND          J1   +/-2,5%/72h   52.33%    63.34%  -11.02pp   1.0000  nein
+    T-036   MACD_CROSS         J1   +/-2,5%/72h   52.03%    63.41%  -11.38pp   1.0000  nein
+    T-039   FIBONACCI_SUPPORT  J2   +/-2,5%/72h   47.00%    63.08%  -16.08pp   1.0000  nein
+    T-034   RSI_OVERSOLD       J2   +/-2,5%/72h   49.09%    63.51%  -14.43pp   1.0000  nein
+    T-034   RSI_OVERSOLD       J1   +/-2,5%/72h   48.32%    63.65%  -15.33pp   1.0000  nein
+    T-041   MULTI_SIGNAL       J1   +/-2,5%/72h   51.02%    63.49%  -12.47pp   1.0000  nein
+    T-035   EMA_TREND          J2   +/-2,5%/72h   46.28%    63.26%  -16.98pp   1.0000  nein
+    T-036   MACD_CROSS         J2   +/-2,5%/72h   46.44%    63.42%  -16.98pp   1.0000  nein
+    T-037   TSI                J2   +/-2,5%/72h   45.36%    63.32%  -17.96pp   1.0000  nein
+    T-041   MULTI_SIGNAL       J2   +/-2,5%/72h   47.05%    63.45%  -16.40pp   1.0000  nein
+
+========================================================================================================
+ LOOK-AHEAD-SENSITIVITAET (Start erst am Stundenende, +45 min)
+========================================================================================================
+
+    Strategie          Jahr Kombi          P(auf)  ohne LA    Delta
+    BOLLINGER_BOUNCE   J1   +/-2,5%/72h    49.33%   44.56%   -4.77pp
+    BOLLINGER_BOUNCE   J1   +/-5%/7d       49.03%   48.38%   -0.65pp
+    BOLLINGER_BOUNCE   J1   +/-7%/14d      50.46%   50.24%   -0.22pp
+    BOLLINGER_BOUNCE   J2   +/-2,5%/72h    50.07%   46.99%   -3.08pp
+    BOLLINGER_BOUNCE   J2   +/-5%/7d       43.39%   43.26%   -0.13pp
+    BOLLINGER_BOUNCE   J2   +/-7%/14d      42.40%   42.42%   +0.01pp
+    EMA_TREND          J1   +/-2,5%/72h    52.33%   52.64%   +0.32pp
+    EMA_TREND          J1   +/-5%/7d       52.15%   52.20%   +0.05pp
+    EMA_TREND          J1   +/-7%/14d      53.67%   53.68%   +0.01pp
+    EMA_TREND          J2   +/-2,5%/72h    46.28%   46.57%   +0.29pp
+    EMA_TREND          J2   +/-5%/7d       45.27%   45.29%   +0.02pp
+    EMA_TREND          J2   +/-7%/14d      43.85%   43.85%   +0.00pp
+    FIBONACCI_SUPPORT  J1   +/-2,5%/72h    51.10%   51.17%   +0.07pp
+    FIBONACCI_SUPPORT  J1   +/-5%/7d       52.33%   52.37%   +0.05pp
+    FIBONACCI_SUPPORT  J1   +/-7%/14d      54.72%   54.72%   -0.00pp
+    FIBONACCI_SUPPORT  J2   +/-2,5%/72h    47.00%   47.05%   +0.06pp
+    FIBONACCI_SUPPORT  J2   +/-5%/7d       45.83%   45.89%   +0.06pp
+    FIBONACCI_SUPPORT  J2   +/-7%/14d      49.55%   49.56%   +0.01pp
+    MACD_CROSS         J1   +/-2,5%/72h    52.03%   52.50%   +0.46pp
+    MACD_CROSS         J1   +/-5%/7d       52.49%   52.59%   +0.10pp
+    MACD_CROSS         J1   +/-7%/14d      54.18%   54.21%   +0.03pp
+    MACD_CROSS         J2   +/-2,5%/72h    46.44%   46.81%   +0.37pp
+    MACD_CROSS         J2   +/-5%/7d       46.10%   46.14%   +0.03pp
+    MACD_CROSS         J2   +/-7%/14d      46.35%   46.35%   -0.00pp
+    MULTI_SIGNAL       J1   +/-2,5%/72h    51.02%   50.99%   -0.03pp
+    MULTI_SIGNAL       J1   +/-5%/7d       51.73%   51.75%   +0.02pp
+    MULTI_SIGNAL       J1   +/-7%/14d      53.83%   53.83%   -0.00pp
+    MULTI_SIGNAL       J2   +/-2,5%/72h    47.05%   47.02%   -0.03pp
+    MULTI_SIGNAL       J2   +/-5%/7d       45.73%   45.76%   +0.02pp
+    MULTI_SIGNAL       J2   +/-7%/14d      46.01%   46.03%   +0.01pp
+    RSI_DIVERGENZ      J1   +/-2,5%/72h    45.84%   46.92%   +1.07pp
+    RSI_DIVERGENZ      J1   +/-5%/7d       49.91%   49.73%   -0.18pp
+    RSI_DIVERGENZ      J1   +/-7%/14d      55.20%   55.20%   +0.00pp
+    RSI_DIVERGENZ      J2   +/-2,5%/72h    40.97%   41.62%   +0.65pp
+    RSI_DIVERGENZ      J2   +/-5%/7d       39.34%   39.40%   +0.06pp
+    RSI_DIVERGENZ      J2   +/-7%/14d      40.80%   40.80%   +0.00pp
+    RSI_OVERSOLD       J1   +/-2,5%/72h    48.32%   47.21%   -1.10pp
+    RSI_OVERSOLD       J1   +/-5%/7d       49.03%   48.87%   -0.15pp
+    RSI_OVERSOLD       J1   +/-7%/14d      51.00%   50.95%   -0.05pp
+    RSI_OVERSOLD       J2   +/-2,5%/72h    49.09%   48.28%   -0.81pp
+    RSI_OVERSOLD       J2   +/-5%/7d       46.05%   46.08%   +0.03pp
+    RSI_OVERSOLD       J2   +/-7%/14d      46.15%   46.20%   +0.05pp
+    TSI                J1   +/-2,5%/72h    53.33%   54.00%   +0.67pp
+    TSI                J1   +/-5%/7d       52.75%   52.85%   +0.10pp
+    TSI                J1   +/-7%/14d      54.10%   54.13%   +0.03pp
+    TSI                J2   +/-2,5%/72h    45.36%   45.85%   +0.48pp
+    TSI                J2   +/-5%/7d       45.56%   45.60%   +0.04pp
+    TSI                J2   +/-7%/14d      45.20%   45.19%   -0.00pp
+
+  Groesster Betrag der Verzerrung: 4.77 pp
+
+========================================================================================================
+ URTEILSTABELLE JE STRATEGIE (1.8)
+========================================================================================================
+
+    Strategie           beste Luecke Kombi/Jahr               Placebo  stabil Urteil          
+    RSI_OVERSOLD              -3.87pp +/-7%/14d / J1            +7.43pp      JA TRAEGT NICHT    
+    EMA_TREND                 -1.10pp +/-7%/14d / J1            -3.63pp    nein TRAEGT NICHT    
+    MACD_CROSS                -0.61pp +/-7%/14d / J1            -4.61pp    nein TRAEGT NICHT    
+    TSI                       -0.68pp +/-7%/14d / J1            -5.71pp    nein TRAEGT NICHT    
+    BOLLINGER_BOUNCE          -4.34pp +/-7%/14d / J1           +12.09pp      JA TRAEGT NICHT    
+    FIBONACCI_SUPPORT         +0.09pp +/-7%/14d / J1            +0.20pp    nein TRAEGT NICHT    
+    RSI_DIVERGENZ             +0.29pp +/-7%/14d / J1            +1.63pp      JA TRAEGT NICHT    
+    MULTI_SIGNAL              -0.98pp +/-7%/14d / J1            -0.54pp    nein TRAEGT NICHT    
+    ICHIMOKU                       - -                              -       - NICHT TESTBAR   
+    MOMENTUM_BREAKOUT              - -                              -       - NICHT TESTBAR   
+    STOCHRSI_REVERSAL              - -                              -       - NICHT TESTBAR   
+
+========================================================================================================
+ URTEIL 1.9 - vier Bedingungen, alle vier
+========================================================================================================
+
+  Tests gesamt:                              48
+  1) Punktschaetzer ueber Kostenschwelle:    2
+  2) davon KI-Untergrenze ueber Schwelle:    0
+  3) davon Placebo geschlagen (>95. Perz.):  0
+  4) davon vorzeichenstabil in beiden Jahren:0
+  davon FDR-signifikant:                     0
+
+  Kleinste gemessene Luecke zur Kostenschwelle: -0.29 pp (RSI_DIVERGENZ J1 +/-7%/14d: 55.20% gegen 54.92%)
+  Naechste KI-Obergrenze an ihrer Schwelle:    -13.99 pp (RSI_DIVERGENZ J1 +/-7%/14d)
+
+  KEINE Strategie erfuellt alle vier Bedingungen.
+  ARCHITEKTURREPARATUR ZUM FREILEGEN DIESER STRATEGIEN: NEIN
+
+========================================================================================================
+ REGRESSION gegen den Altlauf (messung_t034_strategien_out.txt)
+========================================================================================================
+    RSI_OVERSOLD       +/-2,5%/72h  n 20129/20129 q 49.09/49.09 KI[45.19;52.96]/[45.19;52.96] Plc 37.07/37.07 -> BITGLEICH
+    RSI_OVERSOLD       +/-5%/7d     n 19079/19079 q 46.05/46.05 KI[41.09;51.15]/[41.09;51.15] Plc 37.40/37.4 -> BITGLEICH
+    RSI_OVERSOLD       +/-7%/14d    n 19004/19004 q 46.15/46.15 KI[40.84;51.58]/[40.84;51.58] Plc 40.04/40.04 -> BITGLEICH
+    EMA_TREND          +/-2,5%/72h  n 40799/40799 q 46.28/46.28 KI[42.75;49.83]/[42.75;49.83] Plc 54.43/54.43 -> BITGLEICH
+    EMA_TREND          +/-5%/7d     n 38489/38489 q 45.27/45.27 KI[41.02;49.90]/[41.02;49.9] Plc 50.78/50.78 -> BITGLEICH
+
+  5 von 5 Altzeilen bitgleich reproduziert, 0 Abweichungen.

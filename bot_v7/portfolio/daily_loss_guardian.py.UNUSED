@@ -1,0 +1,134 @@
+"""
+Trading Imperium V6 - Daily Loss Guardian
+=============================================
+Sicherheits-Wächter für Live-Trading.
+
+Funktionsweise:
+1. Beim Tagesstart wird der Portfoliowert eingefroren
+2. Alle 30s prüft der Watcher: Aktueller Wert vs Tagesstart
+3. Bei -10% (oder konfigurierbar): ALLE Positionen schließen + Bot pausieren
+4. Pause hält bis zum nächsten Kalendertag (00:00 UTC)
+5. Manuelle Reset-Möglichkeit für UI
+
+WICHTIG: Funktioniert für Paper UND Live identisch!
+"""
+import time
+import threading
+from typing import Callable, Optional, Dict
+from core.logger import log
+
+
+class DailyLossGuardian:
+    """Wächter der Tagesverluste überwacht und Bot bei -X% pausiert."""
+
+    def __init__(self, calculator, on_pause_callback: Optional[Callable] = None,
+                 close_all_callback: Optional[Callable] = None,
+                 check_interval_sec: int = 30):
+        """
+        Args:
+            calculator: PortfolioCalculator-Instanz
+            on_pause_callback: Wird aufgerufen wenn Limit erreicht (z.B. Telegram-Alert)
+            close_all_callback: Funktion die ALLE Positionen schließt
+            check_interval_sec: Prüf-Intervall (default 30s)
+        """
+        self.calculator = calculator
+        self.on_pause_callback = on_pause_callback
+        self.close_all_callback = close_all_callback
+        self.check_interval = check_interval_sec
+        self._running = False
+        self._thread = None
+        self._open_positions_getter = None
+        self._prices_getter = None
+        self._was_paused = False  # Trigger nur einmal pro Tag
+
+    def set_data_sources(self, open_positions_getter: Callable, prices_getter: Callable):
+        """Setzt die Funktionen die offene Positionen + Preise liefern."""
+        self._open_positions_getter = open_positions_getter
+        self._prices_getter = prices_getter
+
+    def start(self):
+        """Startet den Wächter in einem Daemon-Thread."""
+        if self._running:
+            log.warn("GUARDIAN", "Schon aktiv")
+            return
+        self._running = True
+        self._thread = threading.Thread(target=self._watch_loop, daemon=True, name="DailyLossGuardian")
+        self._thread.start()
+        log.info("GUARDIAN", f"💂 Daily-Loss-Guardian aktiv (alle {self.check_interval}s, Limit: -{self.calculator.config.risk.max_daily_loss_pct}%)")
+
+    def stop(self):
+        self._running = False
+
+    def _watch_loop(self):
+        """Hauptloop - prueft alle 30s die Tagesperformance."""
+        while self._running:
+            try:
+                self._check()
+            except Exception as e:
+                log.error("GUARDIAN", f"Check-Fehler: {e}")
+            time.sleep(self.check_interval)
+
+    def _check(self):
+        """Einzelner Check der Tagesperformance."""
+        if not self._open_positions_getter or not self._prices_getter:
+            return
+
+        positions = self._open_positions_getter() or {}
+        prices = self._prices_getter() or {}
+
+        snapshot = self.calculator.get_snapshot(positions, prices)
+        limit = self.calculator.config.risk.max_daily_loss_pct
+
+        # Limit erreicht?
+        if snapshot.daily_pnl_pct <= -limit and not self._was_paused:
+            self._was_paused = True
+            self._handle_loss_limit_reached(snapshot)
+
+        # Reset wenn neuer Tag (Calculator macht das auch, aber explizit)
+        if not self.calculator._daily_paused:
+            self._was_paused = False
+
+    def _handle_loss_limit_reached(self, snapshot):
+        """Wird aufgerufen wenn Daily-Loss-Limit erreicht ist."""
+        log.error("GUARDIAN", f"🚨 DAILY-LOSS-LIMIT ERREICHT!")
+        log.error("GUARDIAN", f"   Tagesstart: {snapshot.daily_start_value:.2f}$")
+        log.error("GUARDIAN", f"   Aktuell:    {snapshot.total_value_usd:.2f}$")
+        log.error("GUARDIAN", f"   Verlust:    {snapshot.daily_pnl_usd:.2f}$ ({snapshot.daily_pnl_pct:.2f}%)")
+        log.error("GUARDIAN", f"   Aktion:     ALLE Positionen schliessen + Bot pausieren bis morgen")
+
+        # 1. Alle Positionen schließen
+        if self.close_all_callback:
+            try:
+                self.close_all_callback()
+                log.info("GUARDIAN", "✅ Alle Positionen geschlossen")
+            except Exception as e:
+                log.error("GUARDIAN", f"Close-All Fehler: {e}")
+
+        # 2. Calculator pausieren
+        self.calculator._daily_paused = True
+
+        # 3. User benachrichtigen (Telegram)
+        if self.on_pause_callback:
+            try:
+                msg = (f"🚨 DAILY-LOSS-LIMIT!\n"
+                       f"Verlust: {snapshot.daily_pnl_pct:.2f}%\n"
+                       f"Wert: {snapshot.total_value_usd:.2f}$\n"
+                       f"Bot pausiert bis morgen.")
+                self.on_pause_callback(msg)
+            except Exception as e:
+                log.warn("GUARDIAN", f"Notify-Fehler: {e}")
+
+    def manual_reset(self):
+        """Manueller Reset (z.B. UI-Button) - hebt Pause auf."""
+        self._was_paused = False
+        self.calculator.force_daily_reset()
+        log.info("GUARDIAN", "⚠️ Manueller Reset - Daily-Loss-Limit aufgehoben")
+
+    def get_status(self):
+        """Status fuer Dashboard."""
+        return {
+            "running": self._running,
+            "limit_pct": self.calculator.config.risk.max_daily_loss_pct,
+            "is_paused": self.calculator.is_daily_paused(),
+            "check_interval_sec": self.check_interval,
+        }

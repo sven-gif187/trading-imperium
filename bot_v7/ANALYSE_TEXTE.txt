@@ -1,0 +1,355 @@
+ANALYSE-REITER - Textblock je Zeitrahmen
+Muenze: BTC/USDC        Stand: 31.08.2026 21:54 UTC
+
+Erzeugt mit analyse_text_export.py. Es sind DIESELBEN Funktionen,
+die auch das Fenster benutzt - der Text ist also Wort fuer Wort der,
+der unter dem Chart steht. Ergaenzt um alle dreizehn Fibonacci-Stufen
+(im Bild sind nur fuenf beschriftet) und die Bollinger-Werte am
+rechten Rand.
+
+ACHTUNG: Momentaufnahme. Die Zahlen aendern sich mit jeder Kerze -
+sie passen nur zu Bildern, die zur selben Zeit entstanden sind.
+
+
+==========================================================================
+  BTC/USDC   Zeitrahmen 15m (15 Minuten)
+==========================================================================
+  Im Bild: 150 Kerzen von 300 geladenen
+
+  Preis 78,978.50   Trend SEITWAERTS   Schwankung (ATR) 182.56
+  WIDERSTAENDE (ueber dem Kurs)
+       79,192.78   3x beruehrt   Staerke 60%
+  UNTERSTUETZUNGEN (unter dem Kurs)
+       78,798.25   4x beruehrt   Staerke 80%   (durchbrochen)
+       78,702.92   3x beruehrt   Staerke 60%
+       78,328.23   3x beruehrt   Staerke 60%   (durchbrochen)
+  FORMATIONEN
+    DREIECK        NEUTRAL  Guete 41%
+      Spanne auf 59% zusammengelaufen - Ausbruch steht an
+  SIGNAL: KEIN
+    Begruendung: kein Setup erkennbar
+
+  FIBONACCI
+    Richtung AB   (bei AUF liegt die 0 am Hoch, bei AB am Tief)
+    Anker Hoch    79,399.44
+    Anker Tief    76,992.79
+    Spanne         2,406.65   = 3.03 % des Hochs
+
+    Verhaeltnis        Preis   Abstand zum Kurs   Art
+    0,0         76,992.79     -2.51 %          anker  *
+    0,236       77,560.76     -1.80 %          rueck   
+    0,382       77,912.13     -1.35 %          rueck  *
+    0,5         78,196.11     -0.99 %          rueck  *
+    0,618       78,480.10     -0.63 %          rueck  *
+    0,707       78,694.29     -0.36 %          rueck   
+    0,786       78,884.42     -0.12 %          rueck   
+    0,866       79,076.95     +0.12 %          rueck   
+    1,0         79,399.44     +0.53 %          anker  *
+    1,272       80,054.05     +1.36 %          vor     
+    1,618       80,886.75     +2.42 %          vor     
+    2,0         81,806.09     +3.58 %          vor     
+    2,618       83,293.40     +5.46 %          vor     
+    (* = im Bild beschriftet, die uebrigen sind nur gezeichnet)
+
+  BOLLINGER (20 Perioden, 2 Standardabweichungen)
+    oberes Band     79,214.78
+    Mitte           78,926.74
+    unteres Band    78,638.71
+    Bandbreite         0.73 %   (Abstand der Baender, gemessen an der Mitte)
+    Der Kurs liegt zwischen Mitte und oberem Band.
+
+==========================================================================
+  BTC/USDC   Zeitrahmen 30m (30 Minuten)
+==========================================================================
+  Im Bild: 150 Kerzen von 300 geladenen
+
+  Preis 78,979.03   Trend AUFWAERTS   Schwankung (ATR) 305.58
+  WIDERSTAENDE (ueber dem Kurs)
+       79,107.27   8x beruehrt   Staerke 100%
+       79,381.76   2x beruehrt   Staerke 40%
+       79,659.46   2x beruehrt   Staerke 40%   (durchbrochen)
+  UNTERSTUETZUNGEN (unter dem Kurs)
+       78,962.77   2x beruehrt   Staerke 40%
+       78,720.46   2x beruehrt   Staerke 40%   (durchbrochen)
+       78,605.74   5x beruehrt   Staerke 100%
+  SIGNAL: SUPPORT_BOUNCE
+    Guete       77%
+    Stop        78,670.85
+    Ziel        79,107.27
+    Chance/Risiko 0.42  (unter 1.5 lohnt sich nach Kosten selten)
+    Begruendung: Kurs in Unterstuetzung 78962.77 (2 Beruehrungen) + Trendstruktur aufwaerts
+
+  FIBONACCI
+    Richtung AB   (bei AUF liegt die 0 am Hoch, bei AB am Tief)
+    Anker Hoch    79,399.44
+    Anker Tief    76,992.79
+    Spanne         2,406.65   = 3.03 % des Hochs
+
+    Verhaeltnis        Preis   Abstand zum Kurs   Art
+    0,0         76,992.79     -2.51 %          anker  *
+    0,236       77,560.76     -1.80 %          rueck   
+    0,382       77,912.13     -1.35 %          rueck  *
+    0,5         78,196.11     -0.99 %          rueck  *
+    0,618       78,480.10     -0.63 %          rueck  *
+    0,707       78,694.29     -0.36 %          rueck   
+    0,786       78,884.42     -0.12 %          rueck   
+    0,866       79,076.95     +0.12 %          rueck   
+    1,0         79,399.44     +0.53 %          anker  *
+    1,272       80,054.05     +1.36 %          vor     
+    1,618       80,886.75     +2.42 %          vor     
+    2,0         81,806.09     +3.58 %          vor     
+    2,618       83,293.40     +5.46 %          vor     
+    (* = im Bild beschriftet, die uebrigen sind nur gezeichnet)
+
+  BOLLINGER (20 Perioden, 2 Standardabweichungen)
+    oberes Band     79,389.87
+    Mitte           78,583.18
+    unteres Band    77,776.49
+    Bandbreite         2.05 %   (Abstand der Baender, gemessen an der Mitte)
+    Der Kurs liegt zwischen Mitte und oberem Band.
+
+==========================================================================
+  BTC/USDC   Zeitrahmen 1h (1 Stunde)
+==========================================================================
+  Im Bild: 150 Kerzen von 300 geladenen
+
+  Preis 78,979.02   Trend SEITWAERTS   Schwankung (ATR) 516.41
+  WIDERSTAENDE (ueber dem Kurs)
+       79,347.58   6x beruehrt   Staerke 100%
+       79,932.27   2x beruehrt   Staerke 40%
+       81,383.79   2x beruehrt   Staerke 40%
+  UNTERSTUETZUNGEN (unter dem Kurs)
+       78,962.77   2x beruehrt   Staerke 40%
+       78,786.04   3x beruehrt   Staerke 60%   (durchbrochen)
+       78,520.13   2x beruehrt   Staerke 40%
+  FORMATIONEN
+    DREIECK        NEUTRAL  Guete 53%
+      Spanne auf 47% zusammengelaufen - Ausbruch steht an
+  SIGNAL: SUPPORT_BOUNCE
+    Guete       64%
+    Stop        78,502.18
+    Ziel        79,347.58
+    Chance/Risiko 0.77  (unter 1.5 lohnt sich nach Kosten selten)
+    Begruendung: Kurs in Unterstuetzung 78962.77 (2 Beruehrungen)
+
+  FIBONACCI
+    Richtung AB   (bei AUF liegt die 0 am Hoch, bei AB am Tief)
+    Anker Hoch    81,494.43
+    Anker Tief    76,873.94
+    Spanne         4,620.49   = 5.67 % des Hochs
+
+    Verhaeltnis        Preis   Abstand zum Kurs   Art
+    0,0         76,873.94     -2.67 %          anker  *
+    0,236       77,964.38     -1.28 %          rueck   
+    0,382       78,638.97     -0.43 %          rueck  *
+    0,5         79,184.18     +0.26 %          rueck  *
+    0,618       79,729.40     +0.95 %          rueck  *
+    0,707       80,140.63     +1.47 %          rueck   
+    0,786       80,505.65     +1.93 %          rueck   
+    0,866       80,875.28     +2.40 %          rueck   
+    1,0         81,494.43     +3.18 %          anker  *
+    1,272       82,751.20     +4.78 %          vor     
+    1,618       84,349.89     +6.80 %          vor     
+    2,0         86,114.92     +9.04 %          vor     
+    2,618       88,970.38    +12.65 %          vor     
+    (* = im Bild beschriftet, die uebrigen sind nur gezeichnet)
+
+  BOLLINGER (20 Perioden, 2 Standardabweichungen)
+    oberes Band     79,316.92
+    Mitte           78,359.13
+    unteres Band    77,401.33
+    Bandbreite         2.44 %   (Abstand der Baender, gemessen an der Mitte)
+    Der Kurs liegt zwischen Mitte und oberem Band.
+
+==========================================================================
+  BTC/USDC   Zeitrahmen 4h (4 Stunden)
+==========================================================================
+  Im Bild: 150 Kerzen von 300 geladenen
+
+  Preis 78,979.03   Trend AUFWAERTS   Schwankung (ATR) 706.10
+  WIDERSTAENDE (ueber dem Kurs)
+       79,445.58   2x beruehrt   Staerke 40%
+       81,383.79   2x beruehrt   Staerke 40%
+  UNTERSTUETZUNGEN (unter dem Kurs)
+       77,731.99   2x beruehrt   Staerke 40%
+       76,755.54   4x beruehrt   Staerke 80%
+       65,730.57   2x beruehrt   Staerke 40%   (durchbrochen)
+  FORMATIONEN
+    DOPPEL_TIEF    BULLISH  Guete 72%  Ziel 81,865.51
+      Tiefs 76873.94/76992.79, Nackenlinie 79399.44
+  SIGNAL: KEIN
+    Begruendung: kein Setup erkennbar
+
+  FIBONACCI
+    Richtung AUF   (bei AUF liegt die 0 am Hoch, bei AB am Tief)
+    Anker Hoch    81,494.43
+    Anker Tief    62,480.00
+    Spanne        19,014.43   = 23.33 % des Hochs
+
+    Verhaeltnis        Preis   Abstand zum Kurs   Art
+    0,0         81,494.43     +3.18 %          anker  *
+    0,236       77,007.02     -2.50 %          rueck   
+    0,382       74,230.92     -6.01 %          rueck  *
+    0,5         71,987.21     -8.85 %          rueck  *
+    0,618       69,743.51    -11.69 %          rueck  *
+    0,707       68,051.23    -13.84 %          rueck   
+    0,786       66,549.09    -15.74 %          rueck   
+    0,866       65,027.93    -17.66 %          rueck   
+    1,0         62,480.00    -20.89 %          anker  *
+    1,272       57,308.08    -27.44 %          vor     
+    1,618       50,729.08    -35.77 %          vor     
+    2,0         43,465.57    -44.97 %          vor     
+    2,618       31,714.65    -59.84 %          vor     
+    (* = im Bild beschriftet, die uebrigen sind nur gezeichnet)
+
+  BOLLINGER (20 Perioden, 2 Standardabweichungen)
+    oberes Band     79,095.75
+    Mitte           78,143.36
+    unteres Band    77,190.96
+    Bandbreite         2.44 %   (Abstand der Baender, gemessen an der Mitte)
+    Der Kurs liegt zwischen Mitte und oberem Band.
+
+==========================================================================
+  BTC/USDC   Zeitrahmen 1d (1 Tag)
+==========================================================================
+  Im Bild: 150 Kerzen von 300 geladenen
+
+  Preis 78,974.00   Trend AUFWAERTS   Schwankung (ATR) 3,093.47
+  WIDERSTAENDE (ueber dem Kurs)
+       79,875.58   2x beruehrt   Staerke 40%   (durchbrochen)
+       82,275.82   3x beruehrt   Staerke 60%
+       84,118.94   2x beruehrt   Staerke 40%   (durchbrochen)
+  UNTERSTUETZUNGEN (unter dem Kurs)
+       78,713.81   5x beruehrt   Staerke 100%   (durchbrochen)
+       74,725.69   4x beruehrt   Staerke 80%
+       69,739.65   4x beruehrt   Staerke 80%   (durchbrochen)
+  SIGNAL: SUPPORT_BOUNCE
+    Guete       77%
+    Stop        76,715.22
+    Ziel        79,875.58
+    Chance/Risiko 0.40  (unter 1.5 lohnt sich nach Kosten selten)
+    Begruendung: Kurs in Unterstuetzung 79875.58 (2 Beruehrungen) + Trendstruktur aufwaerts
+
+  FIBONACCI
+    Richtung AB   (bei AUF liegt die 0 am Hoch, bei AB am Tief)
+    Anker Hoch    82,846.15
+    Anker Tief    57,744.87
+    Spanne        25,101.28   = 30.30 % des Hochs
+
+    Verhaeltnis        Preis   Abstand zum Kurs   Art
+    0,0         57,744.87    -26.88 %          anker  *
+    0,236       63,668.77    -19.38 %          rueck   
+    0,382       67,333.56    -14.74 %          rueck  *
+    0,5         70,295.51    -10.99 %          rueck  *
+    0,618       73,257.46     -7.24 %          rueck  *
+    0,707       75,491.47     -4.41 %          rueck   
+    0,786       77,474.48     -1.90 %          rueck   
+    0,866       79,482.58     +0.64 %          rueck   
+    1,0         82,846.15     +4.90 %          anker  *
+    1,272       89,673.70    +13.55 %          vor     
+    1,618       98,358.74    +24.55 %          vor     
+    2,0        107,947.43    +36.69 %          vor     
+    2,618      123,460.02    +56.33 %          vor     
+    (* = im Bild beschriftet, die uebrigen sind nur gezeichnet)
+
+  BOLLINGER (20 Perioden, 2 Standardabweichungen)
+    oberes Band     86,764.71
+    Mitte           72,492.80
+    unteres Band    58,220.90
+    Bandbreite        39.37 %   (Abstand der Baender, gemessen an der Mitte)
+    Der Kurs liegt zwischen Mitte und oberem Band.
+
+==========================================================================
+  BTC/USDC   Zeitrahmen 1w (1 Woche)
+==========================================================================
+  Im Bild: 150 Kerzen von 300 geladenen
+
+  Preis 78,974.01   Trend ABWAERTS   Schwankung (ATR) 5,897.28
+  WIDERSTAENDE (ueber dem Kurs)
+      109,915.28   3x beruehrt   Staerke 60%
+      124,700.82   3x beruehrt   Staerke 60%
+  UNTERSTUETZUNGEN (unter dem Kurs)
+       75,506.93   2x beruehrt   Staerke 40%
+       73,648.98   4x beruehrt   Staerke 80%   (durchbrochen)
+       67,733.62   4x beruehrt   Staerke 80%   (durchbrochen)
+  SIGNAL: BREAKOUT
+    Guete       47%
+    Stop        67,282.17
+    Ziel        109,915.28
+    Chance/Risiko 2.65  (unter 1.5 lohnt sich nach Kosten selten)
+    Begruendung: Ausbruch ueber Widerstand 73648.98 + Gegen den Abwaertstrend - abgewertet
+
+  FIBONACCI
+    Richtung AUF   (bei AUF liegt die 0 am Hoch, bei AB am Tief)
+    Anker Hoch   126,296.00
+    Anker Tief    38,508.01
+    Spanne        87,787.99   = 69.51 % des Hochs
+
+    Verhaeltnis        Preis   Abstand zum Kurs   Art
+    0,0        126,296.00    +59.92 %          anker  *
+    0,236      105,578.03    +33.69 %          rueck   
+    0,382       92,760.99    +17.46 %          rueck  *
+    0,5         82,402.01     +4.34 %          rueck  *
+    0,618       72,043.02     -8.78 %          rueck  *
+    0,707       64,229.89    -18.67 %          rueck   
+    0,786       57,294.64    -27.45 %          rueck   
+    0,866       50,271.60    -36.34 %          rueck   
+    1,0         38,508.01    -51.24 %          anker  *
+    1,272       14,629.68    -81.48 %          vor     
+    1,618      -15,744.97   -119.94 %          vor     
+    2,0        -49,279.98   -162.40 %          vor     
+    2,618     -103,532.96   -231.10 %          vor     
+    (* = im Bild beschriftet, die uebrigen sind nur gezeichnet)
+
+  BOLLINGER (20 Perioden, 2 Standardabweichungen)
+    oberes Band     85,209.31
+    Mitte           70,115.66
+    unteres Band    55,022.01
+    Bandbreite        43.05 %   (Abstand der Baender, gemessen an der Mitte)
+    Der Kurs liegt zwischen Mitte und oberem Band.
+
+==========================================================================
+  BTC/USDC   Zeitrahmen 1M (1 Monat)
+==========================================================================
+  Im Bild: 88 Kerzen von 88 geladenen
+
+  Preis 78,967.17   Trend ABWAERTS   Schwankung (ATR) 16,673.90
+  WIDERSTAENDE (ueber dem Kurs)
+    keine erkannt
+  UNTERSTUETZUNGEN (unter dem Kurs)
+       69,233.15   3x beruehrt   Staerke 60%   (durchbrochen)
+       30,857.72   2x beruehrt   Staerke 40%
+       12,193.73   2x beruehrt   Staerke 40%   (durchbrochen)
+  SIGNAL: BREAKOUT
+    Guete       41%
+    Stop        51,543.35
+    Begruendung: Ausbruch ueber Widerstand 69233.15 + Gegen den Abwaertstrend - abgewertet
+
+  FIBONACCI
+    Richtung AUF   (bei AUF liegt die 0 am Hoch, bei AB am Tief)
+    Anker Hoch   126,296.00
+    Anker Tief     3,777.00
+    Spanne       122,519.00   = 97.01 % des Hochs
+
+    Verhaeltnis        Preis   Abstand zum Kurs   Art
+    0,0        126,296.00    +59.93 %          anker  *
+    0,236       97,381.52    +23.32 %          rueck   
+    0,382       79,493.74     +0.67 %          rueck  *
+    0,5         65,036.50    -17.64 %          rueck  *
+    0,618       50,579.26    -35.95 %          rueck  *
+    0,707       39,675.07    -49.76 %          rueck   
+    0,786       29,996.07    -62.01 %          rueck   
+    0,866       20,194.55    -74.43 %          rueck   
+    1,0          3,777.00    -95.22 %          anker  *
+    1,272      -29,548.17   -137.42 %          vor     
+    1,618      -71,939.74   -191.10 %          vor     
+    2,0       -118,742.00   -250.37 %          vor     
+    2,618     -194,458.74   -346.25 %          vor     
+    (* = im Bild beschriftet, die uebrigen sind nur gezeichnet)
+
+  BOLLINGER (20 Perioden, 2 Standardabweichungen)
+    oberes Band    124,119.19
+    Mitte           88,254.17
+    unteres Band    52,389.14
+    Bandbreite        81.28 %   (Abstand der Baender, gemessen an der Mitte)
+    Der Kurs liegt zwischen unterem Band und Mitte.

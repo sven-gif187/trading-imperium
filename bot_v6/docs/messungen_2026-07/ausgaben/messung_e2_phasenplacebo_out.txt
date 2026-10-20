@@ -1,0 +1,56 @@
+
+================================================================================================================
+ E2 PHASENGLEICHES PLACEBO  -  Jahr 2  2025-07..2026-07
+ 1514 echte Kaeufe | 366 Tage gesamt | 242 Tage mit F&G<30 | 40 Ziehungen je Szenario
+================================================================================================================
+  Szenario                                      P(auf) %  n entsch.   2,5%-P  97,5%-P
+  --------------------------------------------------------------------------------------------
+  S0  ECHTE Einstiege                              47.66       1494        -        -
+  S1  gleichverteilt ueber das ganze Jahr          47.14               44.87    49.50
+  S3  gleichverteilt ueber alle F&G<30-Tage        47.02               45.24    49.00
+  S2  gleiche Tage, nur Uhrzeit zufaellig          45.46               42.59    47.13
+
+  Zerlegung des Unterschieds (Prozentpunkte):
+    F&G-Tagesfilter        S1 -> S3 :  -0.12 pp
+    Auswahl WELCHER Angsttage S3 -> S2 :  -1.56 pp
+    Uhrzeitwahl            S2 -> S0 :  +2.20 pp
+    gesamt                 S1 -> S0 :  +0.52 pp
+
+  Block-Bootstrap ueber 104 Kalendertage, 2000 Ziehungen:
+    P(auf) echt = 47.66 %   95%-KI = [42.58 ; 52.56] %
+    Zufallsniveau S2 (Mittel) = 45.46 %  -> INNERHALB des KI
+
+  Block-Bootstrap EV(R)-Differenz Stop 5,0 % minus Stop 2,0 %:
+    Punktschaetzer = +0.1340 R  (EV(R) 2,0 % = -0.4481 / 5,0 % = -0.3142)
+    95%-KI = [+0.0778 ; +0.1912] R  aus 2000 Ziehungen
+    Null im Intervall: NEIN - Unterschied gesichert
+
+  Zum Vergleich: bis Break-even fehlen ab Stop 5,0 % noch +0.3142 R
+
+================================================================================================================
+ E2 PHASENGLEICHES PLACEBO  -  Jahr 1  2024-07..2025-07
+ 797 echte Kaeufe | 366 Tage gesamt | 43 Tage mit F&G<30 | 40 Ziehungen je Szenario
+================================================================================================================
+  Szenario                                      P(auf) %  n entsch.   2,5%-P  97,5%-P
+  --------------------------------------------------------------------------------------------
+  S0  ECHTE Einstiege                              50.69        795        -        -
+  S1  gleichverteilt ueber das ganze Jahr          50.10               48.02    52.82
+  S3  gleichverteilt ueber alle F&G<30-Tage        51.67               48.41    54.23
+  S2  gleiche Tage, nur Uhrzeit zufaellig          51.52               48.60    54.32
+
+  Zerlegung des Unterschieds (Prozentpunkte):
+    F&G-Tagesfilter        S1 -> S3 :  +1.57 pp
+    Auswahl WELCHER Angsttage S3 -> S2 :  -0.15 pp
+    Uhrzeitwahl            S2 -> S0 :  -0.83 pp
+    gesamt                 S1 -> S0 :  +0.59 pp
+
+  Block-Bootstrap ueber 43 Kalendertage, 2000 Ziehungen:
+    P(auf) echt = 50.69 %   95%-KI = [43.33 ; 57.69] %
+    Zufallsniveau S2 (Mittel) = 51.52 %  -> INNERHALB des KI
+
+  Block-Bootstrap EV(R)-Differenz Stop 5,0 % minus Stop 2,0 %:
+    Punktschaetzer = +0.1308 R  (EV(R) 2,0 % = -0.3681 / 5,0 % = -0.2372)
+    95%-KI = [+0.0426 ; +0.2356] R  aus 2000 Ziehungen
+    Null im Intervall: NEIN - Unterschied gesichert
+
+  Zum Vergleich: bis Break-even fehlen ab Stop 5,0 % noch +0.2372 R

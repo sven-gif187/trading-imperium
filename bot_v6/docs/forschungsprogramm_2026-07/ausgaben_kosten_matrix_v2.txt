@@ -1,0 +1,84 @@
+====================================================================================================
+ KOSTENMATRIX v2 - nach Gebuehrenkorrektur Bybit EU (Taker 0,25 %)
+ p_be = 0,5 + c/(2B).  Kein Trial - reine Kostenarithmetik.
+====================================================================================================
+
+  Gebuehrenbasis je Boerse (je Seite):
+    Bybit EU     Maker 0.10 %  Taker 0.25 %   bybit.eu Help-Center 08.03.2026, vom Eigentuemer direkt geprueft [SICHER]
+    Bitvavo      Maker 0.15 %  Taker 0.25 %   offizielle Gebuehrenseite (403 beim Abruf), Sekundaerquellen konsistent [WAHRSCHEINLICH]
+    Kraken Pro   Maker 0.25 %  Taker 0.40 %   offizielle Gebuehrenseite nicht abgerufen [WAHRSCHEINLICH]
+    Bitpanda     Broker-Spread 1.00-1.50 % je Seite [WAHRSCHEINLICH]
+
+====================================================================================================
+ NOETIGE TREFFERQUOTE p_be
+====================================================================================================
+
+    Boerse                 Pfad     Reibung           +/-5 %      +/-7 %     +/-10 %
+    ----------------------------------------------------------------------------------
+    Bybit EU               TAKER    c=0.600 %      56.00 %     54.29 %     53.00 %
+    Bybit EU               MAKER    c=0.260 %      52.60 %     51.86 %     51.30 %
+    ----------------------------------------------------------------------------------
+    Bitvavo                TAKER    c=0.600 %      56.00 %     54.29 %     53.00 %
+    Bitvavo                MAKER    c=0.360 %      53.60 %     52.57 %     51.80 %
+    ----------------------------------------------------------------------------------
+    Kraken Pro             TAKER    c=0.900 %      59.00 %     56.43 %     54.50 %
+    Kraken Pro             MAKER    c=0.560 %      55.60 %     54.00 %     52.80 %
+    ----------------------------------------------------------------------------------
+    Bitpanda               BROKERm  c=2.000 %      70.00 %     64.29 %     60.00 %
+    Bitpanda               BROKERm  c=3.000 %      80.00 %     71.43 %     65.00 %
+
+====================================================================================================
+ VERGLEICH ZUR MATRIX v1 (Bybit EU)
+====================================================================================================
+
+    Szenario                                        c     +/-5 %     +/-7 %    +/-10 %
+    ----------------------------------------------------------------------------------
+    v1 ANNAHME Taker 0,10 % (FALSCH)           0.300 %     53.00 %     52.14 %     51.50 %
+    v2 IST Taker 0,25 %, Market-Pfad           0.600 %     56.00 %     54.29 %     53.00 %
+    v2 IST Maker 0,10 %, Limit-Pfad            0.260 %     52.60 %     51.86 %     51.30 %
+
+====================================================================================================
+ ABGLEICH MIT DER 57,5-%-ANGABE DES EIGENTUEMERS
+====================================================================================================
+
+    Angabe Eigentuemer: +/-5 % erfordert 57,50 % statt 53,00 %.
+    Rueckrechnung: p=57,50 % bei B=5 % impliziert c = 0.750 %.
+    Diese Reibung entsteht bei Taker 0,25 %/Seite NUR mit einer
+    Slippage-Annahme von 0.125 % je Seite.
+    Die Register-Konvention ist 0.05 % je Seite (Majors); damit
+    ergibt sich c = 0.60 % und p_be = 56.00 %.
+
+    Beide Zahlen sind verteidigbar - die Differenz ist REIN die
+    Slippage-Annahme, nicht die Gebuehr. 56.0 % gilt fuer
+    liquide Majors, 57,5 % ist die konservativere Variante und trifft
+    duenne Alt-Buecher eher. Die Live-Capture-Messung entscheidet das;
+    bis dahin wird BEIDES ausgewiesen.
+    
+====================================================================================================
+ GEWICHTETE MATRIX v2
+====================================================================================================
+
+    Boerse           Kosten  EU-Nutzba  API/Integ  Liquidita  Quote-Ass  Migration  Gegenpart   SUMME v2      v1   Delta
+    ------------------------------------------------------------------------------------------------------------
+    Bybit EU              6          9          9          7          8          9          6       7.70    8.20   -0.50
+    Bitvavo               5          9          7          6          5          6          7       6.50    6.50   +0.00
+    Kraken                3          9          7          7          7          7          8       6.45    6.70   -0.25
+    Bitpanda              1          9          3          4          5          2          8       4.25    4.25   +0.00
+
+    Rangfolge v2: Bybit EU (7.70)  >  Bitvavo (6.50)  >  Kraken (6.45)  >  Bitpanda (4.25)
+    Abstand Platz 1 zu Platz 2: 1.20 (v1: 1.50)
+
+====================================================================================================
+ ROBUSTHEITSPRUEFUNG DER RANGFOLGE
+====================================================================================================
+
+    Ab welchem Kosten-Gewicht kippt Platz 1?
+    Kosten-Gewicht 25%: Bybit EU 7.70  Bitvavo 6.50  Kraken 6.45
+    Kosten-Gewicht 35%: Bybit EU 7.47  Bitvavo 6.30  Kraken 5.99
+    Kosten-Gewicht 45%: Bybit EU 7.25  Bitvavo 6.10  Kraken 5.53
+    Kosten-Gewicht 55%: Bybit EU 7.02  Bitvavo 5.90  Kraken 5.07
+    Kosten-Gewicht 65%: Bybit EU 6.79  Bitvavo 5.70  Kraken 4.61
+    Kosten-Gewicht 75%: Bybit EU 6.57  Bitvavo 5.50  Kraken 4.15
+
+    Lesart: Bleibt derselbe Name vorn, ist die Empfehlung nicht
+    von der (unsicheren) Kostenschaetzung allein getragen.

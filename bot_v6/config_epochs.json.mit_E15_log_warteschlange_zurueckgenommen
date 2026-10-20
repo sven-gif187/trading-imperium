@@ -1,0 +1,169 @@
+{
+  "_comment": "Verhaltensaenderungen des Bots. Auswertung NUR innerhalb einer Epoche vergleichen.",
+  "epochs": [
+    {
+      "id": "E0_baseline",
+      "start": "2026-05-01T00:00:00+00:00",
+      "label": "Baseline (Original-Regeln)",
+      "note": "Urspruengliches Trailing. Daily-Loss-Limit AKTIV (buggy) - enthaelt den 18.06. Zwangsverkauf aller 5 offenen Positionen um 16:21.",
+      "changes": [
+        "original-trailing",
+        "daily-loss-aktiv-bug"
+      ]
+    },
+    {
+      "id": "E1_stufentrailing",
+      "start": "2026-06-22T00:00:00+00:00",
+      "label": "Stufen-Trailing + Daily-Loss AUS",
+      "note": "R/R-Fix: gewinnabhaengiges Trailing (x1.6 / x1.0 / x0.7 / x0.5). Daily-Loss-Limit deaktiviert (_daily_loss_disabled). Journal-Recovery-Fix (reiner Bugfix, kein Trading-Impact). Boundary auf Tagesebene - exakte Install-Zeit ggf. nachschaerfen.",
+      "changes": [
+        "stufen-trailing-on",
+        "daily-loss-disabled",
+        "journal-recovery-fix"
+      ]
+    },
+    {
+      "id": "E2_regimefilter_aktiv",
+      "start": "2026-06-24T22:56:24.534152+00:00",
+      "label": "Regime-Filter aktiv",
+      "note": "blockt Kauf bei bestaetigtem Abwaertstrend",
+      "changes": []
+    },
+    {
+      "id": "E3_regimefilter_scharf",
+      "start": "2026-06-26T07:03:46.418815+00:00",
+      "label": "Regime-Filter scharf",
+      "note": "Regime+Cycle getrennt, blockt Abwaertstrend",
+      "changes": []
+    },
+    {
+      "id": "E4_btc_only",
+      "start": "2026-08-07T00:16:50+00:00",
+      "label": "BTC-only-Modus (Testphase)",
+      "note": "active_mode=btc_only. Belegt aus der Telemetrie: erste Modus-Sperre 07.08. 00:16:50, letzte 10.08. 04:26:36 UTC. In dieser Zeit wurden ETH und SOL vom Kauf ausgeschlossen (rund 11.000 Blockaden je Tag).",
+      "changes": [
+        "active_mode=btc_only",
+        "nur_asset=BTC"
+      ]
+    },
+    {
+      "id": "E5_balanced_zurueck",
+      "start": "2026-08-10T04:26:37+00:00",
+      "label": "Zurueck auf balanced + Trend-Exit im Schattenmodus",
+      "note": "Zwei Aenderungen am selben Tag. 1) active_mode zurueck auf balanced - letzte btc_only-Sperre 04:26:36 UTC. 2) TREND_EXIT_SCHATTEN=True in runtime/exit_monitor.py:24 - die Regel rechnet, verkauft aber nicht mehr. ACHTUNG: der Verlusttag 10.08. (-6.86$, zwei Trades um 15:13 und 15:36) faellt in DIESE Epoche, nicht in E4 - der BTC-Modus war da elf Stunden aus.",
+      "changes": [
+        "active_mode=balanced",
+        "TREND_EXIT_SCHATTEN=True"
+      ]
+    },
+    {
+      "id": "E6_messfenster",
+      "start": "2026-08-13T13:21:19+00:00",
+      "label": "Messfenster: eingefroren, korrekte Gebuehren",
+      "note": "Beginn des Zwei-Wochen-Messfensters. Gesetzt am 14.08. nachtraeglich, weil die Grenze beim Einfrieren vergessen wurde - ohne sie mischt epoch_report.py Trades mit ALTER Gebuehr (0,10 % je Seite) und NEUER (0,25 %) in dieselbe Epoche E5. Zeitpunkt = letzter Neustart nach dem Doppelverkaufs-Fix. Was in dieser Epoche NEU ist: Gebuehren 0,25 % Taker (Bybit EU) statt 0,10 %; Slippage je Muenze aus der Orderbuch-Messung statt pauschal 0,02-0,08 %; Meta-Voting 50/50 im Signal; Ist-Slippage auf allen vier Journal-Pfaden; Zustandssicherung nach jedem Trade; score und stop_loss in der Telemetrie gefuellt. ACHTUNG: Der Trade vom 12.08. 18:55 UTC (TREND-EXIT BTC -2,68 $) gehoert NICHT hierher - er entstand, waehrend der Trend-Ausstieg durch einen Konfigurationsfehler ungewollt scharf war.",
+      "changes": [
+        "gebuehren=0.25%_taker",
+        "slippage=je_muenze",
+        "meta_voting=50/50",
+        "slippage_im_journal",
+        "zustand_nach_jedem_trade",
+        "score+stop_loss_in_telemetrie"
+      ]
+    },
+    {
+      "id": "E7_filter_schaerfer",
+      "start": "2026-08-15T07:47:32.416376+00:00",
+      "label": "Regime-Filter strenger: min_confirmations 3 -> 2",
+      "note": "NICHT von Hand gesetzt, sondern vom lernenden Waechter features/regime_adaptiv.py (AKTIV=True) selbstaendig geaendert - mitten im Messfenster. Entdeckt am 17.08. durch eine Telegram-Meldung, die Sven auffiel; der RegelWaechter schlug NICHT an, weil er nur trend_exit ueberwacht. Zeitpunkt und Begruendung belegt in telemetrie.db, Tabelle regime_lernen, id 28: 'Geblockte Kaeufe haetten im Mittel -0,64 % verloren (99 Stunden). Der Filter schuetzt - strenger stellen.' Die Entscheidung war inhaltlich richtig - sie deckt sich mit zwei unabhaengigen Messungen vom 17.08. (regime_filter_messung.py: -0,282 % / 25,7 % im Plus; nachlauf.db: -0,33 % / 26 % im Plus). Falsch war nur der Zeitpunkt: ohne diese Grenze haette E6 Trades unter zwei verschiedenen Regelwerken verglichen. Der Lerner laeuft bewusst weiter, damit messbar bleibt, OB seine Entscheidung richtig war - siehe schwelle_vergleich.py.",
+      "changes": [
+        "min_confirmations=2",
+        "quelle=regime_adaptiv_automatisch"
+      ]
+    },
+    {
+      "id": "E8_angleich_v7",
+      "start": "2026-10-14T09:18:25.132061+00:00",
+      "label": "Angleich an v7: Ausstiege aus Kosten gerechnet, Verlustzaehler, ATH dynamisch",
+      "note": "Vier Patches aus patches_nach_27_08 auf einmal, eine Grenze (wie 00_LIES_MICH.md verlangt): 00a BREAKEVEN_PUFFER_PCT 0.35->0.55, 45 TRAIL_AB_PCT 1.2->1.57, 54 coin_consecutive_losses gespeichert, 63 ATH aus Wochenkerzen (Rueckfall 126200). v6 hat damit dieselben Ausstiegswerte wie v7 (seit L7). Freigabe Sven 14.10.2026 (Chat, F6). Vorab-Registrierung mit Messgroessen M1-M4 und Abbruchkriterien: pruefstand/epochen/E8_v6_angleich_v7.md. Bekannt offen: doppelte Kaufgebuehr (Befund 42) und Befund 72.",
+      "changes": [
+        "BREAKEVEN_PUFFER_PCT=0.55",
+        "TRAIL_AB_PCT=1.57",
+        "coin_consecutive_losses_persistiert",
+        "ATH_dynamisch_126200"
+      ]
+    },
+    {
+      "id": "E9_kaufgebuehr_einfach",
+      "start": "2026-10-14T09:35:46.683656+00:00",
+      "label": "Kaufgebuehr nur einmal gebucht (Befund 42)",
+      "note": "execution/engine.py:401 filled_cost = amount - fee, wortgleich mit v7 (engine.py:551, seit 11.09.). Vorher zog exit_monitor die Kaufgebuehr doppelt ab: E7 115 von 136 Runden, 45,91 $. Kauf-amount im Journal ab hier OHNE Gebuehr (= qty * Kurs), wie in v7 und wie beim Verkauf. E8 (09:18:25 UTC) hat keine abgeschlossene Runde - Auswertung E8+E9 gemeinsam. Die 3 Positionen, die beim Stopp offen waren (BTC, ETH, SOL), tragen ihre doppelte cost_basis weiter. Vorab-Registrierung pruefstand/epochen/E9_v6_kaufgebuehr_einfach.md. Freigabe Sven 14.10.2026.",
+      "changes": [
+        "filled_cost=amount-fee",
+        "journal_buy_amount_ohne_gebuehr"
+      ]
+    },
+    {
+      "id": "E10_kostenlatte_bitvavo",
+      "start": "2026-10-14T13:58:25.000440+00:00",
+      "label": "Kostenlatte Bitvavo USDC (Zielboerse gewechselt)",
+      "note": "Entscheidung Sven 14.10.2026: Zielboerse Bitvavo USDC-Maerkte statt Bybit EU. Papier-Gebuehr 0,05 % je Seite (bitvavo_usdc), SPREAD_BP BTC/ETH/SOL aus Bitvavo-Stichprobe 14.10. (Median 2,78/4,27/5,72 bp), K_BASIS 0.505 -> 0.150, Nullsicherung-Puffer 0.55 -> 0.195, TRAIL_AB_PCT 1.57 -> 1.21, Regime-Lerner und Schatten-Ausstiege 0.32 -> 0.150, kosten_je_runde_pct 0.150. Ab hier auswerten (E8/E9 hatten kaum Runden). Offene BTC-Position von vor E10 gekauft mit 0,25 %. Vorab-Registrierung pruefstand/epochen/E10_L9_kostenlatte_bitvavo.md, Schattenbuch berichte/2026-10-14_kosten_schatten_v6_mit_schlupf.json.",
+      "changes": [
+        "paper_boerse=bitvavo_usdc",
+        "K_BASIS=0.150",
+        "BREAKEVEN_PUFFER=0.195",
+        "TRAIL_AB=1.21",
+        "SPREAD_BP=bitvavo",
+        "regime_kosten=0.150"
+      ]
+    },
+    {
+      "id": "E11_trailstart_wirksam",
+      "start": "2026-10-14T19:55:41.850614+00:00",
+      "label": "Nachzieh-Start aus wirksamem Abstand (A5-V1)",
+      "note": "Entscheidung Sven 14.10.2026 (Z4). risk/exit_rules.py effektiver_trail(): Start = (1+K)/(1-Abstand)-1+0,05 mit dem wirksamen Abstand (Config x Regime x Leiter x Trend-Bonus) statt fest TRAIL_AB_PCT 1,21. EARLY_BEAR 0,85 -> 1,06; Trend 1,3 -> 1,52. Auswertung gemeinsam mit der vorigen Epoche (gleiche Kostenlatte). Vorab-Registrierung pruefstand/epochen/E11_L10_trailstart_wirksam.md.",
+      "changes": [
+        "trail_start=aus_wirksamem_abstand"
+      ]
+    },
+    {
+      "id": "E12_puffer_pflichtfelder",
+      "start": "2026-10-15T09:35:57.538913+00:00",
+      "label": "Puffer K+0,10 und Kauf-Felder am Verkauf (E5, Befund 88)",
+      "note": "Entscheidung Sven 15.10.2026 (E5): risk/exit_rules.py BREAKEVEN_MARGE_PCT 0,045 -> 0,10, Puffer der Nullsicherung 0,195 -> 0,25 %. Dazu nur Aufzeichnung: app.py _journal_add fuellt fehlende Kauf-Felder eines Verkaufs aus dem ersten Kauf der Runde (Befund 88). Vorab-Registrierung pruefstand/epochen/E12_L11_puffer_pflichtfelder.md.",
+      "changes": [
+        "breakeven_marge_pct=0.10",
+        "breakeven_puffer_pct=0.25",
+        "journal_kauf_felder_am_verkauf"
+      ]
+    },
+    {
+      "id": "E13_kleinigkeiten",
+      "start": "2026-10-15T10:03:04.743633+00:00",
+      "label": "Nachzieh-Marge 0,10 und Kleinigkeiten (E5b, Befund 72, P0-11)",
+      "note": "Entscheidung Sven 15.10.2026 (E5b): risk/exit_rules.py TRAIL_MARGE_PCT 0,05 -> 0,10, Nachzieh-Start = Nulllinie + 0,10 (0,85->1,11 / 1,0->1,26 / 1,3->1,57). Ohne Handelswirkung: maker_schatten.py Bitvavo-Gebuehren; live/watchdog.py stop() (Befund 72); data/market_data.py ohne ccxt.coinbasepro (P0-11). Vorab-Registrierung pruefstand/epochen/E13_L12_kleinigkeiten.md.",
+      "changes": [
+        "trail_marge_pct=0.10",
+        "watchdog_stop",
+        "datenclient_getattr"
+      ]
+    },
+    {
+      "id": "E14_kaufgroesse_handelsgeld",
+      "start": "2026-10-15T20:35:04.880957+00:00",
+      "label": "Kaufgroesse aus Handelsgeld ohne Sparplan (KG1)",
+      "note": "Entscheidung Sven 15.10.2026 (KG1/KG1a, pruefstand/entscheidungen.md): Kaufgroesse nur aus dem Handelsgeld, das Sparplan-BTC zaehlt nicht mehr mit. portfolio/manager.py neue Funktion get_trading_capital() (= get_total_capital() minus Sparplan); app.py Block MANUELLES SIZING nutzt sie statt get_total_capital(). Drawdown-Guard, Tagesverlust, Tagesstart und Anzeige rechnen weiter mit Sparplan (E10-KAPITAL). Beleg: v7 setzte am 15.10. 95 % der Handelskasse in eine Muenze (Signal 117,44 $, ueberschrieben auf 232,91 $). Bots waren seit 20:11 Berlin aus (Claude-App-Update beendete sie), Patch bei geschlossenem Bot. Vorab-Registrierung pruefstand/epochen/E14_L13_kaufgroesse_handelsgeld.md.",
+      "changes": [
+        "sizing_basis=get_trading_capital (ohne Sparplan)"
+      ]
+    },
+    {
+      "id": "E15_log_warteschlange",
+      "start": "2026-10-19T21:00:50.469900+00:00",
+      "label": "Log-Warteschlange gegen Haenger (ohne Handelswirkung)",
+      "note": "Auftrag Sven 19.10.2026: ui/main_window.py Logger-Rueckruf reiht Zeilen in eine Warteschlange ein (Fenster holt sie alle 250 ms ab) statt self.after() aus fremden Threads. Ursache des 35-h-Haengers 16./17.10. (pruefstand/berichte/2026-10-17_v6_haenger.md). Keine Handelsregel geaendert, keine Messgrenze: Auswertung weiter gemeinsam ab E10. Vorab-Registrierung pruefstand/epochen/E15_L14_log_warteschlange.md.",
+      "changes": [
+        "log_warteschlange"
+      ]
+    }
+  ]
+}

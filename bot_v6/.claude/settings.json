@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "C:/Users/<BENUTZER>/AppData/Local/Python/pythoncore-3.13-64/python.exe",
+            "args": [
+              "C:/Users/<BENUTZER>/Desktop/trading_imperium_v6(21)/.claude/hooks/sitzungsstart.py"
+            ],
+            "timeout": 20,
+            "statusMessage": "Projektgedaechtnis wird vorgelegt"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "C:/Users/<BENUTZER>/AppData/Local/Python/pythoncore-3.13-64/python.exe",
+            "args": [
+              "C:/Users/<BENUTZER>/Desktop/trading_imperium_v6(21)/.claude/hooks/jede_nachricht.py"
+            ],
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "C:/Users/<BENUTZER>/AppData/Local/Python/pythoncore-3.13-64/python.exe",
+            "args": [
+              "C:/Users/<BENUTZER>/Desktop/trading_imperium_v6(21)/.claude/hooks/schreibschutz.py"
+            ],
+            "timeout": 10,
+            "statusMessage": "Schreibschutz"
+          }
+        ]
+      }
+    ]
+  }
+}

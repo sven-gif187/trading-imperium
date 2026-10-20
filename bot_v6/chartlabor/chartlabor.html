@@ -1,0 +1,2592 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Chartlabor</title>
+<style>
+  :root{
+    --grund:#0d1117; --karte:#161b22; --rand:#30363d; --text:#e6edf3;
+    --matt:#8b949e; --gruen:#26a69a; --rot:#ef5350; --blau:#58a6ff;
+    --fib:#a78bfa; --gelb:#d29922; --werkzeug:#1f6feb;
+  }
+  *{box-sizing:border-box}
+  /* [07.09.2026] Untereinander statt gerechnet. Vorher stand in #buehne
+     die Hoehe calc(100vh - 42px) - eine feste Annahme ueber die Hoehe der
+     Bedienleiste. Die Leiste bricht aber um, sobald Knoepfe dazukommen:
+     gemessen 71px statt 42px bei 1920 Punkten Breite. Die unteren 29px
+     des Charts lagen dadurch ausserhalb des Fensters, und genau dort
+     steht die Zeitachse. Jetzt teilt sich der Platz von selbst auf. */
+  body{margin:0;background:var(--grund);color:var(--text);
+       font:13px/1.45 "Segoe UI",system-ui,sans-serif;overflow:hidden;
+       display:flex;flex-direction:column;height:100vh}
+  /* Der Warnstreifen fuer alte Kurse. Liegt zwischen Leiste und
+     Chart und schiebt den Chart herunter statt ihn zu ueberdecken -
+     eine Warnung, die etwas verdeckt, wird weggeklickt. */
+  #alterhinweis{flex:0 0 auto;padding:7px 12px;background:#3d2c00;
+        color:#f0c674;border-bottom:1px solid #6b4f00;font-size:12px;
+        line-height:1.5}
+  #alterhinweis b{color:#ffd479}
+  #kopf{display:flex;flex-wrap:wrap;gap:6px;align-items:center;
+        padding:6px 10px;background:var(--karte);
+        border-bottom:1px solid var(--rand);flex:0 0 auto}
+  .gruppe{display:flex;gap:3px;align-items:center;
+          padding-right:10px;margin-right:4px;border-right:1px solid var(--rand)}
+  .gruppe:last-child{border-right:none}
+  button,select{background:#21262d;color:var(--text);border:1px solid var(--rand);
+          border-radius:5px;padding:4px 9px;cursor:pointer;font-size:12px}
+  button:hover{background:#30363d}
+  button:disabled{opacity:.4;cursor:default}
+  button:disabled:hover{background:#21262d}
+  button.an{background:var(--werkzeug);border-color:var(--werkzeug);color:#fff}
+  label.schalter{display:flex;align-items:center;gap:3px;cursor:pointer;
+          padding:3px 6px;border-radius:5px;font-size:12px;user-select:none}
+  label.schalter:hover{background:#21262d}
+  .titel{font-size:11px;color:var(--matt);margin-right:3px;text-transform:uppercase;
+         letter-spacing:.5px}
+  /* Kein Textmarkieren beim Ziehen: sonst faerbt jeder Zug ueber den
+     Chart die Infobox blau ein, weil der Browser das fuer eine
+     Textauswahl haelt. [07.09.2026 beim Prueftest aufgefallen] */
+  #buehne{position:relative;flex:1 1 auto;min-height:0;width:100%;
+        user-select:none;-webkit-user-select:none}
+  canvas{position:absolute;inset:0;display:block}
+  #infobox{position:absolute;top:8px;left:12px;background:rgba(13,17,23,.88);
+        border:1px solid var(--rand);border-radius:6px;padding:6px 10px;
+        font:12px/1.6 Consolas,monospace;pointer-events:none;white-space:pre}
+  #hinweis{position:absolute;bottom:10px;left:12px;color:var(--matt);
+        font-size:11px;background:rgba(13,17,23,.85);padding:4px 9px;
+        border-radius:5px;pointer-events:none}
+  #laden{position:absolute;inset:0;display:flex;align-items:center;
+        justify-content:center;background:var(--grund);font-size:15px;z-index:5}
+  /* Meldungskasten fuer Sichern/Einlesen. Ein Fehler bleibt stehen, bis
+     er weggeklickt wird - eine Erfolgsmeldung geht von selbst. */
+  /* Zeichnungsliste. Liegt links UNTER der Infobox, damit sie nichts
+     verdeckt, was man beim Zeichnen braucht. Zu-/aufklappbar - wer sie
+     nicht braucht, soll den Chart nicht kleiner haben. */
+  #liste{position:absolute;top:88px;left:12px;width:340px;
+        max-height:calc(100% - 150px);overflow:auto;z-index:4;
+        background:rgba(13,17,23,.97);border:1px solid var(--rand);
+        border-radius:8px;box-shadow:0 6px 22px rgba(0,0,0,.55)}
+  #listeKopf{display:flex;gap:6px;align-items:center;padding:6px 9px;
+        border-bottom:1px solid var(--rand);position:sticky;top:0;
+        background:var(--karte);font-size:11px;color:var(--matt);
+        text-transform:uppercase;letter-spacing:.5px}
+  #listeKopf button{padding:2px 7px;font-size:11px;text-transform:none;
+        letter-spacing:0}
+  #listeLeer{padding:14px 10px;color:var(--matt);font-size:12px}
+  .zeile{padding:5px 8px;border-bottom:1px solid #21262d;cursor:pointer}
+  .zeile:hover{background:#161b22}
+  .zeile.gewaehlt{background:#1c2a3a}
+  .zeile .oben{display:flex;gap:7px;align-items:center}
+  .auge{width:18px;text-align:center;user-select:none;font-size:13px}
+  .punkt{width:11px;height:11px;border-radius:3px;flex:0 0 auto;
+        border:1px solid rgba(255,255,255,.25)}
+  .was{flex:1 1 auto;white-space:nowrap;overflow:hidden;
+        text-overflow:ellipsis;font:12px/1.4 Consolas,monospace}
+  .zeile.unsichtbar .was,.zeile.unsichtbar .punkt{opacity:.4}
+  .stellrad{display:flex;gap:3px;flex-wrap:wrap;margin:6px 0 2px 25px}
+  .stellrad button{padding:2px 7px;font-size:11px}
+  .stellrad .farbknopf{width:20px;height:20px;padding:0}
+  .stellrad .trenner{width:9px}
+  #meldung{position:absolute;top:10px;left:50%;transform:translateX(-50%);
+        max-width:66%;background:var(--karte);border:1px solid var(--rand);
+        border-left:4px solid var(--matt);border-radius:6px;padding:8px 12px;
+        font:12px/1.5 Consolas,monospace;white-space:pre-wrap;z-index:6;
+        cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.55)}
+  #meldung.ok{border-left-color:var(--gruen)}
+  #meldung.warn{border-left-color:var(--gelb)}
+  #meldung.fehler{border-left-color:var(--rot)}
+</style>
+
+<div id="kopf">
+  <div class="gruppe">
+    <span class="titel">Münze</span>
+    <select id="symbol"><option value="BTCUSDT">BTC/USDT</option></select>
+    <span id="quelle" class="titel" style="margin-left:4px"></span>
+  </div>
+  <div class="gruppe" id="rahmen">
+    <span class="titel">Zeitraster</span>
+  </div>
+  <div class="gruppe" id="werkzeuge">
+    <span class="titel">Werkzeug</span>
+  </div>
+  <div class="gruppe" id="farben">
+    <span class="titel">Farbe</span>
+  </div>
+  <div class="gruppe" id="fuellungen">
+    <span class="titel">Füllung</span>
+  </div>
+  <div class="gruppe" id="indikatoren">
+    <span class="titel">Indikatoren</span>
+  </div>
+  <div class="gruppe">
+    <button id="zeichnungsliste" title="Zeichnungen einzeln ein- und ausblenden, Farbe und Füllung ändern">📋 Zeichnungen</button>
+    <button id="alles">Alles zeigen</button>
+    <button id="einpassen" title="Preisachse so einstellen, dass die Zeichnungen ganz ins Bild passen">⤢ Einpassen</button>
+    <button id="loeschen">Zeichnung löschen</button>
+    <button id="letzte">Rückgängig</button>
+  </div>
+  <div class="gruppe" id="merken">
+    <span class="titel">Merken</span>
+  </div>
+  <div class="gruppe" id="holen">
+    <span class="titel">Holen</span>
+  </div>
+  <div class="gruppe">
+    <button id="sichern" title="Alle Zeichnungen dieser Münze als Datei speichern">💾 Sichern</button>
+    <button id="einlesen" title="Gesicherte Zeichnungen aus einer Datei dazuladen">📂 Laden</button>
+    <input type="file" id="dateiwahl" accept="application/json,.json" hidden>
+  </div>
+  <div class="gruppe">
+    <button onclick="location.href='lernpfad.html'">📘 Lernpfad</button>
+  </div>
+</div>
+
+<div id="alterhinweis" hidden></div>
+
+<div id="buehne">
+  <canvas id="leinwand"></canvas>
+  <div id="infobox"></div>
+  <div id="hinweis">Rad = zoomen · Ziehen = verschieben · Werkzeug wählen und ziehen = einzeichnen · Doppelklick auf eine Zeichnung = löschen<br>
+    Schild am Bildrand = Zeichnung liegt außerhalb; der Prozentwert ist ihr Abstand zum letzten sichtbaren Schlusskurs</div>
+  <div id="liste" hidden>
+    <div id="listeKopf">
+      <span id="listeZahl">Zeichnungen</span>
+      <span style="flex:1"></span>
+      <button id="alleAn">alle zeigen</button>
+      <button id="alleAus">alle aus</button>
+      <button id="listeZu">✕</button>
+    </div>
+    <div id="listeInhalt"></div>
+  </div>
+  <div id="meldung" hidden></div>
+  <div id="laden">Kerzen werden geladen …</div>
+</div>
+
+<script>
+"use strict";
+// ===================================================================
+// CHARTLABOR - Kerzenchart mit Zeichenwerkzeugen
+// -------------------------------------------------------------------
+// Bewusst ohne fremde Bibliothek gebaut: alles auf einer Leinwand
+// (Canvas) selbst gezeichnet. Grund - die Zeichenwerkzeuge (Fibonacci,
+// Rechteck, Dreieck) muessen exakt auf denselben Koordinaten sitzen wie
+// die Kerzen. Mit einer fremden Chart-Bibliothek haengt man dafuer eine
+// zweite Ebene darueber und muss beide von Hand synchron halten - das
+// verrutscht beim Zoomen zuverlaessig.
+//
+// Zeichnungen werden in DATEN-Koordinaten gespeichert (Zeitstempel und
+// Preis), nicht in Bildpunkten. Deshalb bleiben sie beim Wechsel des
+// Zeitrasters an derselben Stelle im Kursverlauf stehen.
+// ===================================================================
+
+const RAHMEN = ["1M","1w","1d","4h","1h","15m","1m","1s"];
+const RAHMEN_NAME = {"1M":"Monat","1w":"Woche","1d":"Tag","4h":"4 Std",
+                     "1h":"1 Std","15m":"15 Min","1m":"1 Min","1s":"1 Sek"};
+
+const WERKZEUG = [
+  ["zeiger",   "Zeiger"],
+  ["trend",    "Trendlinie"],
+  ["waag",     "Waagerechte"],
+  ["rechteck", "Kasten"],
+  ["dreieck",  "Dreieck"],
+  ["fib",      "Fibonacci"],
+  ["fibzonen", "Fib + Zonen"],
+];
+
+// Farben zum Auswaehlen. Gilt fuer jede neue Zeichnung, nicht nur fuer
+// Kaesten - eine gruene Trendlinie neben einem gruenen Kasten sagt mehr
+// als beides in Blau.
+const FARBEN = [
+  ["gruen",   "Grün",    "#26a69a"],
+  ["rot",     "Rot",     "#ef5350"],
+  ["violett", "Violett", "#a78bfa"],
+  ["gelb",    "Gelb",    "#d29922"],
+  ["grau",    "Grau",    "#8b949e"],   // zum Ausgrauen von Bereichen
+];
+
+// Wie stark ein Kasten oder ein Dreieck ausgefuellt wird.
+//
+// DER MITTLERE WERT IST DER ALTE. Vorher stand .13 fest im Code; alte
+// Zeichnungen ohne Eintrag fallen genau darauf zurueck und sehen aus wie
+// immer. Wer einen Bereich ausgrauen will, nimmt Farbe Grau und kraeftig.
+const FUELLUNG = [
+  ["keine",    "keine",   0],
+  ["leicht",   "leicht",  0.13],
+  ["kraeftig", "kräftig", 0.38],
+  ["voll",     "voll",    0.62],
+];
+const FUELLUNG_RUECKFALL = "leicht";
+
+// Drei Plaetze fuer einen Arbeitsstand: Zeitraster, Bildausschnitt,
+// Indikatoren und Zeichnungen zusammen.
+const PLAETZE = [1, 2, 3];
+
+const INDI = [
+  ["ema20",   "EMA 20"],
+  ["ema50",   "EMA 50"],
+  ["ema200",  "EMA 200"],
+  ["bb",      "Bollinger"],
+  ["elliott", "Elliott-Wellen"],
+  ["vol",     "Volumen"],
+  ["rsi",     "RSI"],
+  ["macd",    "MACD"],
+];
+
+const FIB_STUFEN = [0, .236, .382, .5, .618, .786, 1, 1.272, 1.618];
+
+// Eigene Farbe je Fibonacci-Stufe, angelehnt an TradingView. Zweck ist
+// nicht Schoenheit: bei neun Linien dicht beieinander erkennt man ohne
+// Farbe nicht mehr, welche man gerade ansieht.
+//
+// BEWUSST EINE ZWEITE TABELLE statt FIB_STUFEN umzubauen. Wer oben eine
+// Zahl hinzufuegt, soll KEINE Farbe pflegen muessen - die Stufe kommt
+// dann in FIB_RUECKFALL heraus und funktioniert trotzdem. Genau das ist
+// die Aufgabe in Lektion 3 des Lernpfads, und sie soll richtig bleiben.
+const FIB_FARBEN = {
+  0:     "#9598a1",   // Grau  - Anker unten
+  0.236: "#f23645",   // Rot
+  0.382: "#ff9800",   // Orange
+  0.5:   "#4caf50",   // Gruen - die Haelfte
+  0.618: "#089981",   // Tuerkis - der "goldene Schnitt"
+  0.786: "#00bcd4",   // Cyan
+  1:     "#9598a1",   // Grau  - Anker oben
+  1.272: "#2962ff",   // Blau  - Ziel jenseits von 100 %
+  1.618: "#9c27b0",   // Lila  - weites Ziel
+};
+const FIB_RUECKFALL = "#8b949e";
+
+// ZONEN FUER DAS WERKZEUG "Fib + Zonen"
+// -------------------------------------------------------------------
+// [07.09.2026, Wunsch von Sven] Zwei getoente Kaesten zusaetzlich zu
+// den Linien: die Rueckzugszone und die Zielzone.
+//
+// EHRLICH DAZU: Das sind ueberlieferte Gewohnheiten, keine Messungen.
+// 0,618 bis 0,786 ist die Zone, die viele "goldene Zone" nennen; 1,272
+// bis 1,618 sind die ueblichen Ziele darueber hinaus. Ob der Kurs sich
+// daran haelt, sagt keine dieser Zahlen - genau wie bei den
+// Elliott-Wellen ist das eine Deutung.
+//
+// Die Zahlen stehen hier und NICHT in FIB_STUFEN. Diese Liste bleibt
+// eine reine Zahlenliste, weil Lektion 1 und 3 des Lernpfads daran
+// haengen.
+const FIB_ZONEN = [
+  {von: 0.618, bis: 0.786, rolle: "rueckzug"},
+  {von: 1.272, bis: 1.618, rolle: "ziel"},
+];
+// Gruen ist die Seite, auf der gekauft wird, Rot die, auf der verkauft
+// wird. Bei einem Fibonacci von unten nach oben (Aufwaerts) ist der
+// Rueckzug die Kaufgelegenheit und das Ziel die Verkaufsgelegenheit -
+// zieht man ihn von oben nach unten, dreht sich beides um.
+const ZONE_GRUEN = "#26a69a";
+const ZONE_ROT   = "#ef5350";
+
+// Welche Stufen dicker gezeichnet werden - die, auf die geschaut wird.
+const FIB_WICHTIG = [0, 0.5, 0.618, 1];
+
+// ===================================================================
+// WELCHE MAERKTE UND ZEITRASTER ES GIBT
+// -------------------------------------------------------------------
+// [08.09.2026, Wunsch von Sven: "bau die charts noch fuer gold und
+// silber dazu"]
+//
+// Die Liste steht NICHT hier im Code, sondern kommt aus
+// daten/uebersicht.json. Der Holer schreibt sie aus dem, was wirklich
+// im Ordner liegt - nicht aus dem, was geholt werden sollte.
+//
+// WARUM DAS WICHTIG IST: Eine zweite Liste im HTML waere schon beim
+// naechsten Abruf falsch. Sie wuerde Knoepfe fuer Dateien anbieten, die
+// es nicht gibt (Gold hat keine Sekundenkerzen - Yahoo liefert die
+// ueberhaupt nicht), und der Chart wuerde beim Klick eine Fehlermeldung
+// zeigen statt den Knopf gar nicht erst anzubieten.
+//
+// Fehlt die Datei, faellt alles auf BTCUSDT mit allen Rastern zurueck -
+// so wie es vor dem 08.09. war.
+let uebersicht = null;
+
+async function uebersichtLaden(){
+  try{
+    const antwort = await fetch("daten/uebersicht.json");
+    if(!antwort.ok) throw new Error(antwort.status);
+    const d = await antwort.json();
+    if(d && d.maerkte && Object.keys(d.maerkte).length) uebersicht = d.maerkte;
+  }catch(e){
+    uebersicht = null;               // kein Beinbruch, nur weniger Auswahl
+  }
+  const wahl = document.getElementById("symbol");
+  wahl.textContent = "";
+  const liste = uebersicht ? Object.keys(uebersicht) : [symbol];
+  liste.forEach(sym=>{
+    const o = document.createElement("option");
+    o.value = sym;
+    o.textContent = uebersicht ? (uebersicht[sym].name || sym) : sym;
+    wahl.appendChild(o);
+  });
+  if(!liste.includes(symbol)) symbol = liste[0];
+  wahl.value = symbol;
+  quelleAnzeigen();
+}
+
+// Gibt es dieses Zeitraster fuer die aktuelle Muenze?
+function rasterDa(tf){
+  if(!uebersicht || !uebersicht[symbol]) return true;
+  return !!uebersicht[symbol].raster[tf];
+}
+
+function quelleAnzeigen(){
+  const feld = document.getElementById("quelle");
+  if(!feld) return;
+  const m = uebersicht && uebersicht[symbol];
+  if(!m){ feld.textContent = ""; return; }
+  const r = m.raster[rahmen];
+  feld.textContent = m.quelle === "yahoo" ? "Yahoo · Terminkontrakt" : "Binance";
+  feld.title = r
+    ? `${r.anzahl} Kerzen, ab ${new Date(r.von*1000).toLocaleDateString("de-DE")}`
+    : "";
+}
+
+// ===================================================================
+// WIE ALT SIND DIE KURSE, DIE HIER ZU SEHEN SIND?
+// -------------------------------------------------------------------
+// [22.09.2026, Befund von Sven: "der BTC Kurs stimmt gar nicht, es
+// zeigt mir im chartlabor 79 k an obwohl wir laut boerse bei 85 k sind"]
+//
+// Er hatte recht, aber die Zahlen waren nicht falsch - sie waren
+// SECHZEHN TAGE ALT. Die letzte Kerze stammte vom 06.09. mit 79.630,
+// die Boerse stand am 22.09. bei 85.956. Das sind 7,9 Prozent, und der
+// Chart hat kein Wort darueber verloren.
+//
+// DARIN LIEGT DER FEHLER, nicht im Zahlenwert: alte Kurse sehen aus
+// wie neue. KURSVERLAUF_HOLEN.bat laeuft nicht von selbst, und ohne
+// Hinweis merkt man es erst, wenn man zufaellig woanders nachsieht.
+// Genau die Sorte stilles Scheitern, die in CLAUDE.md Regel 4 steht.
+//
+// DIE SCHWELLE IST DIESELBE WIE IM HOLER (frisch_genug in
+// chartlabor_daten.py): fuenf Zeitraster Spielraum, mindestens aber
+// drei Minuten, dazu die Marktpause - die Metallboerse hat Wochenende,
+// Krypto laeuft durch.
+//
+// Das Zeitraster wird NICHT aus einer Tabelle genommen, sondern an den
+// geladenen Kerzen GEMESSEN. Eine Tabelle hier waere eine zweite
+// Wahrheit neben der im Holer; der gemessene Abstand kann nicht
+// auseinanderlaufen.
+const ALTER_MINDESTENS = 180;        // drei Minuten, wie im Holer
+const ALTER_PAUSE_TAGE = {yahoo: 4, binance: 0};
+
+// Was man dagegen tun kann. Die Teilfassung ersetzt diesen Satz - dort
+// gibt es keine .bat, die man doppelklicken koennte.
+const ALTER_RAT = "Zum Nachholen: KURSVERLAUF_HOLEN.bat im Chartlabor-Ordner doppelklicken.";
+
+let rasterSek = 3600;                // beim Laden gemessen
+
+function rasterAusDaten(){
+  // Der mittlere Abstand zweier Kerzen - dieselbe Rechnung wie
+  // abstand() im Holer, nur hier in der Seite. Median und nicht
+  // Durchschnitt, sonst verzieht ein Wochenende das Ergebnis.
+  if(kerzen.length < 3) return 3600;
+  const d = new Array(kerzen.length - 1);
+  for(let i = 1; i < kerzen.length; i++) d[i-1] = kerzen[i].t - kerzen[i-1].t;
+  d.sort((a,b)=>a-b);
+  return d[d.length >> 1] || 3600;
+}
+
+function alterText(sek){
+  const paar = (n, eins, viele) => n + " " + (n === 1 ? eins : viele);
+  if(sek < 90)     return paar(Math.round(sek), "Sekunde", "Sekunden");
+  if(sek < 5400)   return paar(Math.round(sek/60), "Minute", "Minuten");
+  if(sek < 172800) return paar(Math.round(sek/3600), "Stunde", "Stunden");
+  return paar(Math.round(sek/86400), "Tag", "Tage");
+}
+
+function alterPruefen(){
+  const feld = document.getElementById("alterhinweis");
+  if(!feld) return;
+  const vorher = feld.hidden;
+  if(!kerzen.length){ feld.hidden = true; }
+  else{
+    const letzte = kerzen[kerzen.length-1].t;
+    const sek = Date.now()/1000 - letzte;
+    const quelle = (uebersicht && uebersicht[symbol])
+                 ? uebersicht[symbol].quelle : "binance";
+    const pause = (ALTER_PAUSE_TAGE[quelle] || 0) * 86400;
+    const erlaubt = Math.max(5 * rasterSek, ALTER_MINDESTENS) + pause;
+    if(sek <= erlaubt){
+      feld.hidden = true;
+    }else{
+      feld.hidden = false;
+      feld.innerHTML =
+        `<b>⚠ Diese Kurse sind ${alterText(sek)} alt.</b> `
+      + `Letzte Kerze: ${new Date(letzte*1000).toLocaleString("de-DE")} · `
+      + `${RASTER_NAME_TEXT(symbol)} ${RAHMEN_NAME[rahmen]}. `
+      + ALTER_RAT;
+    }
+  }
+  // Der Streifen schiebt den Chart herunter - die Leinwand muss
+  // nachziehen, sonst laeuft sie unten aus dem Fenster.
+  if(vorher !== feld.hidden) groesseAnpassen();
+}
+
+// Kleiner Helfer fuer die Beschriftung im Streifen.
+function RASTER_NAME_TEXT(sym){
+  const m = uebersicht && uebersicht[sym];
+  return m ? m.name : sym;
+}
+
+// ---------- Zustand ----------
+let kerzen = [];              // {t,o,h,l,c,v}
+let symbol = "BTCUSDT";
+let rahmen = "1d";
+let werkzeug = "zeiger";
+let farbe = "gruen";          // Farbe fuer die naechste Zeichnung
+let fuellung = "leicht";      // Fuellung fuer den naechsten Kasten/Dreieck
+let anIndi = new Set(["ema50","vol"]);
+let zeichnungen = [];         // {art, a:{t,p}, b:{t,p}}
+let entwurf = null;           // waehrend des Ziehens
+let i0 = 0, i1 = 0;           // sichtbarer Indexbereich
+let maus = null;              // {x,y}
+let zieht = null;             // {modus, startX, startY, i0, i1}
+// Wo der Elliott-Kasten steht, falls er gezeichnet wurde. Die
+// Randhinweise weichen ihm aus - sonst legt sich ein Schild darueber.
+// Wird bei jedem Bildaufbau zurueckgesetzt.
+let elliottKasten = null;
+// Laeuft gerade eine Groessenanpassung? Verhindert, dass sich zeichne()
+// und groesseAnpassen() gegenseitig aufrufen.
+let groesseLaeuft = false;
+// Welche Zeichnung gerade ausgewaehlt ist (Platz in der Liste), -1 = keine.
+let gewaehlt = -1;
+
+const lw = document.getElementById("leinwand");
+const ctx = lw.getContext("2d");
+let B = 0, H = 0, dpr = 1;
+
+// Randabstaende. Rechts Platz fuer die Preisskala, unten fuer die Zeit.
+const R = {links:8, rechts:74, oben:10, unten:26};
+let hoeheUnterfeld = 0;   // fuer Volumen/RSI/MACD
+
+// ===================================================================
+// Aufbau der Bedienleiste
+// ===================================================================
+function knopf(eltern, text, aktiv, klick){
+  const b = document.createElement("button");
+  b.textContent = text;
+  if(aktiv) b.classList.add("an");
+  b.onclick = klick;
+  eltern.appendChild(b);
+  return b;
+}
+
+function leisteBauen(){
+  const r = document.getElementById("rahmen");
+  RAHMEN.forEach(tf=>{
+    const b = knopf(r, RAHMEN_NAME[tf], tf===rahmen,
+                    ()=>{ rahmen=tf; leisteBauen(); laden(); });
+    // Gesperrt statt Fehlermeldung: Gold hat keine Sekundenkerzen.
+    if(!rasterDa(tf)){
+      b.disabled = true;
+      b.title = `${RAHMEN_NAME[tf]} gibt es für ${symbol} nicht`;
+    }
+  });
+  const w = document.getElementById("werkzeuge");
+  WERKZEUG.forEach(([id,name])=>{
+    knopf(w, name, id===werkzeug, ()=>{ werkzeug=id; leisteBauen(); zeichne(); });
+  });
+  const f = document.getElementById("farben");
+  FARBEN.forEach(([id,name,hex])=>{
+    const b = knopf(f, name, id===farbe, ()=>{ farbe=id; leisteBauen(); });
+    b.style.borderLeft = "4px solid " + hex;
+    if(id===farbe){ b.style.background = hex; b.style.color = "#0d1117"; }
+  });
+  const fu = document.getElementById("fuellungen");
+  FUELLUNG.forEach(([id,name])=>{
+    const b = knopf(fu, name, id===fuellung, ()=>{ fuellung=id; leisteBauen(); });
+    b.title = "Gilt für die nächste Fläche (Kasten, Dreieck)";
+  });
+  // Merken und Holen sind bewusst ZWEI Gruppen und nicht ein Knopf mit
+  // Nachfrage. Ein Klick, der mal speichert und mal laedt, verwechselt
+  // man genau einmal - und dann ist der Stand weg.
+  const mk = document.getElementById("merken");
+  PLAETZE.forEach(n=>{
+    const s = platzLesen(n);
+    const b = knopf(mk, String(n), false, ()=>merken(n));
+    b.title = `Platz ${n}: ${platzText(s)}\n(Klick = jetzigen Stand hier merken)`;
+  });
+  const hl = document.getElementById("holen");
+  PLAETZE.forEach(n=>{
+    const s = platzLesen(n);
+    const b = knopf(hl, String(n), false, ()=>holen(n));
+    b.disabled = !s;
+    b.title = s ? `Platz ${n}: ${platzText(s)}\n(Klick = diesen Stand holen)`
+                : `Platz ${n} ist leer`;
+  });
+  const ind = document.getElementById("indikatoren");
+  INDI.forEach(([id,name])=>{
+    knopf(ind, name, anIndi.has(id), ()=>{
+      anIndi.has(id) ? anIndi.delete(id) : anIndi.add(id);
+      leisteBauen(); zeichne();
+    });
+  });
+  // Beim Neubau nur die Knoepfe ersetzen, die Ueberschrift behalten
+  [["rahmen",RAHMEN.length],["werkzeuge",WERKZEUG.length],
+   ["farben",FARBEN.length],["fuellungen",FUELLUNG.length],
+   ["merken",PLAETZE.length],["holen",PLAETZE.length],
+   ["indikatoren",INDI.length]]
+    .forEach(([id,n])=>{
+      const box = document.getElementById(id);
+      while(box.querySelectorAll("button").length > n) box.querySelector("button").remove();
+    });
+  // Die Leiste kann durch die neuen Knoepfe eine Zeile mehr brauchen.
+  // Dann ist die Buehne kleiner - das muss die Leinwand mitbekommen.
+  if(typeof B === "number" && B > 0) groesseAnpassen();
+}
+
+// ===================================================================
+// Daten
+// ===================================================================
+async function laden(){
+  document.getElementById("laden").style.display = "flex";
+  try{
+    // "1M" (Monat) und "1m" (Minute) waeren auf Windows dieselbe Datei -
+    // deshalb heisst die Monatsdatei "1mon". Siehe chartlabor_daten.py.
+    const datei = (rahmen === "1M") ? "1mon" : rahmen;
+    const antwort = await fetch(`daten/${symbol}_${datei}.json`);
+    if(!antwort.ok) throw new Error(antwort.status + " " + antwort.statusText);
+    const d = await antwort.json();
+    kerzen = d.kerzen;
+    rasterSek = rasterAusDaten();   // einmal messen, nicht bei jedem Blick
+    // Eine von Hand eingestellte Achse gilt nur fuer das, wofuer sie
+    // eingestellt wurde. Beim Wechsel der Muenze oder des Zeitrasters
+    // waere sie eine Falle - Silber steht bei 66, Bitcoin bei 86.000.
+    preisFest = null;
+    indiVergessen();          // neue Kerzen = alle Indikatoren ungueltig
+    elliottSpeicher = null;
+    const sicht = Math.min(180, kerzen.length);
+    i1 = kerzen.length; i0 = Math.max(0, i1 - sicht);
+    zeichnungenLesen();
+    gewaehlt = -1;
+    listeAufbauen();
+    quelleAnzeigen();
+    alterPruefen();
+    document.getElementById("laden").style.display = "none";
+    zeichne();
+  }catch(e){
+    document.getElementById("laden").textContent =
+      `Kerzen nicht gefunden: daten/${symbol}_${rahmen}.json\n(${e.message})`;
+  }
+}
+
+// ===================================================================
+// Indikatoren
+// ===================================================================
+function ema(werte, n){
+  const k = 2/(n+1); const out = new Array(werte.length).fill(null);
+  let v = null;
+  for(let i=0;i<werte.length;i++){
+    v = (v===null) ? werte[i] : werte[i]*k + v*(1-k);
+    if(i>=n-1) out[i] = v;
+  }
+  return out;
+}
+function sma(werte, n){
+  const out = new Array(werte.length).fill(null); let s=0;
+  for(let i=0;i<werte.length;i++){
+    s += werte[i];
+    if(i>=n) s -= werte[i-n];
+    if(i>=n-1) out[i] = s/n;
+  }
+  return out;
+}
+function bollinger(werte, n=20, f=2){
+  const m = sma(werte,n);
+  const ob=[], un=[];
+  for(let i=0;i<werte.length;i++){
+    if(m[i]===null){ ob.push(null); un.push(null); continue; }
+    let s=0; for(let j=i-n+1;j<=i;j++) s += (werte[j]-m[i])**2;
+    const abw = Math.sqrt(s/n);
+    ob.push(m[i]+f*abw); un.push(m[i]-f*abw);
+  }
+  return {mitte:m, oben:ob, unten:un};
+}
+function rsi(werte, n=14){
+  const out = new Array(werte.length).fill(null);
+  let g=0, v=0;
+  for(let i=1;i<werte.length;i++){
+    const d = werte[i]-werte[i-1];
+    const auf = Math.max(d,0), ab = Math.max(-d,0);
+    if(i<=n){ g+=auf; v+=ab; if(i===n){ g/=n; v/=n; out[i]=100-100/(1+g/(v||1e-9)); } }
+    else{
+      g = (g*(n-1)+auf)/n; v = (v*(n-1)+ab)/n;
+      out[i] = 100-100/(1+g/(v||1e-9));
+    }
+  }
+  return out;
+}
+function macd(werte){
+  const s = ema(werte,12), l = ema(werte,26);
+  const linie = werte.map((_,i)=> (s[i]===null||l[i]===null) ? null : s[i]-l[i]);
+  const gueltig = linie.filter(x=>x!==null);
+  const sig = ema(gueltig, 9);
+  const versatz = linie.length - gueltig.length;
+  const signal = new Array(linie.length).fill(null);
+  for(let i=0;i<gueltig.length;i++) signal[i+versatz] = sig[i];
+  const balken = linie.map((x,i)=> (x===null||signal[i]===null)?null:x-signal[i]);
+  return {linie, signal, balken};
+}
+
+// ===================================================================
+// INDIKATOREN NUR EINMAL RECHNEN
+// -------------------------------------------------------------------
+// [07.09.2026, gemessen] Bei 79.282 Kerzen und allen Indikatoren
+// brauchte ein Bild 190 ms - das sind fuenf Bilder je Sekunde, beim
+// Ziehen unbenutzbar. Der Grund stand offen im Code: EMA, Bollinger,
+// RSI und MACD wurden bei JEDEM Bildaufbau ueber den GANZEN Bestand
+// neu gerechnet. Sie haengen aber gar nicht vom Bildausschnitt ab -
+// nur davon, welche Kerzen geladen sind.
+//
+// Aufgefallen ist das nicht durch Nachdenken, sondern durch Nachmessen,
+// nachdem die Historie von 9.600 auf 79.282 Stundenkerzen gewachsen war.
+// Vorher fiel es nicht auf: bei 3.308 Kerzen waren es 2,5 ms.
+//
+// Gerechnet wird erst beim ersten Gebrauch - wer RSI nie einschaltet,
+// zahlt auch nichts dafuer.
+// ===================================================================
+let indiSpeicher = {};
+
+// Muss IMMER aufgerufen werden, wenn sich `kerzen` aendert. Sonst
+// zeigt der Chart die Indikatoren der vorigen Muenze - und zwar
+// lautlos, denn falsche Zahlen sehen aus wie richtige.
+function indiVergessen(){ indiSpeicher = {}; }
+
+function indi(name){
+  if(name in indiSpeicher) return indiSpeicher[name];
+  if(!("schluss" in indiSpeicher)) indiSpeicher.schluss = kerzen.map(k => k.c);
+  const s = indiSpeicher.schluss;
+  const wert =
+      name === "ema20"  ? ema(s, 20)  :
+      name === "ema50"  ? ema(s, 50)  :
+      name === "ema200" ? ema(s, 200) :
+      name === "bb"     ? bollinger(s) :
+      name === "rsi"    ? rsi(s) :
+      name === "macd"   ? macd(s) : null;
+  indiSpeicher[name] = wert;
+  return wert;
+}
+
+// Kleinster und groesster Wert - als Schleife, NICHT ueber
+// Math.min(...liste).
+//
+// [07.09.2026, gemessen] Die Spreizung mit "..." uebergibt jeden Wert
+// als EIGENES Argument. Dieser Browser bricht ab 147.578 Argumenten mit
+// "Maximum call stack size exceeded" ab. Der 15-Minuten-Chart hat mit
+// voller Historie rund 317.000 Kerzen - der Knopf "Alles zeigen" waere
+// dort ein sicherer Absturz gewesen, und zwar erst, nachdem die Daten
+// da waren. Eine Schleife kennt diese Grenze nicht und ist obendrein
+// schneller, weil sie nichts kopiert.
+function spanneVon(liste, feldTief, feldHoch){
+  let lo = Infinity, hi = -Infinity;
+  for(let i = 0; i < liste.length; i++){
+    const t = liste[i][feldTief], h = liste[i][feldHoch];
+    if(t < lo) lo = t;
+    if(h > hi) hi = h;
+  }
+  return {lo, hi};
+}
+function groesstesFeld(liste, feld){
+  let m = -Infinity;
+  for(let i = 0; i < liste.length; i++) if(liste[i][feld] > m) m = liste[i][feld];
+  return m;
+}
+
+// ===================================================================
+// Umrechnung Daten <-> Bildpunkte
+// ===================================================================
+let preisMin=0, preisMax=1, plotO=0, plotU=0, breiteProKerze=1;
+
+// ===================================================================
+// DIE PREISACHSE - automatisch oder von Hand
+// -------------------------------------------------------------------
+// [09.10.2026, Befund von Sven: "wenn ich mein fiblvl ziehen will im
+// gesamten btc chart wird mir nur die kaufzone und nicht die
+// verkaufszone angezeigt da das fenster zu klein ist"]
+//
+// Er hatte recht, und es war keine Kleinigkeit. NACHGEMESSEN im ganzen
+// BTC-Tageschart, Fibonacci vom Allzeittief 2.817 zum Allzeithoch
+// 126.200: die Stufe 127,2 % liegt bei 159.760 und die Stufe 161,8 %
+// bei 202.451. Der Chartbereich reichte von y=10 bis y=433, die beiden
+// Stufen landeten bei y=-73 und y=-208 - also 73 bis 208 Bildpunkte
+// UEBER dem oberen Rand.
+//
+// URSACHE: Die Preisachse richtete sich ausschliesslich nach den
+// sichtbaren KERZEN. Was darueber liegt, gibt es nicht. Bei einer
+// Fibonacci-Verlaengerung liegt die Zielzone aber IMMER ueber dem
+// Hoch - das ist ihr Zweck.
+//
+// preisFest = null heisst "automatisch nach den Kerzen", wie bisher.
+// Sobald von Hand gezogen oder eingepasst wird, steht hier {min,max}.
+let preisFest = null;
+
+// Lineare oder logarithmische Achse.
+//
+// WARUM DAS DAZUGEHOERT: Der ganze BTC-Verlauf geht von 2.817 auf
+// 126.200 - das 45-fache. Auf einer linearen Achse liegen die Jahre
+// 2017 bis 2020 alle in den untersten zwei Prozent der Hoehe und sind
+// nicht mehr auseinanderzuhalten. Auf einer logarithmischen Achse
+// nimmt die gleiche PROZENTUALE Bewegung ueberall gleich viel Platz
+// ein - eine Verdopplung sieht 2017 genauso aus wie 2026.
+let logSkala = false;
+
+// Die Untergrenze der logarithmischen Achse. log(0) ist minus
+// unendlich, und einen Preis von null gibt es nicht.
+function logBoden(){
+  return Math.max(preisMin, 1e-9);
+}
+
+function yVonPreis(p){
+  if(logSkala){
+    const u = Math.log(logBoden());
+    const o = Math.log(Math.max(preisMax, logBoden()*1.000001));
+    const w = Math.log(Math.max(p, 1e-12));
+    return plotU - (w - u)/((o - u) || 1) * (plotU - plotO);
+  }
+  return plotU - (p - preisMin)/(preisMax - preisMin || 1) * (plotU - plotO);
+}
+function preisVonY(y){
+  if(logSkala){
+    const u = Math.log(logBoden());
+    const o = Math.log(Math.max(preisMax, logBoden()*1.000001));
+    return Math.exp(u + (plotU - y)/((plotU - plotO) || 1) * (o - u));
+  }
+  return preisMin + (plotU - y)/(plotU - plotO) * (preisMax - preisMin);
+}
+
+// Liegt ein Punkt auf der Preisachse (rechts) statt im Chart?
+function aufAchse(x){ return x >= B - R.rechts; }
+
+// Die beiden Schalter unten rechts in der Ecke. Ihre Rechtecke werden
+// beim Zeichnen gemerkt, damit der Mausklick sie treffen kann - sonst
+// muesste die Lage an zwei Stellen stehen und koennte auseinander-
+// laufen.
+let achsSchalter = {auto: null, log: null};
+
+function xVonIndex(i){ return R.links + (i - i0 + .5) * breiteProKerze; }
+function indexVonX(x){ return Math.round((x - R.links)/breiteProKerze + i0 - .5); }
+// yVonPreis und preisVonY stehen weiter oben - sie muessen die
+// log-Achse kennen. [09.10.2026] Hier standen sie ein ZWEITES Mal, in
+// der alten linearen Fassung. JavaScript nimmt bei zwei gleichnamigen
+// Funktionen die SPAETERE, also diese - der Log-Schalter liess sich
+// umlegen und aenderte nichts. Aufgefallen ist es nur, weil die Probe
+// nachgerechnet hat, wo 10.000 zwischen 1.000 und 100.000 landen muss
+// (in der Bildmitte); sie landeten bei 365 statt 205.
+function xVonZeit(t){
+  // Zeitstempel -> Bildpunkt, auch zwischen Kerzen (fuer Zeichnungen)
+  if(!kerzen.length) return 0;
+  let lo=0, hi=kerzen.length-1;
+  if(t <= kerzen[0].t) return xVonIndex(0);
+  if(t >= kerzen[hi].t) return xVonIndex(hi + (t-kerzen[hi].t)/(schrittSek()||1));
+  while(lo<hi-1){ const m=(lo+hi)>>1; (kerzen[m].t<=t)?lo=m:hi=m; }
+  const anteil = (t-kerzen[lo].t)/((kerzen[hi].t-kerzen[lo].t)||1);
+  return xVonIndex(lo+anteil);
+}
+function zeitVonX(x){
+  const i = (x - R.links)/breiteProKerze + i0 - .5;
+  const g = Math.floor(i);
+  if(!kerzen.length) return 0;
+  if(g < 0) return kerzen[0].t + g*schrittSek();
+  if(g >= kerzen.length-1) return kerzen[kerzen.length-1].t + (i-(kerzen.length-1))*schrittSek();
+  return Math.round(kerzen[g].t + (i-g)*(kerzen[g+1].t-kerzen[g].t));
+}
+function schrittSek(){
+  return kerzen.length>1 ? (kerzen[1].t-kerzen[0].t) : 3600;
+}
+
+// ===================================================================
+// Zeichnen
+// ===================================================================
+function groesseAnpassen(){
+  dpr = window.devicePixelRatio || 1;
+  const b = document.getElementById("buehne").getBoundingClientRect();
+  B = b.width; H = b.height;
+  lw.width = B*dpr; lw.height = H*dpr;
+  lw.style.width = B+"px"; lw.style.height = H+"px";
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  zeichne();
+}
+
+function zeichne(){
+  if(!kerzen.length) return;
+
+  // SELBSTHEILUNG: Stimmt die Leinwand ueberhaupt noch mit der Buehne
+  // ueberein? Sie kann auseinanderlaufen, wenn die Bedienleiste umbricht,
+  // ohne dass ein resize-Ereignis kommt.
+  //
+  // WARUM DAS HIER STEHT UND NICHT NUR IM ResizeObserver: Der Beobachter
+  // ist der saubere Weg, aber er war am 07.09. nicht pruefbar - im
+  // Pruefbrowser ruht die Bildschleife, und ueber die werden seine
+  // Rueckrufe zugestellt (nachgemessen: requestAnimationFrame feuert dort
+  // gar nicht). Eine Zusicherung, die man nicht pruefen kann, ist keine.
+  // Diese Zeilen hier laufen bei JEDEM Bildaufbau und in jedem Browser.
+  if(!groesseLaeuft){
+    const r = document.getElementById("buehne").getBoundingClientRect();
+    if(Math.abs(r.width - B) > 1 || Math.abs(r.height - H) > 1){
+      groesseLaeuft = true;          // gegen eine Endlosschleife
+      groesseAnpassen();             // zeichnet selbst neu
+      groesseLaeuft = false;
+      return;
+    }
+  }
+
+  ctx.clearRect(0,0,B,H);
+  elliottKasten = null;
+
+  const unterfelder = [];
+  if(anIndi.has("vol"))  unterfelder.push("vol");
+  if(anIndi.has("rsi"))  unterfelder.push("rsi");
+  if(anIndi.has("macd")) unterfelder.push("macd");
+  hoeheUnterfeld = unterfelder.length ? Math.min(90, (H-120)/unterfelder.length) : 0;
+
+  plotO = R.oben;
+  plotU = H - R.unten - unterfelder.length*hoeheUnterfeld;
+  breiteProKerze = (B - R.links - R.rechts) / (i1 - i0);
+
+  const sicht = kerzen.slice(Math.max(0,i0), Math.min(kerzen.length,i1));
+  if(!sicht.length) return;
+  if(preisFest){
+    // Von Hand eingestellt - die Kerzen haben hier nichts zu sagen.
+    preisMin = preisFest.min; preisMax = preisFest.max;
+  }else{
+    const spanne = spanneVon(sicht, "l", "h");
+    const lo = spanne.lo, hi = spanne.hi;
+    if(logSkala){
+      // Luft MULTIPLIKATIV, nicht additiv. Auf einer log-Achse ist ein
+      // fester Betrag oben winzig und unten riesig; drei Prozent sind
+      // ueberall drei Prozent.
+      preisMin = Math.max(lo/1.03, 1e-9); preisMax = hi*1.03;
+    }else{
+      const luft = (hi-lo)*0.06 || hi*0.02;
+      // Nach unten bei null abschneiden: ueber die volle Historie sind
+      // sechs Prozent Luft mehr als der tiefste Kurs von 2017, und dann
+      // stuenden negative Preise an der Achse. Die gibt es nicht.
+      preisMin = Math.max(0, lo-luft); preisMax = hi+luft;
+    }
+  }
+
+  gitterZeichnen();
+  kerzenZeichnen(sicht);
+  linienIndikatoren();
+  if(anIndi.has("elliott")) elliottZeichnen();
+  zeichnungenZeichnen();
+  randhinweiseZeichnen();
+  let y = plotU;
+  unterfelder.forEach(art=>{ unterfeldZeichnen(art, y, hoeheUnterfeld); y += hoeheUnterfeld; });
+  achsenZeichnen();
+  achsSchalterZeichnen();
+  fadenkreuz();
+  infoSchreiben();
+}
+
+// Welche Preise bekommen eine Linie?
+//
+// Linear: acht gleiche Abstaende, wie bisher.
+// Logarithmisch: RUNDE Werte je Zehnerschritt (1, 2, 3, 5, 10, 20 ...).
+// Gleiche Abstaende waeren dort naemlich keine - auf einer log-Achse
+// saessen sie alle oben zusammengedraengt.
+function gitterStufen(){
+  if(!logSkala){
+    const aus = [];
+    for(let i=0;i<=7;i++) aus.push(preisMin + (preisMax-preisMin)*i/7);
+    return aus;
+  }
+  const aus = [];
+  const basis = [1, 2, 3, 5];
+  const von = Math.floor(Math.log10(Math.max(preisMin, 1e-9)));
+  const bis = Math.ceil(Math.log10(Math.max(preisMax, 1e-9)));
+  for(let e = von; e <= bis; e++){
+    for(const b of basis){
+      const v = b * Math.pow(10, e);
+      if(v >= preisMin && v <= preisMax) aus.push(v);
+    }
+  }
+  // Ist die Spanne so klein, dass keine runde Zahl hineinfaellt,
+  // lieber gleiche Abstaende als eine leere Achse.
+  if(aus.length < 2){
+    for(let i=0;i<=7;i++) aus.push(preisMin + (preisMax-preisMin)*i/7);
+  }
+  return aus;
+}
+
+function gitterZeichnen(){
+  ctx.strokeStyle = "#21262d"; ctx.lineWidth = 1;
+  ctx.font = "11px Consolas,monospace"; ctx.fillStyle = "#8b949e";
+  ctx.textAlign = "left"; ctx.textBaseline = "middle";
+  let letztesY = -1e9;
+  gitterStufen().forEach(p=>{
+    const y = yVonPreis(p);
+    ctx.strokeStyle = "#21262d";
+    ctx.beginPath(); ctx.moveTo(R.links,y); ctx.lineTo(B-R.rechts,y); ctx.stroke();
+    // Schilder nur setzen, wenn Platz ist - auf der log-Achse ruecken
+    // die Linien oben dicht zusammen.
+    //
+    // ABSTAND, NICHT DIFFERENZ. [09.10.2026] Hier stand "y - letztesY",
+    // und das ging immer schief: die Preise steigen, der y-Wert wird
+    // dabei KLEINER. Nach dem ersten Schild war die Differenz also
+    // stets negativ und nie groesser als 13 - gezeichnet wurden acht
+    // Gitterlinien und genau EIN Preis. Aufgefallen ist es nicht in den
+    // Zahlenproben (die pruefen gitterStufen(), also die Werte),
+    // sondern erst im Bild.
+    if(Math.abs(y - letztesY) >= 13){
+      ctx.fillStyle = "#8b949e";
+      ctx.fillText(preisText(p), B-R.rechts+6, y);
+      letztesY = y;
+    }
+  });
+}
+
+function preisText(p){
+  if(p===0) return "0";        // sonst steht an der Nullmarke "0.00000"
+  if(p>=1000) return p.toLocaleString("de-DE",{maximumFractionDigits:0});
+  if(p>=1) return p.toFixed(2);
+  return p.toFixed(5);
+}
+
+function kerzenZeichnen(sicht){
+  const b = Math.max(1, breiteProKerze*0.68);
+  const von = Math.max(0,i0);
+  ctx.lineWidth = 1;
+
+  // Der gewoehnliche Weg: jede Kerze ist mindestens einen Bildpunkt
+  // breit, also bekommt jede ihren eigenen Docht und Koerper.
+  if(breiteProKerze >= 1){
+    sicht.forEach((k,n)=>{
+      const x = xVonIndex(von+n);
+      ctx.strokeStyle = ctx.fillStyle = (k.c >= k.o) ? "#26a69a" : "#ef5350";
+      ctx.beginPath();
+      ctx.moveTo(Math.round(x)+.5, yVonPreis(k.h));
+      ctx.lineTo(Math.round(x)+.5, yVonPreis(k.l));
+      ctx.stroke();
+      const yo = yVonPreis(Math.max(k.o,k.c)), yu = yVonPreis(Math.min(k.o,k.c));
+      ctx.fillRect(x-b/2, yo, b, Math.max(1, yu-yo));
+    });
+    return;
+  }
+
+  // ENG: weniger als ein Bildpunkt je Kerze.
+  //
+  // [07.09.2026, gemessen] Ganz herausgezoomt standen 79.282 Kerzen in
+  // 700 Bildpunkten - jede 0,009 Punkte breit. Der Chart malte 158.000
+  // Striche fuer 700 Spalten und brauchte 1.056 ms je Bild. Sichtbar
+  // war davon nichts, was eine Zusammenfassung nicht auch zeigt: mehr
+  // als eine Spalte kann ein Bildpunkt nicht darstellen.
+  //
+  // Also je Spalte: tiefster Kurs, hoechster Kurs, und die Richtung aus
+  // dem ersten Oeffnen gegen den letzten Schluss der Spalte. Das ist
+  // dieselbe Zusammenfassung, die auch ein groeberes Zeitraster macht.
+  let spalte = -1, tief = Infinity, hoch = -Infinity, erstesO = 0, letztesC = 0;
+  const spalteMalen = ()=>{
+    if(spalte < 0) return;
+    ctx.strokeStyle = (letztesC >= erstesO) ? "#26a69a" : "#ef5350";
+    ctx.beginPath();
+    ctx.moveTo(spalte+.5, yVonPreis(hoch));
+    ctx.lineTo(spalte+.5, yVonPreis(tief));
+    ctx.stroke();
+  };
+  for(let n = 0; n < sicht.length; n++){
+    const k = sicht[n];
+    const x = Math.round(xVonIndex(von+n));
+    if(x !== spalte){
+      spalteMalen();
+      spalte = x; tief = k.l; hoch = k.h; erstesO = k.o;
+    }else{
+      if(k.l < tief) tief = k.l;
+      if(k.h > hoch) hoch = k.h;
+    }
+    letztesC = k.c;
+  }
+  spalteMalen();
+}
+
+// Wie viele Kerzen auf einen Bildpunkt kommen. Bei einer Linie ist
+// jeder weitere Punkt in derselben Spalte verschenkte Arbeit - der
+// Bildschirm kann ihn nicht anzeigen.
+function zeichenSchritt(){
+  return breiteProKerze >= 1 ? 1 : Math.max(1, Math.floor(1/breiteProKerze));
+}
+
+function linieMalen(werte, farbe, dicke=1.4){
+  ctx.strokeStyle = farbe; ctx.lineWidth = dicke;
+  ctx.beginPath(); let erste = true;
+  const schritt = zeichenSchritt();
+  for(let i=Math.max(0,i0); i<Math.min(kerzen.length,i1); i+=schritt){
+    if(werte[i]===null||werte[i]===undefined) continue;
+    const x = xVonIndex(i), y = yVonPreis(werte[i]);
+    erste ? (ctx.moveTo(x,y), erste=false) : ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+}
+
+function linienIndikatoren(){
+  if(anIndi.has("ema20"))  linieMalen(indi("ema20"),  "#58a6ff");
+  if(anIndi.has("ema50"))  linieMalen(indi("ema50"),  "#d29922");
+  if(anIndi.has("ema200")) linieMalen(indi("ema200"), "#f778ba");
+  if(anIndi.has("bb")){
+    const b = indi("bb");
+    linieMalen(b.oben,  "rgba(88,166,255,.55)", 1);
+    linieMalen(b.mitte, "rgba(88,166,255,.35)", 1);
+    linieMalen(b.unten, "rgba(88,166,255,.55)", 1);
+  }
+}
+
+// ===================================================================
+// ELLIOTT-WELLEN
+// -------------------------------------------------------------------
+// EHRLICH VORWEG: Eine Wellenzaehlung ist eine DEUTUNG, keine
+// Messung. Zwei Fachleute zaehlen denselben Chart oft verschieden,
+// und die Zaehlung aendert sich rueckwirkend, wenn neue Kerzen
+// dazukommen. Was hier steht, ist deshalb ein Vorschlag mit
+// ausgewiesener Regelpruefung - kein Signal, dem man blind folgt.
+//
+// Verfahren in zwei Schritten:
+//   1. Zickzack: die markanten Wendepunkte finden. Ein Punkt zaehlt
+//      erst als Wende, wenn der Kurs sich um mehr als eine Schwelle
+//      gegen die bisherige Richtung bewegt hat. Kleine Zacken fallen
+//      damit heraus.
+//   2. Die letzten Punkte als 1-2-3-4-5 und A-B-C deuten und gegen
+//      die drei harten Elliott-Regeln pruefen.
+// ===================================================================
+
+// Wendepunkte finden. Rueckgabe: [{i, p, hoch:true/false}, ...]
+function zickzack(vonI, bisI, schwelle){
+  const punkte = [];
+  if(bisI - vonI < 5) return punkte;
+  let richtungHoch = kerzen[vonI+1].c >= kerzen[vonI].c;
+  let extremI = vonI;
+  let extremP = richtungHoch ? kerzen[vonI].l : kerzen[vonI].h;
+
+  for(let i=vonI+1; i<bisI; i++){
+    const k = kerzen[i];
+    if(richtungHoch){
+      if(k.h > extremP){ extremP = k.h; extremI = i; }
+      else if(k.l < extremP * (1 - schwelle)){
+        punkte.push({i:extremI, p:extremP, hoch:true});
+        richtungHoch = false; extremP = k.l; extremI = i;
+      }
+    }else{
+      if(k.l < extremP){ extremP = k.l; extremI = i; }
+      else if(k.h > extremP * (1 + schwelle)){
+        punkte.push({i:extremI, p:extremP, hoch:false});
+        richtungHoch = true; extremP = k.h; extremI = i;
+      }
+    }
+  }
+  punkte.push({i:extremI, p:extremP, hoch:richtungHoch});
+  return punkte;
+}
+
+// Schwelle so waehlen, dass eine brauchbare Anzahl Wenden herauskommt.
+//
+// [06.09.2026] Die erste Fassung hatte eine feste Leiter von 0,4 % bis
+// 12 % und nahm die erste Stufe mit hoechstens 12 Wenden. Die Probe
+// ueber alle acht Zeitraster zeigte, dass das die Spannweite nicht
+// abdeckt: im Monatschart kamen 49 Wenden heraus (selbst 12 % sind
+// dort wenig - Bitcoin macht im Monat gern 30 %), im Sekundenchart
+// genau 1 (0,4 % sind dort eine Ewigkeit, der Kurs bewegt sich um
+// Hundertstel). Die Leiter reicht jetzt von 0,02 % bis 60 %, und
+// gewaehlt wird nicht die erste passende Stufe, sondern die mit der
+// Wendenzahl NAECHST AN NEUN - das ist die Zahl, die eine 1-2-3-4-5-
+// A-B-C-Zaehlung braucht.
+function elliottPunkte(){
+  const von = Math.max(0, i0), bis = Math.min(kerzen.length, i1);
+  if(bis - von < 8) return [];
+  // Von fein nach grob. Die feinsten Stufen braucht der Sekundenchart:
+  // dort bewegt sich Bitcoin um Hundertstel Prozent, 0,02 % waeren
+  // schon eine Ewigkeit - die erste Fassung lieferte dort 0 Wenden.
+  const stufen = [0.00002,0.00005,0.0001,0.0002,0.0004,0.0008,0.0015,
+                  0.0025,0.004,0.006,0.009,0.013,0.019,0.027,0.038,
+                  0.055,0.08,0.12,0.18,0.26,0.38,0.6];
+  let beste = [], besterAbstand = 1e9;
+  for(const s of stufen){
+    const p = zickzack(von, bis, s);
+    // Immer erst bewerten, dann ueber den Abbruch entscheiden. Ein
+    // Abbruch VOR dem Speichern hatte im Sekundenchart dazu gefuehrt,
+    // dass gar nichts zurueckkam.
+    const abstand = Math.abs(p.length - 9);
+    if(abstand < besterAbstand){ besterAbstand = abstand; beste = p; }
+    if(p.length <= 4) break;              // groeber wird es nur noch leerer
+  }
+  return beste;
+}
+
+// Die drei harten Regeln. Sie gelten fuer eine Aufwaertsimpulswelle;
+// bei Abwaerts werden die Vergleiche gespiegelt.
+function elliottRegeln(w){
+  // w = [P0,P1,P2,P3,P4,P5]
+  if(w.length < 6) return null;
+  const auf = w[1].p > w[0].p;
+  const v = x => auf ? x : -x;          // Spiegelung fuer Abwaerts
+  const laenge = (a,b) => Math.abs(w[b].p - w[a].p);
+
+  const r1 = v(w[2].p - w[0].p) > 0;                       // Welle 2 unter/ueber Start?
+  const l1 = laenge(0,1), l3 = laenge(2,3), l5 = laenge(4,5);
+  const r2 = !(l3 < l1 && l3 < l5);                        // Welle 3 nicht die kuerzeste
+  const r3 = v(w[4].p - w[1].p) > 0;                       // Welle 4 ohne Ueberschneidung mit 1
+
+  return {
+    auf,
+    regeln: [
+      ["Welle 2 bleibt über dem Start von Welle 1", r1],
+      ["Welle 3 ist nicht die kürzeste von 1/3/5", r2],
+      ["Welle 4 überschneidet Welle 1 nicht", r3],
+    ],
+    gueltig: r1 && r2 && r3,
+    laengen: {l1, l3, l5},
+  };
+}
+
+// Die Wendepunktsuche laeuft ueber den sichtbaren Bereich und probiert
+// 22 Schwellen durch. Bei 180 Kerzen ist das nichts - ganz herausgezoomt
+// ueber 317.000 Kerzen waeren es sieben Millionen Schritte je Bild.
+// Deshalb wird das Ergebnis je Bildausschnitt gemerkt.
+let elliottSpeicher = null;
+function elliottPunkteGemerkt(){
+  const schluessel = i0 + "|" + i1 + "|" + kerzen.length;
+  if(elliottSpeicher && elliottSpeicher.schluessel === schluessel)
+    return elliottSpeicher.punkte;
+  const punkte = elliottPunkte();
+  elliottSpeicher = {schluessel, punkte};
+  return punkte;
+}
+
+function elliottZeichnen(){
+  const p = elliottPunkteGemerkt();
+
+  // Zu wenig Bewegung fuer eine Zaehlung. Das kommt bei sehr feinen
+  // Zeitrastern vor: in 180 Sekunden bewegt sich Bitcoin um rund
+  // 0,03 % - darin steckt keine 5-Wellen-Struktur. Lieber sagen, dass
+  // es nicht geht, als drei Punkte als Welle 1-2-3 auszugeben.
+  if(p.length < 4){
+    const txt = `Elliott: zu wenig Bewegung im Sichtfenster (${p.length} Wenden).`;
+    const txt2 = "Weiter herauszoomen oder gröberes Zeitraster wählen.";
+    ctx.font = "11px Consolas,monospace";
+    const br = Math.max(ctx.measureText(txt).width, ctx.measureText(txt2).width) + 16;
+    const x0 = B - R.rechts - br - 8, y0 = plotO + 8;
+    ctx.fillStyle = "rgba(13,17,23,.9)"; ctx.strokeStyle = "#d29922"; ctx.lineWidth = 1;
+    ctx.fillRect(x0,y0,br,40); ctx.strokeRect(x0,y0,br,40);
+    elliottKasten = {x0, y0, x1:x0+br, y1:y0+40};
+    ctx.textAlign="left"; ctx.textBaseline="top";
+    ctx.fillStyle="#d29922"; ctx.fillText(txt, x0+8, y0+8);
+    ctx.fillStyle="#8b949e"; ctx.fillText(txt2, x0+8, y0+23);
+    return;
+  }
+
+  // Die letzten bis zu 9 Wenden nehmen: 0-1-2-3-4-5 plus A-B-C
+  const w = p.slice(-9);
+  const F = "#f778ba";
+
+  // Zickzack-Linie
+  ctx.strokeStyle = F; ctx.lineWidth = 1.6;
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  w.forEach((q,n)=>{
+    const x = xVonIndex(q.i), y = yVonPreis(q.p);
+    n===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  // Beschriftung
+  const impuls = w.slice(0,6);
+  const pruef = elliottRegeln(impuls);
+  const namen = ["0","1","2","3","4","5","A","B","C"];
+  ctx.font = "bold 11px Consolas,monospace";
+  ctx.textAlign = "center";
+  w.forEach((q,n)=>{
+    const x = xVonIndex(q.i), y = yVonPreis(q.p);
+    const oben = q.hoch;
+    ctx.fillStyle = n<6 ? F : "#8b949e";
+    ctx.textBaseline = oben ? "bottom" : "top";
+    ctx.beginPath(); ctx.arc(x,y,3,0,7); ctx.fill();
+    ctx.fillText(namen[n] ?? "", x, y + (oben ? -7 : 7));
+  });
+
+  // Regelkasten - ohne den waere die Zaehlung eine Behauptung
+  if(pruef){
+    const zeilen = pruef.regeln.map(([t,ok])=> (ok?"✓ ":"✗ ") + t);
+    ctx.font = "10px Consolas,monospace";
+    const br = Math.max(...zeilen.map(z=>ctx.measureText(z).width)) + 16;
+    const x0 = B - R.rechts - br - 8, y0 = plotO + 8;
+    ctx.fillStyle = "rgba(13,17,23,.9)";
+    ctx.strokeStyle = pruef.gueltig ? "#26a69a" : "#d29922";
+    ctx.lineWidth = 1;
+    ctx.fillRect(x0,y0,br,zeilen.length*14+30);
+    ctx.strokeRect(x0,y0,br,zeilen.length*14+30);
+    elliottKasten = {x0, y0, x1:x0+br, y1:y0+zeilen.length*14+30};
+    ctx.textAlign="left"; ctx.textBaseline="top";
+    ctx.fillStyle = pruef.gueltig ? "#26a69a" : "#d29922";
+    ctx.fillText(pruef.gueltig ? "Zählung regelkonform" : "Zählung verletzt Regeln",
+                 x0+8, y0+6);
+    zeilen.forEach((z,n)=>{
+      ctx.fillStyle = z.startsWith("✓") ? "#8b949e" : "#ef5350";
+      ctx.fillText(z, x0+8, y0+24+n*14);
+    });
+    ctx.fillStyle="#8b949e";
+    ctx.fillText("Deutung, keine Messung.", x0+8, y0+24+zeilen.length*14);
+  }
+}
+
+function unterfeldZeichnen(art, y0, h){
+  ctx.strokeStyle = "#30363d"; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(R.links,y0); ctx.lineTo(B-R.rechts,y0); ctx.stroke();
+  ctx.font = "10px Consolas,monospace"; ctx.fillStyle="#8b949e";
+  ctx.textAlign="left"; ctx.textBaseline="top";
+  const pad = 5;
+
+  if(art==="vol"){
+    ctx.fillText("Volumen", R.links+4, y0+3);
+    const sicht = kerzen.slice(Math.max(0,i0),Math.min(kerzen.length,i1));
+    const max = groesstesFeld(sicht, "v") || 1;
+    const b = Math.max(1, breiteProKerze*0.68);
+    const von = Math.max(0,i0);
+    if(breiteProKerze >= 1){
+      sicht.forEach((k,n)=>{
+        const x = xVonIndex(von+n);
+        const hh = (k.v/max)*(h-pad*2);
+        ctx.fillStyle = k.c>=k.o ? "rgba(38,166,154,.55)" : "rgba(239,83,80,.55)";
+        ctx.fillRect(x-b/2, y0+h-pad-hh, b, hh);
+      });
+    }else{
+      // Eng: je Spalte der groesste Umsatz - wie bei den Kerzen.
+      let spalte = -1, groesstes = 0, steigend = true;
+      const malen = ()=>{
+        if(spalte < 0) return;
+        const hh = (groesstes/max)*(h-pad*2);
+        ctx.fillStyle = steigend ? "rgba(38,166,154,.55)" : "rgba(239,83,80,.55)";
+        ctx.fillRect(spalte, y0+h-pad-hh, 1, hh);
+      };
+      for(let n = 0; n < sicht.length; n++){
+        const k = sicht[n];
+        const x = Math.round(xVonIndex(von+n));
+        if(x !== spalte){ malen(); spalte = x; groesstes = k.v; }
+        else if(k.v > groesstes) groesstes = k.v;
+        steigend = k.c >= k.o;
+      }
+      malen();
+    }
+  }
+
+  if(art==="rsi"){
+    const werte = indi("rsi");
+    const yv = v => y0+h-pad - (v/100)*(h-pad*2);
+    ctx.strokeStyle="rgba(139,148,158,.3)"; ctx.setLineDash([3,3]);
+    [30,70].forEach(s=>{ ctx.beginPath(); ctx.moveTo(R.links,yv(s)); ctx.lineTo(B-R.rechts,yv(s)); ctx.stroke(); });
+    ctx.setLineDash([]);
+    ctx.strokeStyle="#a78bfa"; ctx.lineWidth=1.3; ctx.beginPath();
+    let erste=true;
+    const schritt = zeichenSchritt();
+    for(let i=Math.max(0,i0);i<Math.min(kerzen.length,i1);i+=schritt){
+      if(werte[i]===null) continue;
+      const x=xVonIndex(i), y=yv(werte[i]);
+      erste?(ctx.moveTo(x,y),erste=false):ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    ctx.fillStyle="#8b949e"; ctx.fillText("RSI 14   30 / 70", R.links+4, y0+3);
+  }
+
+  if(art==="macd"){
+    const m = indi("macd");
+    let max = 1e-9;
+    for(let i=Math.max(0,i0);i<Math.min(kerzen.length,i1);i++){
+      if(m.linie[i]===null) continue;
+      const a = Math.abs(m.linie[i]), b = Math.abs(m.signal[i]||0),
+            c = Math.abs(m.balken[i]||0);
+      if(a>max) max=a; if(b>max) max=b; if(c>max) max=c;
+    }
+    const yv = v => y0+h/2 - (v/max)*(h/2-pad);
+    const b = Math.max(1, breiteProKerze*0.6);
+    const schrittM = zeichenSchritt();
+    for(let i=Math.max(0,i0);i<Math.min(kerzen.length,i1);i+=schrittM){
+      if(m.balken[i]===null) continue;
+      const x=xVonIndex(i), y=yv(m.balken[i]), mitte=yv(0);
+      ctx.fillStyle = m.balken[i]>=0 ? "rgba(38,166,154,.6)" : "rgba(239,83,80,.6)";
+      ctx.fillRect(x-b/2, Math.min(y,mitte), b, Math.abs(mitte-y)||1);
+    }
+    [[m.linie,"#58a6ff"],[m.signal,"#d29922"]].forEach(([w,f])=>{
+      ctx.strokeStyle=f; ctx.lineWidth=1.2; ctx.beginPath(); let erste=true;
+      for(let i=Math.max(0,i0);i<Math.min(kerzen.length,i1);i+=schrittM){
+        if(w[i]===null||w[i]===undefined) continue;
+        const x=xVonIndex(i), y=yv(w[i]);
+        erste?(ctx.moveTo(x,y),erste=false):ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+    });
+    ctx.fillStyle="#8b949e"; ctx.fillText("MACD 12/26/9", R.links+4, y0+3);
+  }
+}
+
+function achsenZeichnen(){
+  ctx.font="11px Consolas,monospace"; ctx.fillStyle="#8b949e";
+  ctx.textAlign="center"; ctx.textBaseline="top";
+  const schritt = Math.max(1, Math.floor((i1-i0)/8));
+  const vonI = Math.max(0,i0), bisI = Math.min(kerzen.length,i1)-1;
+  const spanneTage = (bisI > vonI)
+      ? (kerzen[bisI].t - kerzen[vonI].t) / 86400 : 0;
+  for(let i=vonI; i<=bisI; i+=schritt){
+    const d = new Date(kerzen[i].t*1000);
+    // Die Beschriftung richtet sich nach der SICHTBAREN Spanne, nicht
+    // nach dem Zeitraster.
+    //
+    // [07.09.2026] Vorher hing sie am Zeitraster. Seit der 15-Minuten-
+    // Chart neun Jahre umfasst, stand dort neunmal "22.07., 02:45" -
+    // eine Uhrzeit ist ueber neun Jahre keine Auskunft.
+    let kurz;
+    if(spanneTage > 700)
+      kurz = d.toLocaleDateString("de-DE",{month:"2-digit",year:"numeric"});
+    else if(spanneTage > 60)
+      kurz = d.toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit",year:"2-digit"});
+    else if(spanneTage > 2)
+      kurz = d.toLocaleString("de-DE",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"});
+    else
+      kurz = d.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+    ctx.fillText(kurz, xVonIndex(i), H-R.unten+6);
+  }
+}
+
+// ---------- Zeichnungen ----------
+// Farbwert einer Zeichnung. Alte Zeichnungen ohne Farbeintrag bekommen
+// Gruen - sonst waeren sie nach dem Nachruesten der Farbauswahl weg.
+function hexVon(id){
+  const t = FARBEN.find(f=>f[0]===id);
+  return t ? t[2] : "#26a69a";
+}
+// Deckung einer Flaeche. Fehlt der Eintrag - jede Zeichnung von vor dem
+// 07.09. -, kommt der alte feste Wert heraus. So sieht Altes aus wie immer.
+function fuellwert(z){
+  const t = FUELLUNG.find(f => f[0] === (z.fuellung || FUELLUNG_RUECKFALL));
+  return t ? t[2] : 0.13;
+}
+function blass(hex, a){
+  const n = parseInt(hex.slice(1),16);
+  return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`;
+}
+
+function zeichnungMalen(z, hervor){
+  const xa = xVonZeit(z.a.t), ya = yVonPreis(z.a.p);
+  const xb = xVonZeit(z.b.t), yb = yVonPreis(z.b.p);
+  const F = hexVon(z.farbe);
+  ctx.lineWidth = hervor ? 2.2 : 1.6;
+
+  if(z.art==="trend"){
+    ctx.strokeStyle = F;
+    ctx.beginPath(); ctx.moveTo(xa,ya); ctx.lineTo(xb,yb); ctx.stroke();
+  }
+  if(z.art==="waag"){
+    ctx.strokeStyle = F;
+    ctx.beginPath(); ctx.moveTo(R.links,ya); ctx.lineTo(B-R.rechts,ya); ctx.stroke();
+    ctx.fillStyle=F; ctx.font="11px Consolas,monospace";
+    ctx.textAlign="left"; ctx.textBaseline="bottom";
+    ctx.fillText(preisText(z.a.p), R.links+4, ya-2);
+  }
+  if(z.art==="rechteck"){
+    const deckung = fuellwert(z);
+    ctx.strokeStyle=F;
+    const x=Math.min(xa,xb), y=Math.min(ya,yb);
+    if(deckung > 0){
+      ctx.fillStyle = blass(F, deckung);
+      ctx.fillRect(x,y,Math.abs(xb-xa),Math.abs(yb-ya));
+    }
+    ctx.strokeRect(x,y,Math.abs(xb-xa),Math.abs(yb-ya));
+    // Spanne des Kastens in Prozent - das ist meist der Grund, warum
+    // man ihn ueberhaupt aufzieht.
+    const hoch = Math.max(z.a.p,z.b.p), tief = Math.min(z.a.p,z.b.p);
+    ctx.fillStyle=F; ctx.font="10px Consolas,monospace";
+    ctx.textAlign="left"; ctx.textBaseline="bottom";
+    ctx.fillText(`${preisText(tief)} – ${preisText(hoch)}  (${((hoch-tief)/tief*100).toFixed(2)}%)`,
+                 x+3, y-3);
+  }
+  if(z.art==="dreieck"){
+    const deckung = fuellwert(z);
+    ctx.strokeStyle=F;
+    ctx.beginPath();
+    ctx.moveTo(xa,yb); ctx.lineTo(xb,yb); ctx.lineTo((xa+xb)/2,ya); ctx.closePath();
+    if(deckung > 0){ ctx.fillStyle = blass(F, deckung); ctx.fill(); }
+    ctx.stroke();
+  }
+  if(z.art==="fib" || z.art==="fibzonen"){
+    const spanne = z.b.p - z.a.p;
+    const xl = Math.min(xa,xb);
+    // Nach rechts bis zum Chartrand ziehen - eine Fibonacci-Marke ist
+    // erst dann nuetzlich, wenn man sieht, wo der aktuelle Kurs
+    // gegenueber ihr steht.
+    const xr = B - R.rechts;
+
+    // Vorberechnen, damit Baender und Linien dieselben Werte benutzen
+    const stufen = FIB_STUFEN.map(s=>({
+      s,
+      p: z.a.p + spanne*s,
+      y: yVonPreis(z.a.p + spanne*s),
+      farbe: FIB_FARBEN[s] || FIB_RUECKFALL,
+      wichtig: FIB_WICHTIG.includes(s),
+    }));
+
+    // 1. Getoente Baender zwischen benachbarten Stufen. Das ist der
+    //    eigentliche Grund, warum man bei TradingView auf einen Blick
+    //    sieht, in welcher Zone der Kurs gerade steht.
+    for(let n=0; n<stufen.length-1; n++){
+      const o = Math.min(stufen[n].y, stufen[n+1].y);
+      const u = Math.max(stufen[n].y, stufen[n+1].y);
+      ctx.fillStyle = blass(stufen[n+1].farbe, .07);
+      ctx.fillRect(xl, o, xr-xl, u-o);
+    }
+
+    // 2. Die Linien, jede in ihrer Farbe
+    ctx.font = "10px Consolas,monospace";
+    ctx.textAlign = "left"; ctx.textBaseline = "middle";
+    stufen.forEach(({y,farbe,wichtig})=>{
+      ctx.strokeStyle = farbe;
+      ctx.lineWidth = wichtig ? 1.7 : 1;
+      ctx.setLineDash(wichtig ? [] : [5,4]);
+      ctx.beginPath(); ctx.moveTo(xl,y); ctx.lineTo(xr,y); ctx.stroke();
+      ctx.setLineDash([]);
+    });
+
+    // 3. Beschriftung - in ZWEI Durchgaengen und mit Kollisionspruefung.
+    //
+    //    WARUM: Ist die Fibonacci-Marke im Verhaeltnis zum sichtbaren
+    //    Preisbereich klein, liegen neun Stufen auf wenigen Bildpunkten.
+    //    Die erste Fassung schrieb alle neun Schilder uebereinander -
+    //    lesbar war keines. Jetzt kommen die wichtigen Stufen zuerst
+    //    (0, 50, 61,8 und 100 Prozent), und jedes weitere Schild wird nur
+    //    gesetzt, wenn dort noch Platz ist. Lieber vier lesbare Angaben
+    //    als neun unlesbare.
+    const belegt = [];
+    const passt = y => belegt.every(v => Math.abs(v - y) >= 14);
+    const schild = ({s,p,y,farbe})=>{
+      if(!passt(y)) return;
+      belegt.push(y);
+      const txt = `${(s*100).toFixed(1)} %  ${preisText(p)}`;
+      const br = ctx.measureText(txt).width + 8;
+      ctx.fillStyle = blass(farbe, .92);
+      ctx.fillRect(xl+2, y-7, br, 14);
+      ctx.fillStyle = "#0d1117";
+      ctx.fillText(txt, xl+6, y+.5);
+    };
+    stufen.filter(t=>t.wichtig).forEach(schild);
+    stufen.filter(t=>!t.wichtig).forEach(schild);
+
+    // 3b. Die Kauf- und Verkaufszonen - nur beim Werkzeug "Fib + Zonen".
+    if(z.art === "fibzonen"){
+      const aufwaerts = spanne > 0;
+      ctx.textAlign = "left"; ctx.textBaseline = "top";
+      FIB_ZONEN.forEach(zone=>{
+        const p1 = z.a.p + spanne*zone.von, p2 = z.a.p + spanne*zone.bis;
+        const y1 = yVonPreis(p1), y2 = yVonPreis(p2);
+        const o = Math.min(y1,y2), u = Math.max(y1,y2);
+        // Gruen = wo gekauft wird, Rot = wo verkauft wird. Bei einem
+        // Fibonacci von oben nach unten dreht sich das um.
+        const kauf = aufwaerts ? (zone.rolle === "rueckzug")
+                               : (zone.rolle === "ziel");
+        const F2 = kauf ? ZONE_GRUEN : ZONE_ROT;
+        ctx.fillStyle = blass(F2, .18);
+        ctx.fillRect(xl, o, xr-xl, u-o);
+        ctx.strokeStyle = blass(F2, .75);
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4,3]);
+        ctx.strokeRect(xl, o, xr-xl, u-o);
+        ctx.setLineDash([]);
+        const schrift = `${kauf ? "KAUFZONE" : "VERKAUFZONE"} `
+                      + `${(zone.von*100).toFixed(1)}–${(zone.bis*100).toFixed(1)} % `
+                      + `(${preisText(Math.min(p1,p2))}–${preisText(Math.max(p1,p2))})`;
+        // Schild nur, wenn das Band hoch genug ist. 12 Bildpunkte sind
+        // das Mindeste fuer eine 10-Punkt-Schrift - darunter liegt sie
+        // ueber den Raendern und ist unlesbar.
+        if(u - o >= 12){
+          ctx.font = "bold 10px Consolas,monospace";
+          ctx.fillStyle = F2;
+          ctx.fillText(schrift, xr - ctx.measureText(schrift).width - 6, o + 3);
+        }
+      });
+      ctx.font = "10px Consolas,monospace";
+      ctx.textAlign = "left"; ctx.textBaseline = "middle";
+    }
+
+    // 4. Die Verbindung der beiden Anker, in der gewaehlten Farbe der
+    //    Zeichnung - so bleibt die Farbauswahl auch hier sichtbar.
+    ctx.strokeStyle = blass(F,.6); ctx.lineWidth = 1;
+    ctx.setLineDash([2,3]);
+    ctx.beginPath(); ctx.moveTo(xa,ya); ctx.lineTo(xb,yb); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+}
+
+// ===================================================================
+// WELCHE ZEICHNUNG LIEGT UNTER DEM MAUSZEIGER
+// -------------------------------------------------------------------
+// [07.09.2026] Vorher gab es nur einen Abstandsvergleich zu den beiden
+// Ankerpunkten. Bei einem Kasten heisst das: man trifft ihn nur an
+// zwei Ecken, mitten hinein zu klicken tut gar nichts. Deshalb prueft
+// jede Art jetzt so, wie sie wirklich aussieht - ein Kasten von innen,
+// eine Linie nach ihrem Abstand zur Strecke.
+//
+// Es gewinnt die ZULETZT gezeichnete: sie liegt oben und ist die, die
+// man anklickt.
+// ===================================================================
+function abstandZurStrecke(x, y, x1, y1, x2, y2){
+  const dx = x2-x1, dy = y2-y1;
+  const laenge = dx*dx + dy*dy;
+  if(laenge === 0) return Math.hypot(x-x1, y-y1);
+  let t = ((x-x1)*dx + (y-y1)*dy) / laenge;
+  t = Math.max(0, Math.min(1, t));
+  return Math.hypot(x - (x1+t*dx), y - (y1+t*dy));
+}
+
+function trifft(z, x, y){
+  const nah = 7;
+  const xa = xVonZeit(z.a.t), ya = yVonPreis(z.a.p);
+  const xb = xVonZeit(z.b.t), yb = yVonPreis(z.b.p);
+  if(z.art === "waag")  return Math.abs(y - ya) <= nah;
+  if(z.art === "trend") return abstandZurStrecke(x,y,xa,ya,xb,yb) <= nah;
+  if(z.art === "rechteck"){
+    return x >= Math.min(xa,xb)-nah && x <= Math.max(xa,xb)+nah
+        && y >= Math.min(ya,yb)-nah && y <= Math.max(ya,yb)+nah;
+  }
+  if(z.art === "dreieck"){
+    // Drei Ecken wie beim Malen: Grundlinie auf yb, Spitze bei ya.
+    const p = [[xa,yb],[xb,yb],[(xa+xb)/2,ya]];
+    const seite = (i,j) => (p[j][0]-p[i][0])*(y-p[i][1])
+                         - (p[j][1]-p[i][1])*(x-p[i][0]);
+    const s1 = seite(0,1), s2 = seite(1,2), s3 = seite(2,0);
+    const minus = (s1<0)||(s2<0)||(s3<0), plus = (s1>0)||(s2>0)||(s3>0);
+    if(!(minus && plus)) return true;              // innen
+    return Math.min(abstandZurStrecke(x,y,p[0][0],p[0][1],p[1][0],p[1][1]),
+                    abstandZurStrecke(x,y,p[1][0],p[1][1],p[2][0],p[2][1]),
+                    abstandZurStrecke(x,y,p[2][0],p[2][1],p[0][0],p[0][1])) <= nah;
+  }
+  if(z.art === "fib" || z.art === "fibzonen"){
+    const {lo,hi} = preisBereich(z);
+    const {x0,x1} = xBereich(z);
+    return x >= x0-nah && x <= x1
+        && y >= yVonPreis(hi)-nah && y <= yVonPreis(lo)+nah;
+  }
+  // Unbekannte Art (z.B. ein selbst gebautes Werkzeug aus Lektion 8):
+  // auf die beiden Anker zurueckfallen statt gar nicht zu treffen.
+  return Math.min(Math.hypot(x-xa,y-ya), Math.hypot(x-xb,y-yb)) <= nah*2;
+}
+
+// Platz der obersten getroffenen Zeichnung, sonst -1.
+// Ausgeblendete zaehlen nicht - was man nicht sieht, klickt man nicht an.
+function zeichnungUnter(x, y){
+  for(let n = zeichnungen.length-1; n >= 0; n--){
+    if(zeichnungen[n].sichtbar === false) continue;
+    if(trifft(zeichnungen[n], x, y)) return n;
+  }
+  return -1;
+}
+
+function zeichnungenZeichnen(){
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(R.links, plotO, B-R.links-R.rechts, plotU-plotO);
+  ctx.clip();
+  // Ausgeblendete werden uebersprungen. Sie sind nicht geloescht -
+  // sie stehen weiter in der Liste und kommen mit einem Klick zurueck.
+  zeichnungen.forEach((z,n)=>{
+    if(z.sichtbar === false) return;
+    zeichnungMalen(z, n === gewaehlt);
+  });
+  if(entwurf) zeichnungMalen(entwurf,true);
+  ctx.restore();
+}
+
+// ===================================================================
+// RANDHINWEISE - Zeichnungen, die gerade nicht im Bild sind
+// -------------------------------------------------------------------
+// [07.09.2026, Wunsch von Sven] Eine Waagerechte bei 75.000 $ ist im
+// Sekundenchart unsichtbar - dort stehen 79.611 bis 79.631 $ im Bild.
+// Ohne Hinweis sieht es aus, als waere die Zeichnung verloren. Deshalb
+// ein Schild am Bildrand: in der Farbe der Zeichnung, mit ihrem Preis
+// und dem Abstand zum letzten sichtbaren Schlusskurs.
+//
+// EINE ENTSCHEIDUNG VORWEG: Die Sichtbarkeitspruefung benutzt DIESELBEN
+// Umrechner (xVonZeit, yVonPreis) wie das Malen selbst. Eine zweite,
+// eigene Rechnung waere eine zweite Wahrheit - und die geht irgendwann
+// anders aus als das Bild. Dann behauptet ein Schild "ausserhalb",
+// waehrend die Linie sichtbar im Chart steht.
+// ===================================================================
+
+// Preis, auf den sich der Prozentabstand bezieht: der Schlusskurs der
+// letzten Kerze, die gerade im Bild ist. Nicht die allerletzte Kerze -
+// wer in die Vergangenheit scrollt, will den Abstand zu DEM Kurs
+// wissen, den er ansieht.
+function bezugPreis(){
+  if(!kerzen.length) return null;
+  const i = Math.max(0, Math.min(kerzen.length, i1) - 1);
+  return kerzen[i] ? kerzen[i].c : null;
+}
+
+// Welchen Preisbereich eine Zeichnung wirklich einnimmt.
+function preisBereich(z){
+  if(z.art === "waag") return {lo:z.a.p, hi:z.a.p};
+  if(z.art === "fib" || z.art === "fibzonen"){
+    // Nicht die beiden Anker, sondern alle Stufen - die 161,8-Linie
+    // liegt weit ueber dem oberen Anker und gehoert zur Zeichnung.
+    const spanne = z.b.p - z.a.p;
+    const werte = FIB_STUFEN.map(s => z.a.p + spanne*s);
+    return {lo:Math.min(...werte), hi:Math.max(...werte)};
+  }
+  return {lo:Math.min(z.a.p, z.b.p), hi:Math.max(z.a.p, z.b.p)};
+}
+
+// Waagerechter Bereich in BILDPUNKTEN.
+function xBereich(z){
+  const rechts = B - R.rechts;
+  // Eine Waagerechte laeuft ueber die ganze Breite, ein Fibonacci nach
+  // rechts bis zum Chartrand - beides steht so in zeichnungMalen().
+  if(z.art === "waag") return {x0:R.links, x1:rechts};
+  const xa = xVonZeit(z.a.t), xb = xVonZeit(z.b.t);
+  if(z.art === "fib" || z.art === "fibzonen")
+    return {x0:Math.min(xa,xb), x1:rechts};
+  return {x0:Math.min(xa,xb), x1:Math.max(xa,xb)};
+}
+
+// Liegt die Zeichnung ganz ausserhalb des Bildes? null = sie ist zu
+// sehen (auch teilweise - dann braucht es kein Schild).
+function ausserhalb(z){
+  const {lo, hi} = preisBereich(z);
+  const {x0, x1} = xBereich(z);
+  const dy = lo > preisMax ? -1 : (hi < preisMin ? 1 : 0);   // -1 darueber, 1 darunter
+  const dx = x1 < R.links ? -1 : (x0 > B - R.rechts ? 1 : 0);
+  if(dx === 0 && dy === 0) return null;
+  // Genannt wird der Preis, der dem Bild am naechsten liegt - das ist
+  // die Strecke, die der Kurs bis dorthin noch gehen muss.
+  const preis = dy < 0 ? lo : (dy > 0 ? hi : (lo + hi) / 2);
+  return {dx, dy, preis, lo, hi, x0, x1};
+}
+
+// Platz eines Textkastens der Seite, in Leinwand-Koordinaten. Bewusst
+// GEMESSEN statt geschaetzt: die Infobox ist mal breit, mal schmal -
+// ein fester Wert waere beim naechsten Zeitraster schon falsch.
+function domRechteck(id){
+  const el = document.getElementById(id);
+  if(!el || el.hidden) return null;
+  const b = document.getElementById("buehne").getBoundingClientRect();
+  const r = el.getBoundingClientRect();
+  if(!r.width || !r.height) return null;
+  return {x0:r.left-b.left, y0:r.top-b.top, x1:r.right-b.left, y1:r.bottom-b.top};
+}
+
+// Freien Platz fuer ein Schild suchen: in Schritten von 17 Bildpunkten
+// verschieben, bis nichts mehr im Weg ist. Findet sich keiner, kommt
+// null zurueck - dann wird das Schild WEGGELASSEN und mitgezaehlt.
+// Dieselbe Entscheidung wie bei den Fibonacci-Schildern: lieber vier
+// lesbare Angaben als neun uebereinander.
+function freierPlatz(x, y, br, ho, richtung, belegt){
+  const stoert = k => belegt.some(v =>
+      k.x0 < v.x1 && k.x1 > v.x0 && k.y0 < v.y1 && k.y1 > v.y0);
+  for(let n = 0; n < 8; n++){
+    const y0 = y + n*17*richtung;
+    const k = {x0:x, y0:y0, x1:x+br, y1:y0+ho};
+    if(k.y0 < plotO || k.y1 > plotU) break;
+    if(!stoert(k)) return k;
+  }
+  return null;
+}
+
+function randhinweiseZeichnen(){
+  if(!zeichnungen.length) return;
+  const bezug = bezugPreis();
+  if(bezug === null || !(bezug > 0)) return;
+
+  const linkeKante = R.links + 4, rechteKante = B - R.rechts - 4;
+  ctx.font = "10px Consolas,monospace";
+  ctx.textAlign = "left"; ctx.textBaseline = "middle";
+
+  // Was schon auf dem Bild steht, bleibt frei.
+  const belegt = [];
+  [domRechteck("infobox"), domRechteck("hinweis"), domRechteck("meldung"),
+   domRechteck("liste"), elliottKasten].forEach(r => { if(r) belegt.push(r); });
+
+  // Platz fuer die Sammelzeile unten rechts von vornherein reservieren.
+  // Sonst kann sie ausgerechnet dann verdeckt werden, wenn sie noetig
+  // ist - und die Zahl der weggelassenen Schilder waere verschwunden.
+  const sammelBreite = ctx.measureText("+99 weitere außerhalb").width + 8;
+  const sammelPlatz = {x0:rechteKante - sammelBreite, y0:plotU - 17,
+                       x1:rechteKante, y1:plotU};
+  belegt.push(sammelPlatz);
+
+  let ausgelassen = 0;
+  zeichnungen.forEach(z=>{
+    if(z.sichtbar === false) return;   // ausgeblendet heisst ausgeblendet
+    const lage = ausserhalb(z);
+    if(!lage) return;
+
+    const abstand = (lage.preis - bezug) / bezug * 100;
+    const pfeil = lage.dy < 0 ? "▲" : lage.dy > 0 ? "▼" : (lage.dx < 0 ? "◀" : "▶");
+    const name = (WERKZEUG.find(w => w[0] === z.art) || [null, z.art])[1];
+    const txt = `${pfeil} ${name} ${preisText(lage.preis)} · `
+              + `${abstand >= 0 ? "+" : ""}${abstand.toFixed(2)} %`;
+    const br = ctx.measureText(txt).width + 10, ho = 15;
+
+    // Ausgangspunkt: an der Kante, hinter der die Zeichnung liegt.
+    const x = lage.dx < 0 ? linkeKante
+            : lage.dx > 0 ? rechteKante - br
+            : Math.min(Math.max((lage.x0 + lage.x1)/2 - br/2, linkeKante),
+                       rechteKante - br);
+    const y = lage.dy < 0 ? plotO + 4
+            : lage.dy > 0 ? plotU - ho - 4
+            : Math.min(Math.max((yVonPreis(lage.hi) + yVonPreis(lage.lo))/2 - ho/2,
+                       plotO + 4), plotU - ho - 4);
+
+    const platz = freierPlatz(x, y, br, ho, lage.dy > 0 ? -1 : 1, belegt);
+    if(!platz){ ausgelassen++; return; }
+    belegt.push(platz);
+
+    const F = hexVon(z.farbe);
+    ctx.fillStyle = blass(F, .92);
+    ctx.fillRect(platz.x0, platz.y0, br, ho);
+    ctx.fillStyle = "#0d1117";
+    ctx.fillText(txt, platz.x0 + 5, platz.y0 + ho/2 + .5);
+  });
+
+  if(ausgelassen){
+    ctx.fillStyle = "#8b949e";
+    ctx.textAlign = "right"; ctx.textBaseline = "middle";
+    ctx.fillText(`+${ausgelassen} weitere außerhalb`, rechteKante - 4, plotU - 9);
+    ctx.textAlign = "left";
+  }
+}
+
+// ===================================================================
+// ZEICHNUNGSLISTE
+// -------------------------------------------------------------------
+// [07.09.2026, Wunsch von Sven: "die fibonacci zerstoeren die ganze
+// ansicht ... am besten so das ich das jeweilige anklicke und das dann
+// unsichtbar machen kann"]
+//
+// Jede Zeichnung bekommt eine Zeile: Auge zum Aus- und Einblenden,
+// Farbpunkt, Beschreibung. Ein Klick auf die Zeile waehlt sie aus und
+// klappt die Stellraeder auf - Farbe, Fuellung, loeschen.
+//
+// AUSBLENDEN IST NICHT LOESCHEN. Das ist der ganze Sinn: eine
+// Fibonacci-Marke, die gerade stoert, soll verschwinden koennen, ohne
+// dass die Arbeit weg ist. Deshalb steht sie danach weiter in der
+// Liste, nur blass.
+// ===================================================================
+
+function sichtbarkeit(z){ return z.sichtbar !== false; }
+
+function zeichnungText(z){
+  const name = (WERKZEUG.find(w => w[0] === z.art) || [null, z.art])[1];
+  const d = new Date(z.a.t*1000).toLocaleDateString("de-DE",
+        {day:"2-digit", month:"2-digit", year:"2-digit"});
+  if(z.art === "waag") return `${name} · ${preisText(z.a.p)} · ${d}`;
+  const lo = Math.min(z.a.p, z.b.p), hi = Math.max(z.a.p, z.b.p);
+  return `${name} · ${preisText(lo)}–${preisText(hi)} · ${d}`;
+}
+
+function listeAufbauen(){
+  const kasten = document.getElementById("liste");
+  if(kasten.hidden) return;
+  document.getElementById("listeZahl").textContent =
+      `Zeichnungen (${zeichnungen.filter(sichtbarkeit).length}/${zeichnungen.length})`;
+  const inhalt = document.getElementById("listeInhalt");
+  inhalt.textContent = "";
+
+  if(!zeichnungen.length){
+    const leer = document.createElement("div");
+    leer.id = "listeLeer";
+    leer.textContent = "Noch nichts gezeichnet. Werkzeug oben wählen "
+                     + "und im Chart ziehen.";
+    inhalt.appendChild(leer);
+    return;
+  }
+
+  // Neueste zuerst - die hat man gerade gemalt und sucht sie zuerst.
+  for(let n = zeichnungen.length-1; n >= 0; n--){
+    const z = zeichnungen[n];
+    const zeile = document.createElement("div");
+    zeile.className = "zeile" + (n === gewaehlt ? " gewaehlt" : "")
+                    + (sichtbarkeit(z) ? "" : " unsichtbar");
+
+    const oben = document.createElement("div");
+    oben.className = "oben";
+
+    const auge = document.createElement("span");
+    auge.className = "auge";
+    auge.textContent = sichtbarkeit(z) ? "◉" : "○";
+    auge.title = sichtbarkeit(z) ? "ausblenden" : "wieder zeigen";
+    auge.onclick = e => {
+      e.stopPropagation();              // nicht zusaetzlich auswaehlen
+      z.sichtbar = !sichtbarkeit(z);
+      zeichnungenSchreiben(); listeAufbauen(); zeichne();
+    };
+
+    const punkt = document.createElement("span");
+    punkt.className = "punkt";
+    punkt.style.background = hexVon(z.farbe);
+
+    const was = document.createElement("span");
+    was.className = "was";
+    was.textContent = zeichnungText(z);
+
+    oben.append(auge, punkt, was);
+    zeile.appendChild(oben);
+    zeile.onclick = ()=>{ gewaehlt = (gewaehlt === n) ? -1 : n;
+                          listeAufbauen(); zeichne(); };
+
+    if(n === gewaehlt) zeile.appendChild(stellrad(z, n));
+    inhalt.appendChild(zeile);
+  }
+}
+
+// Die Stellraeder einer ausgewaehlten Zeichnung: Farbe, Fuellung,
+// loeschen. Sie aendern DIESE Zeichnung, nicht die Auswahl fuer die
+// naechste - das ist der Unterschied zu den Knoepfen oben in der Leiste.
+function stellrad(z, n){
+  const kasten = document.createElement("div");
+  kasten.className = "stellrad";
+  kasten.onclick = e => e.stopPropagation();
+
+  FARBEN.forEach(([id,name,hex])=>{
+    const b = document.createElement("button");
+    b.className = "farbknopf";
+    b.style.background = hex;
+    b.title = name;
+    if(id === (z.farbe || "gruen")) b.style.outline = "2px solid #fff";
+    b.onclick = ()=>{ z.farbe = id; zeichnungenSchreiben(); listeAufbauen(); zeichne(); };
+    kasten.appendChild(b);
+  });
+
+  // Fuellung nur dort anbieten, wo sie etwas tut.
+  if(z.art === "rechteck" || z.art === "dreieck"){
+    const luecke = document.createElement("span");
+    luecke.className = "trenner";
+    kasten.appendChild(luecke);
+    FUELLUNG.forEach(([id,name])=>{
+      const b = document.createElement("button");
+      b.textContent = name;
+      if(id === (z.fuellung || FUELLUNG_RUECKFALL)) b.classList.add("an");
+      b.title = "Fläche " + name;
+      b.onclick = ()=>{ z.fuellung = id; zeichnungenSchreiben(); listeAufbauen(); zeichne(); };
+      kasten.appendChild(b);
+    });
+  }
+
+  const luecke2 = document.createElement("span");
+  luecke2.className = "trenner";
+  const weg = document.createElement("button");
+  weg.textContent = "löschen";
+  weg.title = "Diese Zeichnung entfernen";
+  weg.onclick = ()=>{
+    zeichnungen.splice(n,1);
+    gewaehlt = -1;
+    zeichnungenSchreiben(); listeAufbauen(); zeichne();
+  };
+  kasten.append(luecke2, weg);
+  return kasten;
+}
+
+function listeUmschalten(an){
+  const kasten = document.getElementById("liste");
+  kasten.hidden = (an === undefined) ? !kasten.hidden : !an;
+  document.getElementById("zeichnungsliste").classList.toggle("an", !kasten.hidden);
+  listeAufbauen();
+  zeichne();                    // Randhinweise weichen der Liste aus
+}
+
+document.getElementById("zeichnungsliste").onclick = ()=>listeUmschalten();
+document.getElementById("listeZu").onclick = ()=>listeUmschalten(false);
+document.getElementById("alleAn").onclick = ()=>{
+  zeichnungen.forEach(z=>{ z.sichtbar = true; });
+  zeichnungenSchreiben(); listeAufbauen(); zeichne();
+};
+document.getElementById("alleAus").onclick = ()=>{
+  zeichnungen.forEach(z=>{ z.sichtbar = false; });
+  zeichnungenSchreiben(); listeAufbauen(); zeichne();
+};
+
+// ===================================================================
+// ALLES INS BILD HOLEN
+// -------------------------------------------------------------------
+// Passt die Preisachse so an, dass die sichtbaren Kerzen UND die
+// sichtbaren Zeichnungen hineinpassen. Genau dafuer gedacht, dass eine
+// Fibonacci-Zielzone nicht mehr oben herausfaellt.
+//
+// Mitgerechnet werden nur Zeichnungen, die auch ZEITLICH im Bild sind -
+// eine Trendlinie aus dem Jahr 2017 soll den Chart von 2026 nicht
+// auseinanderziehen. Eine Waagerechte gilt immer als im Bild, weil sie
+// ueber die ganze Breite laeuft.
+function einpassen(){
+  const sicht = kerzen.slice(Math.max(0,i0), Math.min(kerzen.length,i1));
+  if(!sicht.length) return;
+  const s = spanneVon(sicht, "l", "h");
+  let lo = s.lo, hi = s.hi, dabei = 0;
+  zeichnungen.forEach(z=>{
+    if(z.sichtbar === false) return;             // ausgeblendet zaehlt nicht
+    const xb = xBereich(z);
+    if(xb.x1 < R.links || xb.x0 > B - R.rechts) return;   // zeitlich daneben
+    const b = preisBereich(z);
+    if(!isFinite(b.lo) || !isFinite(b.hi)) return;
+    if(b.lo < lo) lo = b.lo;
+    if(b.hi > hi) hi = b.hi;
+    dabei++;
+  });
+  if(logSkala){
+    preisFest = {min: Math.max(lo/1.03, 1e-9), max: hi*1.03};
+  }else{
+    const luft = (hi-lo)*0.06 || hi*0.02;
+    preisFest = {min: Math.max(0, lo-luft), max: hi+luft};
+  }
+  zeichne();
+  melde(dabei
+    ? `Eingepasst: Kerzen und ${dabei} Zeichnung(en) — ${preisText(preisFest.min)} bis ${preisText(preisFest.max)}.`
+    : `Eingepasst: nur Kerzen, es ist keine Zeichnung im Bild.`, "ok");
+}
+
+// Die Preisachse von Hand verstellen. f > 1 staucht (mehr Preis ins
+// Bild), f < 1 dehnt. Gerechnet wird um die MITTE des sichtbaren
+// Bereichs, bei der log-Achse um die geometrische Mitte - sonst
+// wandert beim Ziehen der Kurs aus dem Bild.
+function achseSkalieren(min, max, f){
+  if(logSkala){
+    const u = Math.log(Math.max(min, 1e-9)), o = Math.log(Math.max(max, 1e-9));
+    const m = (u+o)/2, h = (o-u)/2 * f;
+    return {min: Math.exp(m-h), max: Math.exp(m+h)};
+  }
+  const m = (min+max)/2, h = (max-min)/2 * f;
+  let u = m - h, o = m + h;
+  // Negative Preise gibt es nicht. ABER: unten einfach bei null
+  // abzuschneiden und oben stehen zu lassen waere unehrlich - wer um
+  // den Faktor e zieht, bekaeme nur 1,86. GEMESSEN im ganzen
+  // BTC-Chart, der bei null anfaengt: 150 Bildpunkte Ziehen ergaben
+  // Faktor 1,859 statt 2,718. Deshalb wird die ganze Spanne nach oben
+  // geschoben, statt sie zu kuerzen.
+  if(u < 0){ o -= u; u = 0; }
+  return {min: u, max: o};
+}
+
+// Die zwei Schalter unten rechts in der Ecke zwischen Preis- und
+// Zeitachse - dort, wo sie bei TradingView auch sitzen.
+function achsSchalterZeichnen(){
+  const x0 = B - R.rechts, y0 = H - R.unten + 5, h = 16;
+  const br = (R.rechts - 9) / 2;
+  const male = (x, text, an, titel) => {
+    ctx.fillStyle = an ? "#1f6feb" : "#21262d";
+    ctx.strokeStyle = "#30363d"; ctx.lineWidth = 1;
+    ctx.fillRect(x, y0, br, h); ctx.strokeRect(x+.5, y0+.5, br-1, h-1);
+    ctx.fillStyle = an ? "#fff" : "#8b949e";
+    ctx.font = "9px Consolas,monospace";
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText(text, x + br/2, y0 + h/2 + .5);
+    return {x0:x, y0, x1:x+br, y1:y0+h, titel};
+  };
+  achsSchalter.auto = male(x0 + 3, preisFest ? "Fest" : "Auto", !!preisFest,
+                           "Preisachse: automatisch oder von Hand");
+  achsSchalter.log  = male(x0 + 6 + br, logSkala ? "Log" : "Lin", logSkala,
+                           "Preisachse: linear oder logarithmisch");
+}
+
+function fadenkreuz(){
+  if(!maus) return;
+  ctx.strokeStyle="rgba(139,148,158,.45)"; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(maus.x,plotO); ctx.lineTo(maus.x,H-R.unten); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(R.links,maus.y); ctx.lineTo(B-R.rechts,maus.y); ctx.stroke();
+  ctx.setLineDash([]);
+  if(maus.y>plotO && maus.y<plotU){
+    const p = preisVonY(maus.y);
+    ctx.fillStyle="#1f6feb"; ctx.fillRect(B-R.rechts, maus.y-9, R.rechts, 18);
+    ctx.fillStyle="#fff"; ctx.font="11px Consolas,monospace";
+    ctx.textAlign="left"; ctx.textBaseline="middle";
+    ctx.fillText(preisText(p), B-R.rechts+5, maus.y);
+  }
+  // Und dasselbe fuer die Zeit an der unteren Achse. Ohne das muss man
+  // raten, auf welchem Tag der senkrechte Strich steht.
+  if(maus.x > R.links && maus.x < B-R.rechts){
+    const t = zeitVonX(maus.x);
+    const d = new Date(t*1000);
+    const fein = ["1s","1m","15m"].includes(rahmen);
+    const txt = fein
+      ? d.toLocaleString("de-DE",{day:"2-digit",month:"2-digit",
+                                  hour:"2-digit",minute:"2-digit",
+                                  second: rahmen==="1s" ? "2-digit" : undefined})
+      : (["1M","1w","1d"].includes(rahmen)
+          ? d.toLocaleDateString("de-DE")
+          : d.toLocaleString("de-DE",{day:"2-digit",month:"2-digit",
+                                      hour:"2-digit",minute:"2-digit"}));
+    ctx.font="11px Consolas,monospace";
+    const br = ctx.measureText(txt).width + 12;
+    const x = Math.max(R.links, Math.min(B-R.rechts-br, maus.x - br/2));
+    ctx.fillStyle="#1f6feb"; ctx.fillRect(x, H-R.unten+2, br, 17);
+    ctx.fillStyle="#fff"; ctx.textAlign="center"; ctx.textBaseline="middle";
+    ctx.fillText(txt, x + br/2, H-R.unten+11);
+  }
+}
+
+function infoSchreiben(){
+  const box = document.getElementById("infobox");
+  const i = Math.min(kerzen.length-1, Math.max(0, maus ? indexVonX(maus.x) : i1-1));
+  const k = kerzen[i]; if(!k){ box.textContent=""; return; }
+  const d = new Date(k.t*1000);
+  const ver = ((k.c-k.o)/k.o*100);
+  box.innerHTML =
+    `<span style="color:#8b949e">${symbol} · ${RAHMEN_NAME[rahmen]} · ${d.toLocaleString("de-DE")}</span>\n` +
+    `O ${preisText(k.o)}  H ${preisText(k.h)}  T ${preisText(k.l)}  S ${preisText(k.c)}  ` +
+    `<span style="color:${ver>=0?"#26a69a":"#ef5350"}">${ver>=0?"+":""}${ver.toFixed(2)}%</span>\n` +
+    `<span style="color:#8b949e">${kerzen.length} Kerzen gesamt · sichtbar ${Math.min(kerzen.length,i1)-Math.max(0,i0)} · ` +
+    `ab ${new Date(kerzen[0].t*1000).toLocaleDateString("de-DE")}</span>`;
+}
+
+// ===================================================================
+// Bedienung
+// ===================================================================
+lw.addEventListener("mousedown", e=>{
+  const r = lw.getBoundingClientRect();
+  const x = e.clientX-r.left, y = e.clientY-r.top;
+
+  // Erst die zwei Schalter in der Ecke - sie liegen auf der Achse und
+  // muessen deshalb VOR ihr geprueft werden.
+  const trifft = s => s && x>=s.x0 && x<=s.x1 && y>=s.y0 && y<=s.y1;
+  if(trifft(achsSchalter.auto)){
+    preisFest = null;                 // zurueck auf automatisch
+    zeichne(); return;
+  }
+  if(trifft(achsSchalter.log)){
+    // Beim Umschalten die feste Einstellung fallen lassen - eine
+    // lineare Spanne auf einer log-Achse ergibt keinen sinnvollen
+    // Ausschnitt.
+    logSkala = !logSkala; preisFest = null;
+    zeichne(); return;
+  }
+
+  // Auf der Preisachse wird gezogen, nicht gezeichnet.
+  if(aufAchse(x) && y < plotU){
+    zieht = {modus:"achse", startY:y, min:preisMin, max:preisMax};
+    return;
+  }
+
+  if(werkzeug==="zeiger"){
+    zieht = {modus:"schieben", startX:x, startY:y, i0, i1, bewegt:false};
+  }else{
+    const a = {t: zeitVonX(x), p: preisVonY(y)};
+    entwurf = {art:werkzeug, farbe, fuellung, a, b:{...a}};
+    zieht = {modus:"malen"};
+  }
+});
+
+window.addEventListener("mousemove", e=>{
+  const r = lw.getBoundingClientRect();
+  const x = e.clientX-r.left, y = e.clientY-r.top;
+  maus = (x>=0&&x<=B&&y>=0&&y<=H) ? {x,y} : null;
+
+  if(zieht?.modus==="schieben"){
+    if(Math.abs(x - zieht.startX) > 3 || Math.abs(y - zieht.startY) > 3)
+      zieht.bewegt = true;
+    const um = Math.round((zieht.startX - x)/breiteProKerze);
+    const spanne = zieht.i1 - zieht.i0;
+    let n0 = zieht.i0 + um;
+    n0 = Math.max(-spanne+10, Math.min(kerzen.length-10, n0));
+    i0 = n0; i1 = n0 + spanne;
+  }
+  if(zieht?.modus==="achse"){
+    // Nach unten ziehen = Bereich groesser = Chart staucht sich.
+    // 150 Bildpunkte sind ungefaehr der Faktor e (2,7) - so ist eine
+    // Handbewegung eine spuerbare, aber keine wilde Aenderung.
+    const f = Math.exp((y - zieht.startY) / 150);
+    preisFest = achseSkalieren(zieht.min, zieht.max, f);
+  }
+  if(zieht?.modus==="malen" && entwurf){
+    entwurf.b = {t: zeitVonX(x), p: preisVonY(y)};
+  }
+  // Der Mauszeiger sagt, dass man hier ziehen kann.
+  lw.style.cursor = (aufAchse(x) && y < plotU && werkzeug==="zeiger")
+                  ? "ns-resize" : "";
+  zeichne();
+});
+
+window.addEventListener("mouseup", e=>{
+  // Ein Klick, der den Chart NICHT verschoben hat, ist ein Klick auf
+  // eine Zeichnung - damit kann man sie nachtraeglich aendern.
+  if(zieht?.modus==="schieben" && !zieht.bewegt){
+    // Punkt aus dem Ereignis holen, nicht aus der letzten Mausbewegung -
+    // wer klickt, ohne vorher zu wackeln, hat sonst keinen Punkt.
+    const r = lw.getBoundingClientRect();
+    const kx = e.clientX - r.left, ky = e.clientY - r.top;
+    const n = (kx < 0 || ky < 0 || kx > B || ky > H) ? -1 : zeichnungUnter(kx, ky);
+    if(n >= 0){
+      gewaehlt = n;
+      listeUmschalten(true);          // Stellraeder gleich mit aufklappen
+    }else if(gewaehlt >= 0){
+      gewaehlt = -1;                  // daneben geklickt = Auswahl weg
+      listeAufbauen();
+    }
+  }
+  if(zieht?.modus==="malen" && entwurf){
+    const xa = xVonZeit(entwurf.a.t), xb = xVonZeit(entwurf.b.t);
+    const ya = yVonPreis(entwurf.a.p), yb = yVonPreis(entwurf.b.p);
+    // Winzige Wische verwerfen - sonst entstehen bei jedem Klick Punkte
+    if(Math.abs(xb-xa) > 4 || Math.abs(yb-ya) > 4 || entwurf.art==="waag"){
+      zeichnungen.push(entwurf);
+      zeichnungenSchreiben();
+      listeAufbauen();
+    }
+    entwurf = null;
+  }
+  zieht = null;
+  zeichne();
+});
+
+lw.addEventListener("wheel", e=>{
+  e.preventDefault();
+  const r = lw.getBoundingClientRect();
+  const x = e.clientX-r.left;
+  // Ueber der Preisachse zoomt das Rad senkrecht statt waagerecht.
+  if(aufAchse(x)){
+    preisFest = achseSkalieren(preisMin, preisMax, e.deltaY>0 ? 1.12 : 0.89);
+    zeichne(); return;
+  }
+  const anteil = (x-R.links)/(B-R.links-R.rechts);
+  const spanne = i1-i0;
+  const neu = Math.max(15, Math.min(kerzen.length, Math.round(spanne * (e.deltaY>0 ? 1.15 : 0.87))));
+  const mitte = i0 + spanne*anteil;
+  i0 = Math.round(mitte - neu*anteil);
+  i1 = i0 + neu;
+  if(i1 > kerzen.length + neu*0.3){ i1 = Math.round(kerzen.length + neu*0.3); i0 = i1-neu; }
+  if(i0 < -neu*0.3){ i0 = Math.round(-neu*0.3); i1 = i0+neu; }
+  zeichne();
+}, {passive:false});
+
+lw.addEventListener("dblclick", e=>{
+  const r = lw.getBoundingClientRect();
+  const x = e.clientX-r.left, y = e.clientY-r.top;
+  // Doppelklick auf die Preisachse = zurueck auf automatisch.
+  if(aufAchse(x)){ preisFest = null; zeichne(); return; }
+  // Dieselbe Trefferpruefung wie beim Auswaehlen - vorher traf man
+  // einen Kasten nur an seinen zwei Ecken.
+  const best = zeichnungUnter(x, y);
+  if(best>=0){
+    zeichnungen.splice(best,1);
+    if(gewaehlt === best) gewaehlt = -1;
+    else if(gewaehlt > best) gewaehlt--;
+    zeichnungenSchreiben(); listeAufbauen(); zeichne();
+  }
+});
+
+document.getElementById("alles").onclick = ()=>{
+  i0 = 0; i1 = kerzen.length; preisFest = null; zeichne();
+};
+document.getElementById("einpassen").onclick = einpassen;
+document.getElementById("loeschen").onclick = ()=>{
+  if(!zeichnungen.length) return;
+  if(confirm(`Alle ${zeichnungen.length} Zeichnungen für ${symbol} löschen?`)){
+    zeichnungen = []; gewaehlt = -1;
+    zeichnungenSchreiben(); listeAufbauen(); zeichne();
+  }
+};
+document.getElementById("letzte").onclick = ()=>{
+  zeichnungen.pop(); gewaehlt = -1;
+  zeichnungenSchreiben(); listeAufbauen(); zeichne();
+};
+document.getElementById("symbol").onchange = e=>{
+  symbol = e.target.value;
+  // Beim Wechsel das Zeitraster behalten - aber nur, wenn es die neue
+  // Muenze auch hat. Sonst laege der Chart auf einer Datei, die es
+  // nicht gibt, und zeigte nur "Kerzen nicht gefunden".
+  if(!rasterDa(rahmen)){
+    // Tag zuerst - das ist das Raster, in dem man sich zurechtfindet.
+    // "Der erste Eintrag der Liste" waere der Monatschart gewesen.
+    const ersatz = rasterDa("1d") ? "1d" : (RAHMEN.find(rasterDa) || "1d");
+    melde(`${RAHMEN_NAME[rahmen]} gibt es für ${symbol} nicht — `
+        + `es wird ${RAHMEN_NAME[ersatz]} gezeigt.`, "warn");
+    rahmen = ersatz;
+  }
+  leisteBauen();
+  laden();
+};
+
+window.addEventListener("keydown", e=>{
+  if(e.key==="Escape"){ entwurf=null; zieht=null; werkzeug="zeiger"; leisteBauen(); zeichne(); }
+  if(e.ctrlKey && e.key==="z"){ zeichnungen.pop(); zeichnungenSchreiben(); zeichne(); }
+});
+
+// ---------- Zeichnungen merken ----------
+// Bewusst je Muenze, NICHT je Zeitraster: eine Trendlinie im Tageschart
+// soll auch im Stundenchart an derselben Stelle stehen.
+function schluessel(){ return "chartlabor_zeichnungen_" + symbol; }
+function zeichnungenSchreiben(){
+  try{ localStorage.setItem(schluessel(), JSON.stringify(zeichnungen)); }catch(e){}
+}
+function zeichnungenLesen(){
+  try{ zeichnungen = JSON.parse(localStorage.getItem(schluessel())) || []; }
+  catch(e){ zeichnungen = []; }
+}
+
+// ===================================================================
+// SICHERN UND EINLESEN
+// -------------------------------------------------------------------
+// [07.09.2026, Wunsch von Sven] Zeichnungen liegen im Speicher des
+// Browsers. Der haengt an Browser UND Adresse: anderer Browser,
+// geloeschte Websitedaten, anderer Port - und sie sind weg. Deshalb
+// dieser Weg ueber eine Datei.
+//
+// DREI ENTSCHEIDUNGEN:
+//
+// 1. Geschrieben wird IM BROWSER, nicht auf dem Server. Im Kopf von
+//    chartlabor_start.py steht "er schreibt nichts" - das bleibt so.
+//    Die Datei landet im Download-Ordner.
+//
+// 2. Einlesen HAENGT AN, es ersetzt nie. Wer eine Datei laedt, kann
+//    dadurch keine Zeichnung verlieren. Doppelte werden erkannt und
+//    uebersprungen, also ist auch zweimal Laden harmlos. Aufraeumen
+//    macht "Zeichnung löschen" - das fragt vorher nach.
+//
+// 3. Geprueft wird der INHALT, nicht die Anwesenheit. Genau daran ist
+//    am 06.09. die Monats-/Minuten-Verwechslung aufgefallen: die Datei
+//    war da, sie enthielt nur das Falsche. Eine Zeichnung mit der Art
+//    "kasten" statt "rechteck" wuerde klaglos gespeichert - und dann
+//    nie gemalt. Lautlos.
+// ===================================================================
+
+// Gueltige Arten kommen aus WERKZEUG, nicht aus einer zweiten Liste.
+// Wer nach Lektion 8 des Lernpfads ein eigenes Werkzeug eintraegt,
+// kann es damit sofort sichern und einlesen - ohne hier etwas zu
+// aendern. Eine zweite Liste waere genau die Stelle, die man vergisst.
+const ARTEN = new Set(WERKZEUG.map(w => w[0]).filter(id => id !== "zeiger"));
+
+let meldungUhr = null;
+function melde(text, art){
+  const box = document.getElementById("meldung");
+  box.textContent = text;
+  box.className = art || "";
+  box.hidden = false;
+  clearTimeout(meldungUhr);
+  // Erfolg verschwindet von selbst, ein Fehler bleibt stehen, bis er
+  // weggeklickt wird. Fehler duerfen nicht von allein verschwinden.
+  if(art === "ok") meldungUhr = setTimeout(()=>{ box.hidden = true; zeichne(); }, 9000);
+  zeichne();          // die Randhinweise weichen dem Kasten aus
+}
+
+function zeitstempel(){
+  const d = new Date(), z = n => String(n).padStart(2,"0");
+  return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}`
+       + `_${z(d.getHours())}${z(d.getMinutes())}`;
+}
+
+function sichern(){
+  const belegtePlaetze = PLAETZE.filter(n => platzLesen(n)).length;
+  if(!zeichnungen.length && !belegtePlaetze){
+    melde("Es gibt noch keine Zeichnung und keinen gemerkten Stand zum Sichern.", "warn");
+    return;
+  }
+  const paket = {
+    format: "chartlabor-zeichnungen",
+    fassung: 2,
+    symbol: symbol,
+    erzeugt: new Date().toISOString(),
+    anzahl: zeichnungen.length,
+    zeichnungen: zeichnungen,
+    // Die drei Arbeitsplaetze kommen mit - sie liegen sonst genauso im
+    // Browser-Speicher und waeren beim naechsten Aufraeumen weg. Eine
+    // aeltere Datei ohne diesen Eintrag laedt weiterhin, der Teil ist
+    // freiwillig.
+    plaetze: PLAETZE.map(n => platzLesen(n)),
+  };
+  const name = `chartlabor_zeichnungen_${symbol}_${zeitstempel()}.json`;
+  const blob = new Blob([JSON.stringify(paket, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 10000);
+  melde(`Gesichert: ${zeichnungen.length} Zeichnung(en), `
+      + `${belegtePlaetze} von ${PLAETZE.length} Plätzen.\n${name}\n`
+      + `Sie liegt im Download-Ordner.`, "ok");
+}
+
+// Einen Punkt pruefen. Rueckgabe: null = in Ordnung, sonst der Grund.
+function pruefePunkt(p){
+  if(!p || typeof p !== "object") return "Punkt fehlt";
+  if(!Number.isFinite(p.t)) return "Zeitstempel ist keine Zahl";
+  if(!Number.isFinite(p.p)) return "Preis ist keine Zahl";
+  if(p.p <= 0) return "Preis ist null oder negativ";
+  // Zeitstempel in SEKUNDEN, so wie in daten/*.json. In Millisekunden
+  // waere die Zahl rund tausendmal so gross - die Zeichnung landete
+  // im Jahr 58000, ohne dass irgendwo ein Fehler erschiene.
+  if(p.t < 1e8 || p.t > 1e11)
+    return `Zeitstempel ${p.t} unplausibel (erwartet Sekunden, etwa 1,8 Mrd.)`;
+  return null;
+}
+
+// Eine Zeichnung pruefen. Rueckgabe: {z:...} oder {fehler:"..."}.
+// Der Rueckgabewert wird NEU aufgebaut - fremde Zusatzfelder aus der
+// Datei kommen so gar nicht erst in den Speicher.
+function pruefeZeichnung(z){
+  if(!z || typeof z !== "object") return {fehler:"kein Eintrag"};
+  if(!ARTEN.has(z.art)) return {fehler:`unbekanntes Werkzeug "${z.art}"`};
+  const fa = pruefePunkt(z.a); if(fa) return {fehler:`Anfangspunkt: ${fa}`};
+  const fb = pruefePunkt(z.b); if(fb) return {fehler:`Endpunkt: ${fb}`};
+  // Unbekannte Farbe wird zu Gruen - genau das tut hexVon() beim Malen
+  // auch. Verwerfen waere hier zu streng: die Zeichnung ist in Ordnung.
+  const farbe = FARBEN.some(f => f[0] === z.farbe) ? z.farbe : "gruen";
+  // Wie bei der Farbe: unbekannt oder fehlend wird zum Rueckfallwert,
+  // nicht verworfen. Die Zeichnung selbst ist ja in Ordnung.
+  const fuel = FUELLUNG.some(f => f[0] === z.fuellung) ? z.fuellung : FUELLUNG_RUECKFALL;
+  // Ausgeblendet ist ein Zustand, kein Fehler - er wird uebernommen.
+  // Fehlt die Angabe (alle Zeichnungen vor dem 07.09.), gilt sichtbar.
+  return {z:{art:z.art, farbe:farbe, fuellung:fuel,
+             sichtbar: z.sichtbar !== false,
+             a:{t:z.a.t, p:z.a.p}, b:{t:z.b.t, p:z.b.p}}};
+}
+
+// Erkennungsmerkmal: gleiche Art, gleiche Farbe, gleiche zwei Punkte.
+// Damit legt zweimal Laden derselben Datei keine Doppelten an. Alte
+// Zeichnungen ohne Farbeintrag zaehlen als gruen - so werden sie auch
+// gemalt (hexVon), also muessen sie hier genauso heissen.
+// Die SICHTBARKEIT gehoert bewusst NICHT dazu. Sie ist ein Zustand,
+// kein Merkmal: dieselbe Linie einmal sichtbar und einmal ausgeblendet
+// ist dieselbe Linie - sonst laege sie nach dem Einlesen doppelt da.
+function kennung(z){
+  return [z.art, z.farbe || "gruen", z.fuellung || FUELLUNG_RUECKFALL,
+          z.a.t, z.a.p, z.b.t, z.b.p].join("|");
+}
+
+function einlesen(inhalt, dateiname){
+  let paket;
+  try{ paket = JSON.parse(inhalt); }
+  catch(e){
+    melde(`${dateiname} ist keine gültige JSON-Datei.\n${e.message}`, "fehler");
+    return;
+  }
+  // Auch eine nackte Liste annehmen - wer die Datei von Hand
+  // zusammenstellt, hat den Kopf vielleicht nicht dabei.
+  const liste = Array.isArray(paket) ? paket : (paket && paket.zeichnungen);
+  if(!Array.isArray(liste)){
+    melde(`${dateiname} enthält keine Zeichnungen.\n`
+        + `Erwartet wird eine Liste unter "zeichnungen".`, "fehler");
+    return;
+  }
+  if(!Array.isArray(paket) && paket.symbol && paket.symbol !== symbol){
+    const weiter = confirm(
+      `Die Datei wurde für ${paket.symbol} gesichert, angezeigt wird ${symbol}.\n\n`
+    + `Trotzdem laden? Die Zeichnungen stünden dann an Preisen, die zu `
+    + `${paket.symbol} gehören.`);
+    if(!weiter){ melde("Nichts geladen.", "warn"); return; }
+  }
+
+  const vorhanden = new Set(zeichnungen.map(kennung));
+  const neu = [], gruende = [];
+  let doppelt = 0;
+  liste.forEach((eintrag, n)=>{
+    const e = pruefeZeichnung(eintrag);
+    if(e.fehler){ gruende.push(`Nr. ${n+1}: ${e.fehler}`); return; }
+    const k = kennung(e.z);
+    if(vorhanden.has(k)){ doppelt++; return; }
+    vorhanden.add(k); neu.push(e.z);
+  });
+
+  if(neu.length){
+    zeichnungen = zeichnungen.concat(neu);
+    zeichnungenSchreiben();
+    listeAufbauen();
+    zeichne();
+  }
+
+  // Arbeitsplaetze aus der Datei - nur in FREIE Plaetze. Das haelt die
+  // Regel durch: Laden haengt an, es ersetzt nie. Wer einen Platz
+  // zurueckhaben will, macht ihn vorher frei.
+  let plaetzeZurueck = 0, plaetzeBesetzt = 0, plaetzeKaputt = 0;
+  if(!Array.isArray(paket) && Array.isArray(paket.plaetze)){
+    paket.plaetze.forEach((s, k)=>{
+      const n = PLAETZE[k];
+      if(!s || n === undefined) return;
+      if(platzLesen(n)){ plaetzeBesetzt++; return; }
+      if(pruefePlatz(s).fehler){ plaetzeKaputt++; return; }
+      try{ localStorage.setItem(platzSchluessel(n), JSON.stringify(s)); plaetzeZurueck++; }
+      catch(e){ plaetzeKaputt++; }
+    });
+    if(plaetzeZurueck) leisteBauen();
+  }
+
+  const zeilen = [`${dateiname}: ${liste.length} Eintrag/Einträge gelesen`,
+                  `${neu.length} dazugekommen, jetzt ${zeichnungen.length} insgesamt`];
+  if(doppelt) zeilen.push(`${doppelt} waren schon da (übersprungen)`);
+  if(gruende.length){
+    zeilen.push(`${gruende.length} verworfen:`);
+    gruende.slice(0,4).forEach(g => zeilen.push("   " + g));
+    if(gruende.length > 4) zeilen.push(`   … und ${gruende.length-4} weitere`);
+  }
+  // Erst die Zeichnungen, dann die Plaetze - sonst steht die Zeile ueber
+  // uebersprungene Zeichnungen unter denen ueber die Plaetze und man
+  // liest sie auf das Falsche.
+  if(plaetzeZurueck) zeilen.push(`${plaetzeZurueck} Arbeitsplatz/-plätze zurückgeholt`);
+  if(plaetzeBesetzt) zeilen.push(`${plaetzeBesetzt} Platz/Plätze übersprungen (schon belegt)`);
+  if(plaetzeKaputt)  zeilen.push(`${plaetzeKaputt} Platz/Plätze unbrauchbar`);
+  melde(zeilen.join("\n"), gruende.length ? "warn" : (neu.length ? "ok" : "warn"));
+}
+
+// ===================================================================
+// DREI ARBEITSPLAETZE
+// -------------------------------------------------------------------
+// [07.09.2026, Wunsch von Sven] Einen Chart wegstellen und spaeter
+// daran weiterarbeiten. Gemerkt wird der ganze Stand: Muenze,
+// Zeitraster, der Bildausschnitt, die eingeschalteten Indikatoren und
+// alle Zeichnungen.
+//
+// ZWEI ENTSCHEIDUNGEN:
+//
+// 1. Merken und Holen sind ZWEI Gruppen mit je drei Knoepfen, nicht
+//    ein Knopf, der mal das eine und mal das andere tut. Einen solchen
+//    Knopf verwechselt man genau einmal - und dann ist der Stand weg.
+//
+// 2. Ueberschreiben und Holen fragen nach, wenn dabei etwas verloren
+//    ginge. Nach dem Speichern wird ZURUECKGELESEN und verglichen -
+//    "kein Fehler geworfen" ist keine Bestaetigung, dass etwas ankam.
+//    Genau dieser Unterschied hat am 17.08. vier Kurse zerstoert, ohne
+//    dass irgendwo eine Fehlermeldung stand.
+// ===================================================================
+
+function platzSchluessel(n){ return "chartlabor_platz_" + n; }
+
+function platzLesen(n){
+  try{
+    const roh = localStorage.getItem(platzSchluessel(n));
+    if(!roh) return null;
+    const s = JSON.parse(roh);
+    return (s && Array.isArray(s.zeichnungen)) ? s : null;
+  }catch(e){ return null; }
+}
+
+// Kurzbeschreibung fuer den Knopf-Hinweis.
+function platzText(s){
+  if(!s) return "leer";
+  const d = new Date(s.gespeichert);
+  const wann = isNaN(d) ? "?" : d.toLocaleString("de-DE",
+      {day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit"});
+  return `${s.symbol} · ${RAHMEN_NAME[s.rahmen] || s.rahmen} · `
+       + `${s.zeichnungen.length} Zeichnung(en) · ${wann}`;
+}
+
+// Einen gespeicherten Stand pruefen. Er kann aus einer Datei stammen
+// oder von Hand im Browser-Speicher verstellt worden sein.
+function pruefePlatz(s){
+  if(!s || typeof s !== "object") return {fehler:"kein Eintrag"};
+  if(!RAHMEN.includes(s.rahmen)) return {fehler:`unbekanntes Zeitraster "${s.rahmen}"`};
+  if(typeof s.symbol !== "string" || !s.symbol) return {fehler:"keine Münze angegeben"};
+  if(!Number.isFinite(s.i0) || !Number.isFinite(s.i1) || s.i1 <= s.i0)
+    return {fehler:"Bildausschnitt unbrauchbar"};
+  if(!Array.isArray(s.zeichnungen)) return {fehler:"keine Zeichnungen enthalten"};
+  const gueltigeIndi = INDI.map(i => i[0]);
+  const indikatoren = Array.isArray(s.indikatoren)
+      ? s.indikatoren.filter(i => gueltigeIndi.includes(i)) : [];
+  const zeichnungen = [], verworfen = [];
+  s.zeichnungen.forEach((z,k)=>{
+    const e = pruefeZeichnung(z);
+    e.fehler ? verworfen.push(`Nr. ${k+1}: ${e.fehler}`) : zeichnungen.push(e.z);
+  });
+  return {stand:{symbol:s.symbol, rahmen:s.rahmen, i0:Math.round(s.i0),
+                 i1:Math.round(s.i1), indikatoren, zeichnungen,
+                 gespeichert:s.gespeichert}, verworfen};
+}
+
+function merken(n){
+  const alt = platzLesen(n);
+  if(alt && !confirm(`Platz ${n} ist belegt:\n${platzText(alt)}\n\n`
+                   + `Mit dem jetzigen Stand überschreiben?`)) return;
+  const stand = {
+    format: "chartlabor-arbeitsstand",
+    fassung: 1,
+    gespeichert: new Date().toISOString(),
+    symbol: symbol,
+    rahmen: rahmen,
+    i0: i0, i1: i1,
+    indikatoren: [...anIndi],
+    zeichnungen: JSON.parse(JSON.stringify(zeichnungen)),
+  };
+  try{
+    localStorage.setItem(platzSchluessel(n), JSON.stringify(stand));
+  }catch(e){
+    melde(`Platz ${n} konnte nicht gespeichert werden.\n${e.message}`, "fehler");
+    return;
+  }
+  // Gegenprobe: zurueckLESEN und die Werte vergleichen, nicht nur ihre
+  // Anzahl. Ein "hat nicht gemeckert" ist keine Bestaetigung.
+  const probe = platzLesen(n);
+  if(!probe || JSON.stringify(probe.zeichnungen) !== JSON.stringify(stand.zeichnungen)
+            || probe.rahmen !== stand.rahmen || probe.i0 !== stand.i0){
+    melde(`Platz ${n}: gespeichert, aber die Gegenprobe stimmt nicht.\n`
+        + `Bitte nicht darauf verlassen.`, "fehler");
+    return;
+  }
+  leisteBauen();
+  melde(`Auf Platz ${n} gemerkt:\n${platzText(stand)}`, "ok");
+}
+
+async function holen(n){
+  const roh = platzLesen(n);
+  if(!roh){ melde(`Platz ${n} ist leer.`, "warn"); return; }
+  const {stand, fehler, verworfen} = pruefePlatz(roh);
+  if(fehler){ melde(`Platz ${n} ist unbrauchbar: ${fehler}`, "fehler"); return; }
+
+  // Holen ersetzt den jetzigen Stand - das ist die einzige Stelle im
+  // Chartlabor, an der durch Laden etwas verloren gehen kann. Also
+  // fragen, solange etwas da ist.
+  if(zeichnungen.length && !confirm(
+      `Der jetzige Stand wird ersetzt: ${zeichnungen.length} Zeichnung(en).\n\n`
+    + `Platz ${n} holen?\n`
+    + `(Abbrechen, wenn du vorher „💾 Sichern" oder einen freien Platz willst.)`))
+    return;
+
+  zeichnungen = stand.zeichnungen;
+  anIndi = new Set(stand.indikatoren);
+  const muenzeGewechselt = stand.symbol !== symbol;
+  symbol = stand.symbol;
+  const wahl = document.getElementById("symbol");
+  if(wahl) wahl.value = symbol;
+  rahmen = stand.rahmen;
+  zeichnungenSchreiben();          // in den Speicher DIESER Muenze
+  leisteBauen();
+  await laden();                   // holt die Kerzen und liest die Zeichnungen
+  // NACH laden(): das setzt den Bildausschnitt sonst auf die letzten 180.
+  i0 = stand.i0; i1 = stand.i1;
+  zeichne();
+  const zeilen = [`Platz ${n} geholt:`, platzText(stand)];
+  if(muenzeGewechselt) zeilen.push(`Münze auf ${symbol} umgestellt.`);
+  if(verworfen && verworfen.length){
+    zeilen.push(`${verworfen.length} Zeichnung(en) waren unbrauchbar:`);
+    verworfen.slice(0,3).forEach(v => zeilen.push("   " + v));
+  }
+  melde(zeilen.join("\n"), verworfen && verworfen.length ? "warn" : "ok");
+}
+
+
+document.getElementById("sichern").onclick = sichern;
+document.getElementById("einlesen").onclick = ()=>{
+  document.getElementById("dateiwahl").click();
+};
+document.getElementById("dateiwahl").onchange = e=>{
+  const datei = e.target.files && e.target.files[0];
+  if(!datei) return;
+  const leser = new FileReader();
+  leser.onload  = ()=>{ einlesen(String(leser.result), datei.name); e.target.value = ""; };
+  // Kein stilles Scheitern: auch ein Lesefehler wird gesagt.
+  leser.onerror = ()=>{ melde(`${datei.name} konnte nicht gelesen werden.`, "fehler");
+                        e.target.value = ""; };
+  leser.readAsText(datei);
+};
+document.getElementById("meldung").onclick = function(){
+  this.hidden = true; zeichne();
+};
+
+
+window.addEventListener("resize", groesseAnpassen);
+// Die Bedienleiste bricht je nach Fensterbreite in zwei oder drei Zeilen
+// um. Dann aendert sich die Hoehe der Buehne, OHNE dass das Fenster sich
+// aendert - ein resize-Ereignis kommt dabei nicht. Deshalb zusaetzlich
+// die Buehne selbst beobachten.
+if(window.ResizeObserver){
+  new ResizeObserver(()=>groesseAnpassen()).observe(document.getElementById("buehne"));
+}
+// Erst nachsehen, welche Maerkte es gibt - dann die Leiste bauen,
+// sonst waeren die Zeitrasterknoepfe beim ersten Bild alle frei.
+// Das Alter waechst, waehrend die Seite offen steht. Einmal je Minute
+// nachsehen genuegt - auf die Sekunde kommt es bei einer Warnung nicht
+// an, die von Tagen handelt.
+setInterval(alterPruefen, 60000);
+
+uebersichtLaden().then(()=>{
+  leisteBauen();
+  groesseAnpassen();
+  laden();
+});
+</script>

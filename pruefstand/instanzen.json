@@ -1,0 +1,65 @@
+{
+  "_cleanup": "[CLEANUP-KEEP] Pruefstand-Datei, nicht archivieren",
+  "_stand_utc": "2026-10-15T10:20:00+00:00",
+  "_python": "Python ist im Bash NICHT im PATH: \"/c/Users/<BENUTZER>/AppData/Local/Python/pythoncore-3.13-64/python.exe\" (oder py). SQLite nur lesend: sqlite3.connect('file:...?mode=ro', uri=True).",
+  "_regel": "Zahlen verschiedener Instanzen werden nie gemischt (MASTERPROMPT_AGENTEN.md Abschnitt 5, Grundsatz 6).",
+  "instanzen": {
+    "v6": {
+      "pfad": "C:\\Users\\<BENUTZER>\\Desktop\\trading_imperium_v6(21)",
+      "rolle": "Papierhandel, Messinstanz des Profitabilitaets-Berichts (136 Runden E7)",
+      "modus": "paper",
+      "startkapital_usd": 500.0,
+      "muenzen": ["BTC/USDC", "ETH/USDC", "SOL/USDC"],
+      "positionen": {"groesse_pct": 30.0, "max": 3},
+      "kursquelle": "binance",
+      "gebuehrenmodell": "Papier-Gebuehr Bitvavo USDC 0,05 % je Seite (backtest/fees.py bitvavo_usdc, execution/engine.py PAPER_GEBUEHR_BOERSE) plus simulierter Schlupf, Kostenlatte K 0,150 % je Runde, seit E10 (2026-10-14T13:58:25Z). Vorher Bybit Taker 0,25 %. Nur Market-Orders.",
+      "epoche_aktuell": "E13_kleinigkeiten (seit 2026-10-15T10:03:04Z), Liste in config_epochs.json und pruefstand/epochen/",
+      "dashboard_port": 5050,
+      "dateien": {
+        "config": "data_store\\config.json",
+        "handelsliste": "data_store\\trades_v5.json",
+        "zustand": "data_store\\bot_state.json (open_positions_backup gilt, open_positions ist tot)",
+        "kontokurve_kurz": "data_store\\equity_history.json (500 Werte)",
+        "telemetrie": "data_store\\telemetrie.db",
+        "nachlauf": "data_store\\nachlauf.db",
+        "schatten_universum": "data_store\\schatten_universum.db",
+        "positionsverlauf": "data_store\\positionsverlauf.db",
+        "system_log": "data_store\\system.log",
+        "epochen": "config_epochs.json",
+        "zielgroessen": "config_zielgroessen.json",
+        "patches": "patches_nach_27_08\\"
+      },
+      "geschuetzt_nie_schreiben": ["docs\\forschungsprogramm_2026-07\\forschung.db"],
+      "aufgaben": ["TI6-Tagescheck", "TI6-Sammler", "TI6-OneDriveWacht", "TI6-Wochensicherung", "ForschungCapture"]
+    },
+    "v7": {
+      "pfad": "C:\\Users\\<BENUTZER>\\Desktop\\trading_imperium_v7",
+      "rolle": "Papierhandel mit Warte-Auftraegen (Limit) beim Kauf; Config-Kommentar nennt sie zugleich 'ECHTGELD-INSTANZ' (offen)",
+      "modus": "paper",
+      "startkapital_usd": 500.0,
+      "muenzen": ["BTC/USDC", "ETH/USDC", "SOL/USDC"],
+      "positionen": {"groesse_pct": 50.0, "max": 1},
+      "kursquelle": "binance",
+      "handelsboerse_konfiguriert": "bybit.eu",
+      "gebuehrenmodell": "Papier-Gebuehr Bitvavo USDC 0,05 % je Seite, Maker = Taker (backtest/fees.py bitvavo_usdc, core/kosten.py) plus simulierter Schlupf, Kostenlatte K 0,150 % je Runde, seit L9 (2026-10-14T13:59:20Z). Vorher Maker 0,10 % / Taker 0,25 % (Bybit).",
+      "epoche_aktuell": "L12_kleinigkeiten (seit 2026-10-15T10:03:05Z), Liste in config_epochs.json und pruefstand/epochen/",
+      "dashboard_port": 5070,
+      "cockpit_port": 8170,
+      "dateien": {
+        "config": "data_store\\config.json",
+        "handelsliste": "data_store\\trades_v5.json",
+        "zustand": "data_store\\bot_state.json",
+        "telemetrie": "data_store\\telemetrie.db",
+        "nachlauf": "data_store\\nachlauf.db",
+        "schatten_universum": "data_store\\schatten_universum.db",
+        "epochen": "config_epochs.json"
+      },
+      "aufgaben": ["TI7-Tagescheck", "SchattenUniversumLIVE", "SchattenUniversumLIVE_Anmeldung"]
+    }
+  },
+  "nicht_instanzen": {
+    "C:\\trading_imperium_v6(21)": "leerer Ordner (0 Dateien), Rest vom Umzug",
+    "C:\\Users\\<BENUTZER>\\_ALT_v6_20260903": "Archiv, nur docs\\ (Capture bis 03.09.2026)",
+    "V4": "v4_referenz\\ und v4_data\\ im v6-Ordner, nie mit v6/v7 mischen"
+  }
+}

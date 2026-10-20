@@ -1,0 +1,88 @@
+{
+ "erstellt": "2026-10-14",
+ "fenster_tage": 91,
+ "schritt_tage": 7,
+ "daten_bis": "2026-10-13",
+ "gruppen": {
+  "B K2 | unter": {
+   "fenster": 209,
+   "investiert_pct_band_10_90": [
+    0.0,
+    31.7
+   ],
+   "investiert_pct_median": 0.0,
+   "runden_je_monat_band_10_90": [
+    0.0,
+    3.01
+   ],
+   "runden_je_monat_median": 0.0,
+   "rendite_91t_pct_band_10_90": [
+    -10.31,
+    13.81
+   ],
+   "rendite_91t_pct_median": 0.0,
+   "max_rueckgang_91t_pct_p10": -20.53,
+   "anteil_fenster_besser_als_m3_pct": 33.5
+  },
+  "C K1 | unter": {
+   "fenster": 209,
+   "investiert_pct_band_10_90": [
+    9.2,
+    44.7
+   ],
+   "investiert_pct_median": 25.0,
+   "runden_je_monat_band_10_90": [
+    5.02,
+    12.38
+   ],
+   "runden_je_monat_median": 8.36,
+   "rendite_91t_pct_band_10_90": [
+    -12.37,
+    23.78
+   ],
+   "rendite_91t_pct_median": -3.96,
+   "max_rueckgang_91t_pct_p10": -21.16,
+   "anteil_fenster_besser_als_m3_pct": 42.1
+  },
+  "B K2 | ueber": {
+   "fenster": 228,
+   "investiert_pct_band_10_90": [
+    33.4,
+    78.6
+   ],
+   "investiert_pct_median": 58.25,
+   "runden_je_monat_band_10_90": [
+    2.01,
+    6.36
+   ],
+   "runden_je_monat_median": 3.68,
+   "rendite_91t_pct_band_10_90": [
+    -13.91,
+    111.17
+   ],
+   "rendite_91t_pct_median": 11.81,
+   "max_rueckgang_91t_pct_p10": -23.65,
+   "anteil_fenster_besser_als_m3_pct": 53.1
+  },
+  "C K1 | ueber": {
+   "fenster": 228,
+   "investiert_pct_band_10_90": [
+    35.6,
+    79.1
+   ],
+   "investiert_pct_median": 59.349999999999994,
+   "runden_je_monat_band_10_90": [
+    2.01,
+    7.36
+   ],
+   "runden_je_monat_median": 4.01,
+   "rendite_91t_pct_band_10_90": [
+    -13.21,
+    116.65
+   ],
+   "rendite_91t_pct_median": 14.395,
+   "max_rueckgang_91t_pct_p10": -23.74,
+   "anteil_fenster_besser_als_m3_pct": 54.8
+  }
+ }
+}

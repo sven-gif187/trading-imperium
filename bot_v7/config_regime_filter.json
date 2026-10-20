@@ -1,0 +1,16 @@
+{
+  "_comment": "Regime-Filter: blockt NEUE Kaeufe nur bei bestaetigtem Abwaertstrend (>= min_confirmations von 3 Signalen). Offene Positionen + Stop-Loss bleiben unberuehrt. Auto-Resume sobald Bestaetigungen < min_confirmations. enabled:false schaltet komplett aus. min_confirmations hoeher = vorsichtiger blocken (3 = nur wenn ALLE drei feuern), niedriger = aggressiver warten.",
+  "_messung_10_08_2026": "min_confirmations 2 -> 3, begruendet durch regime_filter_messung.py: geblockte Kaeufe waren nach 4h im Mittel -0.417% (Block sparte), nach 24h +1.056% und nach 48h +3.643% (Block kostete). Der Filter faengt den Ruecksetzer und verpasst die Erholung. Da Positionen ueber Stunden bis Tage laufen, ueberwiegt der Nachteil. EINSCHRAENKUNG: die Faelle sind nicht unabhaengig (Pruefung alle 12s zaehlt dieselbe Marktlage mehrfach) - Richtung belastbar, Prozentzahlen nicht. Zurueckstellen auf 2, wenn der adaptive Waechter (features/regime_adaptiv.py) das meldet.",
+  "enabled": false,
+  "min_confirmations": 2,
+  "signals": {
+    "below_ema": true,
+    "mtf_bearish": true,
+    "regime_bear": true,
+    "cycle_bear": true
+  },
+  "diag": false,
+  "_zuletzt_geaendert": "2026-08-15T07:47:32 durch regime_adaptiv: Geblockte Kaeufe haetten im Mittel -0.64 % verloren (99 Stunden). Der Filter schuetzt - strenger stellen.",
+  "_abgeschaltet_am": "2026-09-15T12:23:36",
+  "_abgeschaltet_warum": "Sven am 15.09.2026. Vor dem Filter steht seit L2 das Fraktal-Tor, das nur noch in Konfluenzzonen kauft. Der Filter blockte danach jeden Kauf (3 von 2 noetigen Bestaetigungen) - der Bot handelte seit 05:34 nicht mehr. Die Messungen vom 10.08. und 15.08., die fuer den Filter sprachen, entstanden OHNE Tor davor und betreffen damit eine andere Stichprobe: damals blockte er Trendfolge-Kaeufe am Hoch. Was er mit Tor davor noch bringt, ist ungemessen - Epoche L3 ist die Messung. Wieder einschalten: enabled auf true."
+}

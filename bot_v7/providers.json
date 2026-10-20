@@ -1,0 +1,79 @@
+[
+  {
+    "provider_name": "ForexSignals.com",
+    "market_type": "forex",
+    "ranking_position": 1,
+    "blind_test_win_rate": 0.75,
+    "blind_test_profit_factor": 2.5,
+    "blind_test_max_drawdown": 0.14,
+    "verification_type": "live_MT4_blind_test_plus_Myfxbook",
+    "claimed_marketing_win_rate": 0.72,
+    "notes": "Community-driven signals; ~28% annual return in blind tests; drawdown unter 15%."
+  },
+  {
+    "provider_name": "1000PipBuilder",
+    "market_type": "forex",
+    "ranking_position": 2,
+    "blind_test_win_rate": 0.78,
+    "blind_test_profit_factor": 2.3,
+    "blind_test_max_drawdown": 0.12,
+    "verification_type": "live_MT4_blind_test_plus_Myfxbook",
+    "claimed_marketing_win_rate": 0.81,
+    "notes": "Myfxbook-verifizierter Track-Record; konservatives Risiko, niedrige Drawdowns."
+  },
+  {
+    "provider_name": "FXLeaders",
+    "market_type": "forex_multi",
+    "ranking_position": 3,
+    "blind_test_win_rate": 0.76,
+    "blind_test_profit_factor": 2.2,
+    "blind_test_max_drawdown": 0.15,
+    "verification_type": "live_MT4_blind_test_plus_Myfxbook",
+    "claimed_marketing_win_rate": 0.76,
+    "notes": "Hohe Winrate; viele kostenlose Signale; breit ueber Forex und weitere Maerkte."
+  },
+  {
+    "provider_name": "Learn2Trade",
+    "market_type": "forex_crypto",
+    "ranking_position": 4,
+    "blind_test_win_rate": 0.72,
+    "blind_test_profit_factor": 2.4,
+    "blind_test_max_drawdown": 0.15,
+    "verification_type": "live_MT4_blind_test",
+    "claimed_marketing_win_rate": 0.82,
+    "notes": "Balanciert Winrate und Profit Factor; Telegram-basierte Signale fuer Forex und Crypto."
+  },
+  {
+    "provider_name": "Signal Start",
+    "market_type": "forex_multi",
+    "ranking_position": 5,
+    "blind_test_win_rate": 0.74,
+    "blind_test_profit_factor": 2.8,
+    "blind_test_max_drawdown": 0.15,
+    "verification_type": "live_MT4_blind_test_plus_Myfxbook",
+    "claimed_marketing_win_rate": 0.74,
+    "notes": "Hoechster Profit Factor in den Blindtests; Copy-Trading-aehnliches Modell."
+  },
+  {
+    "provider_name": "Pipchasers",
+    "market_type": "forex",
+    "ranking_position": 6,
+    "blind_test_win_rate": 0.71,
+    "blind_test_profit_factor": 2.1,
+    "blind_test_max_drawdown": 0.15,
+    "verification_type": "live_MT4_blind_test",
+    "claimed_marketing_win_rate": 0.71,
+    "notes": "Solide, aber leicht niedrigere Winrate und Profit Factor im Vergleich zur Top-Gruppe."
+  },
+  {
+    "provider_name": "United Signals",
+    "market_type": "forex",
+    "ranking_position": 7,
+    "blind_test_win_rate": 0.73,
+    "blind_test_profit_factor": 2.0,
+    "blind_test_max_drawdown": 0.15,
+    "verification_type": "live_MT4_blind_test",
+    "claimed_marketing_win_rate": 0.73,
+    "notes": "Gute Konsistenz; Teil der Top-7 blind getesteten Provider mit verifizierten Profiten."
+  }
+]

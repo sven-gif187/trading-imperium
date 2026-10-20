@@ -1,0 +1,5 @@
+ERLEDIGT: Epoche E13_kleinigkeiten (v6) bzw. L12_kleinigkeiten (v7) seit 15.10.2026 10:03 UTC. risk/exit_rules.py TRAIL_MARGE_PCT 0,05 -> 0,10 (Entscheidung Sven E5b). Nachzieh-Start = Nulllinie + 0,10: 0,85 -> 1,11 / 1,0 -> 1,26 / 1,3 -> 1,57. W3 I1 und I2 gruen. Handbuch 10.17.
+ERLEDIGT: Befund 72 in v6 behoben (E13): live/watchdog.py hat jetzt stop(), Uebernahme aus v7 L6. Der STOPPEN-Knopf bricht das Abschalten nicht mehr vor dem Speichern des Positionsstands ab. Nach stop() startet check() nichts mehr neu.
+ERLEDIGT: P0-11 in v6 behoben (E13): data/market_data.py baut keine feste Tabelle mit ccxt.coinbasepro mehr (gibt es seit ccxt 4 nicht), sondern holt die eingestellte Boerse per getattr wie v7. Kein "Client-Fehler (1. Versuch)" mehr bei jedem Start, derselbe Binance-Client.
+ERLEDIGT: maker_schatten.py (v6 und v7) rechnet mit Bitvavo USDC (Taker = Maker = 0,05 %) statt Bybit (0,25 / 0,10). Der Gebuehrenvorteil des Warte-Auftrags ist bei Bitvavo null.
+NOTIZ: execution/exchange_client.py _init_live (v6 und v7) enthaelt weiter ccxt.coinbasepro. Der Weg laeuft nur im Live-Modus, und Live ist ausgeschlossen (kein Echtgeld). Bewusst nicht angefasst.

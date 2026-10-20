@@ -1,0 +1,46 @@
+
+========================================================================================================
+ E2-PLACEBO II  Richtung oder Volatilitaet?  -  Jahr 2  2025-07..2026-07
+ 1514 echte Kaeufe gegen 20 Zufallsziehungen, Seed 20260730
+========================================================================================================
+
+  Fenster 24 h   (echt n=1514)
+    Mass               ECHT | Zufall Mit     min     max |             Urteil
+    medMFE             2.52 |       1.98    1.78    2.11 |         AUSSERHALB
+    medMAE            -2.74 |      -2.23   -2.35   -2.10 |         AUSSERHALB
+    MFE>=2.5          50.33 |      40.75   37.52   43.66 |         AUSSERHALB
+    MAE<=-2.5         53.50 |      45.34   42.73   47.49 |         AUSSERHALB
+    MFE>=5            18.89 |      14.65   12.88   17.04 |         AUSSERHALB
+    MAE<=-5           25.43 |      17.97   16.25   19.68 |         AUSSERHALB
+
+  Fenster 72 h   (echt n=1514)
+    Mass               ECHT | Zufall Mit     min     max |             Urteil
+    medMFE             3.87 |       3.46    3.16    3.69 |         AUSSERHALB
+    medMAE            -5.27 |      -4.11   -4.30   -3.88 |         AUSSERHALB
+    MFE>=2.5          66.58 |      61.51   58.59   64.60 |         AUSSERHALB
+    MAE<=-2.5         73.45 |      67.39   64.99   69.15 |         AUSSERHALB
+    MFE>=5            38.44 |      35.12   30.45   36.72 |         AUSSERHALB
+    MAE<=-5           52.11 |      42.11   40.22   45.05 |         AUSSERHALB
+
+========================================================================================================
+ E2-PLACEBO II  Richtung oder Volatilitaet?  -  Jahr 1  2024-07..2025-07
+ 797 echte Kaeufe gegen 20 Zufallsziehungen, Seed 20260730
+========================================================================================================
+
+  Fenster 24 h   (echt n=797)
+    Mass               ECHT | Zufall Mit     min     max |             Urteil
+    medMFE             3.52 |       2.44    2.25    2.66 |         AUSSERHALB
+    medMAE            -3.06 |      -2.57   -2.72   -2.45 |         AUSSERHALB
+    MFE>=2.5          63.36 |      49.08   46.05   51.94 |         AUSSERHALB
+    MAE<=-2.5         56.71 |      51.00   49.56   53.07 |         AUSSERHALB
+    MFE>=5            33.00 |      22.43   20.70   25.09 |         AUSSERHALB
+    MAE<=-5           29.61 |      23.61   20.95   26.22 |         AUSSERHALB
+
+  Fenster 72 h   (echt n=797)
+    Mass               ECHT | Zufall Mit     min     max |             Urteil
+    medMFE             6.01 |       4.48    4.01    4.75 |         AUSSERHALB
+    medMAE            -5.40 |      -4.58   -4.90   -4.27 |         AUSSERHALB
+    MFE>=2.5          78.04 |      69.19   65.62   71.52 |         AUSSERHALB
+    MAE<=-2.5         75.16 |      69.55   66.37   71.14 |         AUSSERHALB
+    MFE>=5            56.84 |      45.67   43.29   48.31 |         AUSSERHALB
+    MAE<=-5           53.32 |      46.49   43.79   49.18 |         AUSSERHALB

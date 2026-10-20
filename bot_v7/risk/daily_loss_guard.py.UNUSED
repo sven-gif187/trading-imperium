@@ -1,0 +1,205 @@
+"""Daily Loss Guard - Schutzmechanismus fuer Live-Trading.
+
+ALLE Werte sind PROZENTUAL bezogen auf das Tages-Startkapital.
+
+Funktion:
+- Speichert Tages-Startkapital um Mitternacht UTC
+- Misst aktuellen Drawdown gegen Tages-Start
+- Bei -10% (konfigurierbar): Stop -> alle Positionen schliessen + pausieren
+- Reset um Mitternacht
+"""
+import time
+import json
+import os
+from datetime import datetime, timezone
+from typing import Optional
+from core.logger import log
+
+
+class DailyLossGuard:
+    """Ueberwacht den Tagesverlust und stoppt den Bot bei kritischem Drawdown."""
+
+    def __init__(self, config, portfolio_calculator, state_file: str = None):
+        self.config = config
+        self.calculator = portfolio_calculator
+        self.state_file = state_file or "data_store/daily_loss_state.json"
+
+        self.day_start_value: float = 0.0
+        self.day_date: str = ""
+        self.day_start_time: float = 0.0
+        self.is_paused: bool = False
+        self.pause_reason: str = ""
+        self.lowest_value: float = 0.0  # Tagestief
+
+        os.makedirs(os.path.dirname(self.state_file), exist_ok=True)
+        self._load()
+
+    def _today_str(self) -> str:
+        """UTC-Datum als String (z.B. '2026-04-25')."""
+        return datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+    def initialize_day(self, current_value: float, force: bool = False):
+        """Setzt das Tages-Startkapital. Wird automatisch aufgerufen.
+
+        Args:
+            current_value: Aktueller Portfolio-Wert in USD
+            force: True um Reset zu erzwingen (z.B. manueller Neustart)
+        """
+        today = self._today_str()
+        if not force and self.day_date == today and self.day_start_value > 0:
+            return  # Heute schon initialisiert
+
+        self.day_start_value = current_value
+        self.day_date = today
+        self.day_start_time = time.time()
+        self.is_paused = False
+        self.pause_reason = ""
+        self.lowest_value = current_value
+        self._save()
+        log.info("DAILY_GUARD",
+                 f"Tag {today} gestartet: {current_value:,.2f}$ "
+                 f"(Limit: -{self.config.live_safety.max_daily_loss_pct:.1f}%)")
+
+    def check_and_act(self, on_emergency_stop=None) -> dict:
+        """Prueft den aktuellen Drawdown und triggert bei Bedarf den Notfall-Stop.
+
+        Args:
+            on_emergency_stop: Callback der bei Limit-Treffer ausgefuehrt wird
+                              (z.B. Funktion die alle Positionen schliesst)
+
+        Returns:
+            Status-Dict mit aktuellen Werten
+        """
+        # Pruefe Tages-Reset
+        today = self._today_str()
+        if today != self.day_date:
+            current = self.calculator.get_total_value_usd()
+            log.info("DAILY_GUARD", f"Neuer Tag - Reset (gestern: {self.day_start_value:,.2f}$ -> heute: {current:,.2f}$)")
+            self.initialize_day(current, force=True)
+            return self.get_status()
+
+        if not self.config.live_safety.enabled:
+            return self.get_status()
+
+        if self.is_paused:
+            return self.get_status()
+
+        current = self.calculator.get_total_value_usd()
+        if current <= 0 or self.day_start_value <= 0:
+            return self.get_status()
+
+        # Tagestief tracken
+        if current < self.lowest_value:
+            self.lowest_value = current
+
+        loss_pct = ((self.day_start_value - current) / self.day_start_value) * 100.0
+
+        # Limit erreicht?
+        max_loss = self.config.live_safety.max_daily_loss_pct
+        if loss_pct >= max_loss:
+            self._trigger_emergency_stop(current, loss_pct, on_emergency_stop)
+
+        return {
+            "ok": True,
+            "current_value": current,
+            "day_start_value": self.day_start_value,
+            "loss_pct": round(loss_pct, 2),
+            "limit_pct": max_loss,
+            "is_paused": self.is_paused,
+        }
+
+    def _trigger_emergency_stop(self, current: float, loss_pct: float, callback=None):
+        """Notfall-Stop bei Tageslimit-Treffer."""
+        self.is_paused = True
+        self.pause_reason = f"Tagesverlust {loss_pct:.2f}% erreicht (Limit: {self.config.live_safety.max_daily_loss_pct:.1f}%)"
+
+        log.error("DAILY_GUARD",
+                  f"🚨 TAGES-LIMIT ERREICHT! "
+                  f"Verlust: -{loss_pct:.2f}% "
+                  f"({self.day_start_value:,.2f}$ -> {current:,.2f}$)")
+        log.error("DAILY_GUARD", f"🚨 Bot wird pausiert bis morgen ({self._next_day_str()})")
+
+        # Alle Positionen schliessen wenn aktiviert
+        if self.config.live_safety.close_all_on_daily_loss and callback is not None:
+            try:
+                log.warn("DAILY_GUARD", "Schliesse alle offenen Positionen...")
+                callback()
+            except Exception as e:
+                log.error("DAILY_GUARD", f"Emergency-Callback Fehler: {e}")
+
+        self._save()
+
+    def _next_day_str(self) -> str:
+        """UTC-String fuer morgen."""
+        from datetime import timedelta
+        tomorrow = datetime.now(timezone.utc) + timedelta(days=1)
+        return tomorrow.strftime("%Y-%m-%d 00:00 UTC")
+
+    def can_trade(self) -> tuple:
+        """Pruefung ob Bot aktuell traden darf.
+        Returns: (allowed: bool, reason: str)
+        """
+        if not self.config.live_safety.enabled:
+            return (True, "Live-Safety deaktiviert")
+        if self.is_paused:
+            return (False, self.pause_reason)
+        return (True, "OK")
+
+    def manual_resume(self):
+        """Pause manuell aufheben (z.B. nach User-Bestaetigung)."""
+        self.is_paused = False
+        self.pause_reason = ""
+        # Tages-Start auf aktuellen Wert setzen damit Limit nicht sofort wieder triggert
+        current = self.calculator.get_total_value_usd()
+        if current > 0:
+            self.day_start_value = current
+            self.lowest_value = current
+        self._save()
+        log.info("DAILY_GUARD", f"Manuell fortgesetzt - Neuer Tages-Start: {current:,.2f}$")
+
+    def get_status(self) -> dict:
+        """Status fuer Dashboard."""
+        current = self.calculator.get_total_value_usd()
+        loss_pct = 0.0
+        if self.day_start_value > 0:
+            loss_pct = ((self.day_start_value - current) / self.day_start_value) * 100.0
+        return {
+            "day_date": self.day_date,
+            "day_start_value": round(self.day_start_value, 2),
+            "current_value": round(current, 2),
+            "lowest_value": round(self.lowest_value, 2),
+            "loss_pct": round(loss_pct, 2),
+            "limit_pct": self.config.live_safety.max_daily_loss_pct,
+            "is_paused": self.is_paused,
+            "pause_reason": self.pause_reason,
+            "enabled": self.config.live_safety.enabled,
+        }
+
+    def _save(self):
+        try:
+            with open(self.state_file, "w", encoding="utf-8") as f:
+                json.dump({
+                    "day_start_value": self.day_start_value,
+                    "day_date": self.day_date,
+                    "day_start_time": self.day_start_time,
+                    "is_paused": self.is_paused,
+                    "pause_reason": self.pause_reason,
+                    "lowest_value": self.lowest_value,
+                }, f, indent=2)
+        except Exception as e:
+            log.warn("DAILY_GUARD", f"Save: {e}")
+
+    def _load(self):
+        if not os.path.exists(self.state_file):
+            return
+        try:
+            with open(self.state_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                self.day_start_value = data.get("day_start_value", 0.0)
+                self.day_date = data.get("day_date", "")
+                self.day_start_time = data.get("day_start_time", 0.0)
+                self.is_paused = data.get("is_paused", False)
+                self.pause_reason = data.get("pause_reason", "")
+                self.lowest_value = data.get("lowest_value", 0.0)
+        except Exception as e:
+            log.warn("DAILY_GUARD", f"Load: {e}")

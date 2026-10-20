@@ -1,0 +1,18 @@
+Daten: 11 Coins, 2025-07-29 .. 2026-07-29, Kerzen(BTC)=35040
+
+REF Original-Lauf (unveraendert, wie Studie S.2)         Trades= 1480  mit NK=  33  Rate=  2.2%  Stufen=[(1, 1447), (2, 32), (3, 1)]
+V0  instrumentiert, identische Regeln                    Trades= 1480  mit NK=  33  Rate=  2.2%  Stufen=[(1, 1447), (2, 32), (3, 1)]
+     V0-Blockaden je NK-Gelegenheit: {'stunden_gate': 184, 'preis_nicht_2pct': 38517, 'stufen_deckel': 5, 'cooldown': 0, 'gekauft': 34, 'kein_cash': 221}
+     V0: geschlossene Positionen, deren Tief je -2% erreichte: 541/1480 = 36.6%
+V0a wie V0, aber ALTE Leiter ohne Breakeven              Trades= 1375  mit NK=  45  Rate=  3.3%  Stufen=[(1, 1330), (2, 40), (3, 5)]
+     V0a: Positionen mit Tief <= -2%: 734/1375 = 53.4%
+V1  V0 + Nachkaeufe ohne Stunden-Gate (Cooldown je Coin) Trades= 1515  mit NK= 106  Rate=  7.0%  Stufen=[(1, 1409), (2, 94), (3, 12)]
+     V1-Blockaden: {'stunden_gate': 0, 'preis_nicht_2pct': 40329, 'stufen_deckel': 298, 'cooldown': 2, 'gekauft': 118, 'kein_cash': 294}
+V2  V1 + bis 2 neue Pos. je 15m-Kerze                    Trades= 1467  mit NK=  56  Rate=  3.8%  Stufen=[(1, 1411), (2, 48), (3, 8)]
+V3  V2 + Nachkauf-Deckel entfernt (vor 29.07.)           Trades= 1467  mit NK=  56  Rate=  3.8%  Stufen=[(1, 1411), (2, 48), (3, 8)]
+V4  V3 + ALTE Leiter ohne Breakeven (Vor-29.07.-Zustand) Trades= 1280  mit NK=  50  Rate=  3.9%  Stufen=[(1, 1230), (2, 43), (3, 6), (4, 1)]
+     V4-Blockaden: {'stunden_gate': 0, 'preis_nicht_2pct': 48376, 'stufen_deckel': 0, 'cooldown': 3, 'gekauft': 58, 'kein_cash': 473}
+V5  V4 + Intra-Kerzen-Nachkauf (Rennen NK vs. Stop)      Trades=  916  mit NK= 213  Rate= 23.3%  Stufen=[(1, 703), (2, 171), (3, 39), (4, 3)]
+     V5-Blockaden: {'stunden_gate': 0, 'preis_nicht_2pct': 37943, 'stufen_deckel': 0, 'cooldown': 20, 'gekauft': 258, 'kein_cash': 1596}
+V5n HEUTIGE Regeln (Deckel 3, Ratsche) + Live-Frequenz   Trades= 1329  mit NK= 235  Rate= 17.7%  Stufen=[(1, 1094), (2, 219), (3, 16)]
+     V5n-Blockaden: {'stunden_gate': 0, 'preis_nicht_2pct': 33962, 'stufen_deckel': 264, 'cooldown': 12, 'gekauft': 251, 'kein_cash': 1256}

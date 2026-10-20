@@ -1,0 +1,74 @@
+Journal: 2719 Eintraege, 2026-07-05T00:20:42 .. 2026-08-04T00:35:16
+
+====================================================================================================
+ 1.3  DCA-ZUORDNUNG - welcher Strategie gehoert der Nachkauf?
+====================================================================================================
+
+  DCA-Eintraege ohne offene Position (nicht zuordenbar): 6, Volumen 509.78$
+
+  Strategie             Erst    ErstVol   DCA     DCA-Vol  DCA/Erst
+  ICHIMOKU_CLOUD         251      59823$   361       15294$     0.26x
+  EMA_TREND              158      39855$   278       12269$     0.31x
+  RSI_OVERSOLD            94      19820$   140        5775$     0.29x
+  FIBONACCI_SUPPORT       76      19185$   119        5054$     0.26x
+  MOMENTUM_BREAKOUT       44      20354$    56        2390$     0.12x
+  DCA_FEAR_GREED          30       7525$    62        2183$     0.29x
+  MACD_CROSS              17       3618$    30        1624$     0.45x
+  STOCHRSI_REVERSAL       32      10851$    34        1196$     0.11x
+  MULTI_SIGNAL             7       1574$    16         609$     0.39x
+  TSI_SIGNAL               8       2183$    15         572$     0.26x
+  RSI_DIVERGENCE           9       1696$    12         367$     0.22x
+
+====================================================================================================
+ 1.3  BRUTTO ODER NETTO? Gebuehrenluecke je Strategie
+====================================================================================================
+
+  Formel: fehlend = Einsatz * (FEE_VERKAUF + FEE_KAUF)
+          FEE_VERKAUF=0.002 (Slippage+Fee, in pnl NICHT enthalten)
+          FEE_KAUF   =0.001 (als Mengenabzug realisiert, faellt aus der Differenzformel)
+
+  Strategie             Sells    pnl roh     Einsatz    Gebuehr   pnl netto  je Trade
+  RSI_OVERSOLD             93    125.36$      25290$     75.87$      49.49$    0.532$
+  FIBONACCI_SUPPORT        69     71.89$      23097$     69.29$       2.60$    0.038$
+  STOCHRSI_REVERSAL        32     58.29$      11752$     35.26$      23.03$    0.720$
+  MANUELL                   1     -0.14$         49$      0.15$      -0.29$   -0.287$
+  RSI_DIVERGENCE            8    -11.66$       1763$      5.29$     -16.95$   -2.118$
+  MOMENTUM_BREAKOUT        44    -19.33$      22745$     68.23$     -87.56$   -1.990$
+  MULTI_SIGNAL              7    -25.95$       2183$      6.55$     -32.50$   -4.643$
+  MACD_CROSS               17    -50.32$       5242$     15.73$     -66.05$   -3.885$
+  DCA_FEAR_GREED           28    -67.96$       8668$     26.01$     -93.97$   -3.356$
+  TSI_SIGNAL                9    -85.17$       2377$      7.13$     -92.30$  -10.256$
+  EMA_TREND               154   -223.09$      51050$    153.15$    -376.24$   -2.443$
+  ICHIMOKU_CLOUD          249   -242.79$      74801$    224.40$    -467.19$   -1.876$
+
+  SUMME netto ueber alle Strategien: -1157.92$
+
+====================================================================================================
+ 1.4  VERTEILUNG UND TAIL-RISIKO je Strategie
+====================================================================================================
+
+  Strategie               n     Summe   Median      p10      p90   maxVerl  Top3 %  nachTop3
+  RSI_OVERSOLD           93   125.36$    1.75$   -9.95$    5.72$   -36.98$   87.1%    16.23$
+  FIBONACCI_SUPPORT      69    71.89$    3.39$  -13.68$   10.56$   -42.73$  121.7%   -15.57$
+  STOCHRSI_REVERSAL      32    58.29$    0.89$    0.17$    5.05$    -9.36$   63.8%    21.11$
+  RSI_DIVERGENCE          8   -11.66$    0.77$  -13.17$    6.07$   -20.10$    nan%   -28.50$
+  MOMENTUM_BREAKOUT      44   -19.33$    1.22$  -11.26$    4.79$   -31.23$    nan%   -66.01$
+  MULTI_SIGNAL            7   -25.95$    1.96$  -16.64$    6.12$   -28.01$    nan%   -43.42$
+  MACD_CROSS             17   -50.32$    0.67$  -10.78$    2.25$   -11.68$    nan%   -62.72$
+  DCA_FEAR_GREED         28   -67.96$    2.62$  -18.85$    6.83$   -22.32$    nan%   -98.12$
+  TSI_SIGNAL              9   -85.17$    0.88$  -32.54$    6.86$   -39.07$    nan%  -100.88$
+  EMA_TREND             154  -223.09$    1.24$  -13.40$    5.61$   -31.78$    nan%  -255.13$
+  ICHIMOKU_CLOUD        249  -242.79$    0.92$  -11.40$    5.44$  -139.31$    nan%  -315.78$
+
+====================================================================================================
+ 1.4  TAIL-RISIKO: wie viele Gewinner frisst der groesste Verlust?
+====================================================================================================
+
+  Strategie              maxVerl  avgGewinn   frisst  Gewinner   Puffer
+  RSI_OVERSOLD           -36.98$     4.030$     9.2x        78     8.5x
+  FIBONACCI_SUPPORT      -42.73$     7.694$     5.6x        48     8.6x
+  STOCHRSI_REVERSAL       -9.36$     2.451$     3.8x        30     7.9x
+  RSI_DIVERGENCE         -20.10$     3.107$     6.5x         6     0.9x
+  MOMENTUM_BREAKOUT      -31.23$     3.103$    10.1x        35     3.5x
+  MULTI_SIGNAL           -28.01$     4.857$     5.8x         4     0.7x
+  MACD_CROSS         

@@ -1,0 +1,12 @@
+========================================================================================================
+ NACHTRAGSMESSUNG T-034..T-041 - tragen die blockierten
+ Strategien einen Richtungsvorteil?  Seed 20260730
+ KEINE Runde 3. Programm nach Regel 13 beendet.
+========================================================================================================
+
+  J2: 11 Coins, 8761 1h-Balken je Coin
+    T-034 RSI_OVERSOLD       +/-2,5%/72h  n=20129 P(auf)=49.09% KI[45.19;52.96] Plc=37.07 Schwelle=63.51% unter
+    T-034 RSI_OVERSOLD       +/-5%/7d     n=19079 P(auf)=46.05% KI[41.09;51.15] Plc=37.40 Schwelle=56.76% unter
+    T-034 RSI_OVERSOLD       +/-7%/14d    n=19004 P(auf)=46.15% KI[40.84;51.58] Plc=40.04 Schwelle=54.83% unter
+    T-035 EMA_TREND          +/-2,5%/72h  n=40799 P(auf)=46.28% KI[42.75;49.83] Plc=54.43 Schwelle=63.26% unter
+    T-035 EMA_TREND          +/-5%/7d     n=38489 P(auf)=45.27% KI[41.02;49.90] Plc=50.78 Schwelle=56.63% unter

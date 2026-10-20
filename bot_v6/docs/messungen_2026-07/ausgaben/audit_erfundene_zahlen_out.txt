@@ -1,0 +1,206 @@
+====================================================================================================
+ AUDIT: WO ERFINDET DER BOT ZAHLEN?
+====================================================================================================
+  Durchsucht: ['app.py', 'agents', 'risk', 'portfolio', 'execution', 'runtime', 'features', 'models', 'data', 'core']
+  Ausgenommen: v4_referenz, docs, tests, .bak-Dateien
+
+----------------------------------------------------------------------------------------------------
+ [A] Fear&Greed-Default  -  9 Fundstellen
+----------------------------------------------------------------------------------------------------
+
+  app.py  (5x)
+    :723   fg = self.state.get("fear_greed", 50)  # Aus dem gecachten Wert
+    :930   entry["fear_greed_at_entry"] = self.state.get("fear_greed", 50)
+    :1079  fg = self.state.get("fear_greed", 50)
+    :1171  _fg_entry = self.state.get("fear_greed", 50)
+    :1736  fg = self.state.get("fear_greed", 50)
+
+  agents\dca_advanced.py  (1x)
+    :21    def should_dca(self, symbol, fear_greed=50, volatility=0, regime="UNKNOWN") -> Dict:
+
+  risk\adaptive_sizing.py  (1x)
+    :22    regime="UNKNOWN", fear_greed=50) -> Dict:
+
+  features\bottom_detection.py  (1x)
+    :22    def evaluate(self, fear_greed=50, cycle_phase="UNKNOWN",
+
+  features\portfolio_features.py  (1x)
+    :14    fear_greed=50, daily_pnl=0) -> Dict:
+
+----------------------------------------------------------------------------------------------------
+ [A] Gewicht-Default  -  6 Fundstellen
+----------------------------------------------------------------------------------------------------
+
+  models\rl_feedback.py  (3x)
+    :39    current = self.weights.get(strategy_id, 1.0)
+    :59    return self.weights.get(strategy_id, 1.0)
+    :71    w = self.weights.get(strat, 1.0)
+
+  models\v4_calibrator.py  (2x)
+    :108   return self.weights.get(strategy_id, 1.0)  # Unbekannte: Default 1.0
+    :112   return self.weights.get(strategy_id, 1.0) == 0.0
+
+  models\meta_voting.py  (1x)
+    :108   weight = self.agent_weights.get(agent, 1.0)
+
+----------------------------------------------------------------------------------------------------
+ [A] Indikator aus dict mit Default  -  14 Fundstellen
+----------------------------------------------------------------------------------------------------
+
+  agents\signal_agent.py  (7x)
+    :71    rsi = ind.get("rsi", 50)
+    :72    adx = ind.get("adx", 20)
+    :73    macd = ind.get("macd", 0)
+    :74    macd_sig = ind.get("macd_signal", 0)
+    :96    ema20 = ind.get("ema20", 0)
+    :97    ema50 = ind.get("ema50", 0)
+    ... und 1 weitere
+
+  agents\context_agent.py  (3x)
+    :175   market_lines.append(f"{snap.symbol}: {snap.close:,.2f}$ | RSI:{ind.get('rsi', 50):.0f} "
+    :176   f"ADX:{ind.get('adx', 20):.0f} | {snap.regime.value}")
+    :333   rsi = ind.get("rsi", 50)
+
+  app.py  (2x)
+    :1270  _ij_rsi = float(_ij_ind.get("rsi", 0) or 0)
+    :1271  _ij_adx = float(_ij_ind.get("adx", 0) or 0)
+
+  agents\grid_bot.py  (1x)
+    :92    adx = snapshot.indicators.get("adx", 100)
+
+  models\signal_model.py  (1x)
+    :47    vol_ratio = row.get("volume_ratio", 1)
+
+----------------------------------------------------------------------------------------------------
+ [A] Indikator-Fallback  -  12 Fundstellen
+----------------------------------------------------------------------------------------------------
+
+  agents\v4_strategies.py  (12x)
+    :87    rsi = _safe_get(df, 'RSI', 50)
+    :88    adx = _safe_get(df, 'ADX', 20)
+    :105   adx = _safe_get(df, 'ADX', 20)
+    :118   adx = _safe_get(df, 'ADX', 20)
+    :131   span_a = _safe_get(df, 'ICH_span_a', 0)
+    :132   span_b = _safe_get(df, 'ICH_span_b', 0)
+    ... und 6 weitere
+
+----------------------------------------------------------------------------------------------------
+ [B] or-Fallback auf Zahl  -  1 Fundstellen
+----------------------------------------------------------------------------------------------------
+
+  features\regime_detection.py  (1x)
+    :111   total = sum(scores.values()) or 1
+
+----------------------------------------------------------------------------------------------------
+ [C] Division mit Ersatznenner  -  6 Fundstellen
+----------------------------------------------------------------------------------------------------
+
+  agents\v4_strategies.py  (3x)
+    :183   if abs(price - fibs['78.6']) / max(price, 1e-9) < 0.005 and rsi < 40:
+    :185   elif abs(price - fibs['61.8']) / max(price, 1e-9) < 0.005:
+    :187   elif abs(price - fibs['38.2']) / max(price, 1e-9) < 0.005 and macd_bull:
+
+  portfolio\correlation_guard.py  (2x)
+    :75    avg_corr = total_corr / max(corr_count, 1)
+    :115   avg = total_corr / max(pairs, 1)
+
+  models\v4_calibrator.py  (1x)
+    :103   pnl_factor = min(avg_pnl / max(max_avg, 0.01), 1.0)
+
+----------------------------------------------------------------------------------------------------
+ [C] except mit Zahl-Rueckgabe  -  4 Fundstellen
+----------------------------------------------------------------------------------------------------
+
+  portfolio\manager.py  (3x)
+    :200   except Exception:
+    :247   except Exception:
+    :330   except Exception:
+
+  risk\exit_rules.py  (1x)
+    :106   except Exception:
+
+----------------------------------------------------------------------------------------------------
+ [C] if x else Zahl (Division geschuetzt)  -  29 Fundstellen
+----------------------------------------------------------------------------------------------------
+
+  portfolio\rebalancer.py  (4x)
+    :29    pct = (val / total_equity * 100) if total_equity > 0 else 0
+    :33    cash_pct = ((total_equity - invested) / total_equity * 100) if total_equity > 0 else 100
+    :55    qty = amount_usd / price if price > 0 else 0
+    :84    curr_pct = (val / total_equity * 100) if total_equity > 0 else 0
+
+  risk\exposure.py  (3x)
+    :29    pct = (new_total / total_equity * 100) if total_equity > 0 else 0
+    :44    pct = (new_total / total_equity * 100) if total_equity > 0 else 0
+    :57    pct = (val / total_equity * 100) if total_equity > 0 else 0
+
+  portfolio\agent.py  (2x)
+    :112   coin_pct = (coin_val / total_equity * 100) if total_equity > 0 else 0
+    :130   sec_pct = ((sec_val + amount) / total_equity * 100) if total_equity > 0 else 0
+
+  execution\futures_trader.py  (2x)
+    :66    qty = round((amount_usd * leverage) / entry_price, 6) if entry_price > 0 else 0
+    :86    qty = round((amount_usd * leverage) / entry_price, 6) if entry_price > 0 else 0
+
+  runtime\exit_monitor.py  (2x)
+    :129   fall_from_high = ((highest - current_price) / highest) * 100 if highest > 0 else 0
+    :141   tp_price = entry * (1 + tp_pct / 100) if tp_pct > 0 else 0
+
+  app.py  (1x)
+    :693   tp_threshold = tp_pct if tp_pct > 0 else 3.0
+
+  agents\context_agent.py  (1x)
+    :82    local_score = (self.bull_count / total) if total > 0 else 0.5
+
+  agents\cycle_theory.py  (1x)
+    :57    self.cycle_progress = round((self.days_since_halving / cycle_length) * 100, 1) if cycle_length > 0 else 0
+
+  agents\signal_agent.py  (1x)
+    :206   fall_from_high = ((highest_price - price) / highest_price * 100) if highest_price > 0 else 0
+
+  risk\engine.py  (1x)
+    :179   intent.amount_usd / total_eq * 100 + 5 if total_eq > 0 else 25)
+
+  portfolio\calculator.py  (1x)
+    :182   amount_pct = (target_amount / total * 100) if total > 0 else 0
+
+  features\impact_journal.py  (1x)
+    :109   pnl_pct = ((exit_price / entry_price) - 1) * 100 if entry_price > 0 else 0
+
+  features\multi_timeframe.py  (1x)
+    :61    final_score = weighted_score / total_weight if total_weight > 0 else 0
+
+  features\portfolio_features.py  (1x)
+    :41    cash_pct = (usdc / total_equity * 100) if total_equity > 0 else 100
+
+  features\vwap_agent.py  (1x)
+    :37    pct_diff = ((current_price - current_vwap) / current_vwap) * 100 if current_vwap > 0 else 0
+
+  models\ensemble_signal.py  (1x)
+    :46    score = weighted_sum / total_weight if total_weight > 0 else 0.5
+
+  models\meta_voting.py  (1x)
+    :111   return weighted_sum / total_weight if total_weight > 0 else 0.5
+
+  data\cache.py  (1x)
+    :126   hit_rate = (self._hits / total * 100) if total > 0 else 0
+
+  data\dxy_filter.py  (1x)
+    :58    self.current_dxy = round((1 / eur_rate) * 100, 2) if eur_rate > 0 else 100
+
+  data\orderbook_depth.py  (1x)
+    :46    imbalance = (bid_vol - ask_vol) / total if total > 0 else 0
+
+  data\source_health.py  (1x)
+    :106   return (summe / gewicht) if gewicht > 0 else 0.5
+
+====================================================================================================
+ GESAMT: 81 Fundstellen
+====================================================================================================
+
+  LESART: Nicht jede Fundstelle ist ein Fehler. Entscheidend ist:
+    - Trifft der Ersatzwert eine ENTSCHEIDUNG?          -> gefaehrlich
+    - Erscheint er als KENNZAHL in einem Bericht?       -> gefaehrlich
+    - Ist er dokumentiert und bewusst konservativ?      -> in Ordnung
+    - Schuetzt er nur vor Division durch Null?          -> meist harmlos
+

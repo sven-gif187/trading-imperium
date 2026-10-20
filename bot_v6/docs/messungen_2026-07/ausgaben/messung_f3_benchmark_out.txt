@@ -1,0 +1,65 @@
+====================================================================================================
+ MESSUNG F3 - DER VERGLEICHSMASSSTAB
+ Startkapital 500.00 $ (config.json initial_paper_balance)
+ Reibung 0,100 % Gebuehr + 0,050 % Slippage je Seite
+====================================================================================================
+
+====================================================================================================
+ Jahr 2  2025-07-29 .. 2026-07-29   (35040 15m-Kerzen)
+====================================================================================================
+  BTC-Kurs: 117,613.14 $  ->  64,277.01 $   (-45.35 % brutto)
+
+    Strategie                            Endwert $      P&L $    P&L %   Geb. $   MaxDD %
+    ------------------------------------------------------------------------------------
+    BTC kaufen & halten (mark-to-market)      272.85    -227.15  -45.43%     0.77     53.9%
+    BTC kaufen & halten (am Ende verk.)      272.44    -227.56  -45.51%     0.77     53.9%
+    BTC-DCA woechentlich (52 Tr., m2m)      385.63    -114.37  -22.87%     0.89     31.1%
+    BTC-DCA woechentlich (am Ende verk.)      385.05    -114.95  -22.99%     0.89     31.1%
+    ZUSATZ: 11 Coins gleichgewichtet        190.75    -309.25  -61.85%     0.69         -
+    ------------------------------------------------------------------------------------
+    BOT (Harness, Kontrollanker)             49.44    -450.56  -90.11%      ~93         -
+    Abstand Bot gegen BTC-Halten (m2m): -223.41 $
+    Abstand Bot gegen BTC-DCA (m2m)   : -336.19 $
+
+    DCA-Detail: 52 Kaeufe zu je 9.62 $, Restbar -0.00 $, Bestand 0.00599947 BTC
+
+====================================================================================================
+ Jahr 1  2024-07-29 .. 2025-07-29   (35040 15m-Kerzen)
+====================================================================================================
+  BTC-Kurs: 67,444.00 $  ->  117,613.14 $   (+74.39 % brutto)
+
+    Strategie                            Endwert $      P&L $    P&L %   Geb. $   MaxDD %
+    ------------------------------------------------------------------------------------
+    BTC kaufen & halten (mark-to-market)      870.62    +370.62  +74.12%     1.37     31.4%
+    BTC kaufen & halten (am Ende verk.)      869.32    +369.32  +73.86%     1.37     31.4%
+    BTC-DCA woechentlich (52 Tr., m2m)      707.43    +207.43  +41.49%     1.21     21.5%
+    BTC-DCA woechentlich (am Ende verk.)      706.37    +206.37  +41.27%     1.21     21.5%
+    ZUSATZ: 11 Coins gleichgewichtet        586.66     +86.66  +17.33%     1.09         -
+    ------------------------------------------------------------------------------------
+    BOT (Harness, Kontrollanker)            186.56    -313.44  -62.69%      ~93         -
+    Abstand Bot gegen BTC-Halten (m2m): -684.06 $
+    Abstand Bot gegen BTC-DCA (m2m)   : -520.87 $
+
+    DCA-Detail: 52 Kaeufe zu je 9.62 $, Restbar -0.00 $, Bestand 0.00601491 BTC
+
+====================================================================================================
+ F3-Zusatz  LIVE-FENSTER DES JOURNALS  10.06.2026 - 29.07.2026
+ Bezugsgroesse fuer F1e. Gleiches Startkapital 500 $.
+====================================================================================================
+
+  2026-06-10 .. 2026-07-29   (4705 15m-Kerzen, 49 Tage)
+    BTC kaufen & halten :   +16.54 $  (+3.31 %)   MaxDD 13.6 %
+    BTC-DCA (7 Wochen)  :    +4.22 $  (+0.84 %)   MaxDD 5.9 %
+    11 Coins gleichgew. :    +3.01 $  (+0.60 %)
+
+    Zum Vergleich aus F1e (gleiches Fenster, gleicher Bot):
+      realisiert + offen, Ist-Kosten (S1)  :   -57.81 $
+      realisiert + offen, ohne jede Reibung:   +34.38 $
+    ACHTUNG: der Bot handelte in diesem Fenster nicht BTC allein,
+    sondern 9 Coins inkl. XRP, und war nie voll investiert.
+    Die Zahlen stehen nebeneinander, sie sind keine saubere
+    Risikoparitaet.
+
+====================================================================================================
+ ENDE F3
+====================================================================================================

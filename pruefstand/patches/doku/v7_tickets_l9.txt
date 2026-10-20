@@ -1,0 +1,2 @@
+ERLEDIGT: Epoche L9_kostenlatte_bitvavo (14.10.2026 13:59 UTC) - Zielboerse Bitvavo USDC (Entscheidung Sven): core/kosten.py TAKER/MAKER 0.25 -> 0.05, SCHLUPF 0.005 -> 0.050, K_BASIS 0.505 -> 0.150, exit_rules Puffer 0.195 und TRAIL_AB 1.21, Papier-Gebuehr bitvavo_usdc, SPREAD_BP aus Bitvavo-Stichprobe. BOT-HANDBUCH 10.13.
+DOKUMENTIEREN: Kostenlatte - Runden VOR L9 weiter mit K 0,505 % auswerten, ab L9 mit 0,150 %. Warte-Auftraege sparen bei Bitvavo keine Gebuehr (Maker = Taker 0,05 %), nur ggf. die halbe Spanne. CLAUDE.md Abschnitt 8 angepasst.

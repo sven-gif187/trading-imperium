@@ -1,0 +1,157 @@
+{
+  "exchange": {
+    "name": "Binance",
+    "ccxt_id": "binance",
+    "handel_ccxt_id": "bybit",
+    "handel_hostname": "bybit.eu",
+    "testnet": false,
+    "quote_currency": "USDC",
+    "timeout_connect": 3,
+    "timeout_read": 10,
+    "max_retries": 3,
+    "api_key": "",
+    "api_secret": "",
+    "schluessel_quelle": "BYBIT"
+  },
+  "risk": {
+    "max_daily_loss_pct": 10.0,
+    "max_drawdown_pct": 15.0,
+    "stop_loss_pct": 2.5,
+    "take_profit_pct": 0.0,
+    "trailing_stop_pct": 1.0,
+    "cooldown_after_losses": 3,
+    "kill_switch_enabled": true,
+    "min_volume_24h_usd": 1000000,
+    "max_spread_pct": 0.5,
+    "use_dynamic_sizing": false,
+    "max_open_positions": 1,
+    "max_exposure_per_coin_pct": 55.0,
+    "max_daily_loss_usd": 100.0,
+    "daily_loss": {
+      "mode": "aktiv",
+      "limit_pct": 6.0
+    },
+    "live_require_gate": false,
+    "live_max_order_usd": 25.0,
+    "live_max_capital_usd": 200.0
+  },
+  "trading": {
+    "mode": "paper",
+    "coins": [
+      "BTC/USDC",
+      "ETH/USDC",
+      "SOL/USDC"
+    ],
+    "default_timeframe": "1h",
+    "candle_limit": 120,
+    "loop_interval_seconds": 12,
+    "initial_paper_balance": 500.0,
+    "min_signal_score": 7,
+    "dca_enabled": false,
+    "dca_max_levels": 3,
+    "dca_drop_pct": 2.0,
+    "btc_dca_enabled": false,
+    "btc_dca_pct": 33.0,
+    "btc_dca_interval_min": 60,
+    "grid_enabled": false,
+    "fraktal_tor_aktiv": true,
+    "fraktal_tor_nur_messen": false,
+    "position_size_pct": 50.0,
+    "max_trades": 1
+  },
+  "modes": {
+    "active_mode": "balanced",
+    "all_in": {
+      "name": "all_in",
+      "position_size_pct": 95.0,
+      "max_positions": 1,
+      "cash_reserve_pct": 5.0,
+      "sector_limit_pct": 100.0,
+      "max_coin_pct": 100.0,
+      "nur_asset": ""
+    },
+    "balanced": {
+      "name": "balanced",
+      "position_size_pct": 50.0,
+      "max_positions": 1,
+      "cash_reserve_pct": 10.0,
+      "sector_limit_pct": 80.0,
+      "max_coin_pct": 35.0,
+      "nur_asset": ""
+    },
+    "diversified": {
+      "name": "diversified",
+      "position_size_pct": 10.0,
+      "max_positions": 10,
+      "cash_reserve_pct": 10.0,
+      "sector_limit_pct": 40.0,
+      "max_coin_pct": 15.0,
+      "nur_asset": ""
+    },
+    "btc_only": {
+      "name": "btc_only",
+      "position_size_pct": 30.0,
+      "max_positions": 3,
+      "cash_reserve_pct": 10.0,
+      "sector_limit_pct": 100.0,
+      "max_coin_pct": 95.0,
+      "nur_asset": "BTC"
+    }
+  },
+  "rebalance": {
+    "enabled": false,
+    "interval_min": 240,
+    "btc_target_pct": 50.0,
+    "eth_target_pct": 30.0,
+    "other_target_pct": 20.0,
+    "threshold_pct": 5.0
+  },
+  "ai": {
+    "enable_news": true,
+    "enable_llm_chat": false,
+    "news_interval_min": 30,
+    "sentiment_weight": 0.3,
+    "openai_key": "",
+    "openai_model": "gpt-4o-mini"
+  },
+  "telegram": {
+    "enabled": true,
+    "token": "",
+    "chat_id": "",
+    "notify_on_trade": true,
+    "notify_on_alert": true,
+    "befehle_aktiv": true
+  },
+  "dashboard": {
+    "enabled": true,
+    "port": 5070,
+    "cockpit_port": 8170,
+    "host": "0.0.0.0",
+    "refresh_interval_sec": 8,
+    "ngrok_token": "",
+    "ngrok_enabled": false
+  },
+  "version": "6.1.0",
+  "regel_modi": {
+    "trend_exit": "SHADOW",
+    "baerenmarkt": "ACTIVE",
+    "breakeven_sperre": "ACTIVE",
+    "trailing_leiter": "ACTIVE",
+    "smart_entry": "ACTIVE",
+    "wiedereinstieg_sperre": "ACTIVE",
+    "dca_stufen": "ACTIVE",
+    "meta_voting": "ACTIVE"
+  },
+  "warteauftraege": {
+    "_kommentar": "Warte-Auftraege (Limit-Orders) beim Kauf, nur Papierpfad. aktiv=true ist eine VERHALTENSAENDERUNG und braucht eine Epochengrenze in config_epochs.json. Herleitung und Messung: execution/warteauftraege.py",
+    "aktiv": true,
+    "abstand_pct": 0.1,
+    "gueltig_kerzen": 4,
+    "kerze_minuten": 15,
+    "nur_paper": false,
+    "_scharf_seit": "2026-09-12, Epoche E9, Freigabe Sven",
+    "_scharf_live_seit": "2026-09-16 23:43 UTC"
+  },
+  "_kommentar_modi": "[25.09.2026, Epoche L7, Freigabe Sven] ACHTUNG: modes.balanced traegt NICHT mehr die urspruenglichen 30 Prozent und 3 Positionen, sondern 50 Prozent und EINE Position. Der Name ist damit irrefuehrend, liess sich aber nicht aendern: modes.active_mode zeigt auf den Schluessel 'balanced', und der ist in config/settings.py:173 ein Feldname der Datenklasse. Wer hier 30/3 erwartet, liegt falsch - der wirksame Hebel fuer die Positionsgroesse ist dieser Block, nicht trading.position_size_pct. Beweis: app.py:1592-1600 ueberschreibt intent.amount_usd mit portfolio.get_position_size() aus dem AKTIVEN MODUS, zuletzt und ohne Ruecksicht auf trading.position_size_pct. Die Zeile app.py:1001, die '[SIZING] ... -> 50%' protokolliert, liest dagegen trading.position_size_pct und ist eine reine Anzeige. Zu max_coin_pct 35: der Wert bleibt als Untergrenze stehen, WIRKSAM sind aber 55 Prozent, weil risk/engine.py:47 max(35, position_size_pct+5) rechnet - eine 35er Grenze wuerde die eigene 50-Prozent-Position blockieren. Ebenso risk.max_exposure_per_coin_pct: auf Svens Wunsch auf 35 zurueckgesetzt, wird aber bei vorhandenem aktiven Modus gar nicht gelesen (nur im Rueckfallzweig engine.py:51), und ui/main_window.py:2663 rechnet es beim naechsten Speichern in der Maske erneut auf position_size_pct+5 = 55.",
+  "_kommentar_live": "ECHTGELD-INSTANZ, angelegt 14.09.2026. Abgeleitet aus der Papier-Konfiguration, damit Muenzen und Schwellen identisch sind - geaendert wurden NUR mode, live_require_gate und die Deckel. Der Papier-Bot laeuft daneben weiter und misst Epoche E9."
+}

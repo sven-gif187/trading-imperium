@@ -1,0 +1,5 @@
+{
+  "_comment": "V4-SYNC Steuerung. enabled:false = reines V6-Lernen (kein V4-Merge ins Brain). enabled:true = V4-Warmstart aus EINER festen Datei (source_path) - KEIN Desktop-Scan. Aenderung wirkt beim naechsten Sync (kein Neustart noetig).",
+  "enabled": false,
+  "source_path": "v4_data/trades_log_v4.json"
+}

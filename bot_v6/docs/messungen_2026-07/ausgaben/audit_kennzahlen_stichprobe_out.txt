@@ -1,0 +1,59 @@
+====================================================================================================
+ AUDIT: KENNZAHLEN OHNE MINDESTSTICHPROBE
+====================================================================================================
+
+----------------------------------------------------------------------------------------------------
+ [A] Quote ohne Nenner-Pruefung  -  10 Fundstellen
+----------------------------------------------------------------------------------------------------
+
+  cockpit_server.py  (2x)
+    :89    g=round(g, 2), l=round(l, 2), rr=round(g / l, 2) if l else None,
+    :144   rr=round(gg / ll, 2) if ll else None, ovl=round(ll, 2)))
+
+  features\sensei.py  (2x)
+    :225   win_rate = len(wins) / len(closed) * 100
+    :229   rr = abs(avg_win / avg_loss) if avg_loss else 0
+
+  reports\telegram.py  (1x)
+    :148   wr = (wins / len(sells) * 100) if sells else 0
+
+  reports\trade_journal.py  (1x)
+    :72    wr = (wins / len(pnls) * 100) if pnls else 0
+
+  reports\weekly_report.py  (1x)
+    :30    wr = (wins / len(sells) * 100) if sells else 0
+
+  features\akademie.py  (1x)
+    :418   rr = abs(aw / al) if al else 0
+
+  features\doc_agent.py  (1x)
+    :523   win_rate = (wins / len(closed) * 100) if closed else 0.0
+
+  portfolio\correlation_guard.py  (1x)
+    :75    avg_corr = total_corr / max(corr_count, 1)
+
+----------------------------------------------------------------------------------------------------
+ [B] Mittelwert ohne Laengenpruefung  -  4 Fundstellen
+----------------------------------------------------------------------------------------------------
+
+  features\akademie.py  (2x)
+    :416   aw = sum(wins) / len(wins)
+    :417   al = sum(losses) / len(losses)
+
+  features\sensei.py  (2x)
+    :254   lwr = sum(1 for t in low if t["pnl"] > 0) / len(low) * 100
+    :262   hwr = sum(1 for t in high if t["pnl"] > 0) / len(high) * 100
+
+----------------------------------------------------------------------------------------------------
+ [C] Quote im Ausgabe-String  -  33 Fundstellen
+----------------------------------------------------------------------------------------------------
+
+  features\sensei.py  (6x)
+    :232   f"Abgeschlossene Trades: {len(closed)} | Win-Rate: {win_rate:.0f}% | "
+    :234   f"Schnitt-Gewinn: {avg_win:+.2f}$ | Schnitt-Verlust: {avg_loss:+.2f}$ | "
+    :235   f"Risk/Reward: {rr:.2f}", ""]
+    :240   f"{rr:.1f}x groesser als Verluste. Bei dieser Quote darfst du "
+    :256   f"Win-Rate {lwr:.0f}%. " +
+    ... und 1 weitere
+
+  reports\telegram.py  (5x)

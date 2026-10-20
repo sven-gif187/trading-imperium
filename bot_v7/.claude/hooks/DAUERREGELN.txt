@@ -1,0 +1,31 @@
+BESTANDSSCHUTZ - ohne ausdrueckliche Freigabe wird nichts davon angefasst:
+- app.py: der laufende Papierhandel wird nicht angehalten, nicht neu gestartet.
+- Die vier Cockpit-Reiter (Chartanalyse, Geldfluss, Terminal, Zyklus) sind
+  Beobachtungsdeck und bleiben vom Handelspfad getrennt.
+- docs/forschungsprogramm_2026-07/forschung.db bleibt von data_store/telemetrie.db
+  abgekoppelt. Keine Verbindung, kein gemeinsames Schema, kein Schreibzugriff.
+- Was im Code als bewusst stillgelegt markiert ist, bleibt stillgelegt:
+  Grid-Bot, backtest/optimizer.py, futures_trader.py, multi_exchange.py,
+  TradingView-Webhook, Reddit. Das sind Entscheidungen, keine Bugs.
+- Messfenster: keine Aenderung, die das VERHALTEN des Bots beruehrt.
+  Erlaubt ist nur, was ausschliesslich aufschreibt. Verhaltensaenderung
+  braucht eine Epochengrenze in config_epochs.json.
+  DAS DATUM STEHT HIER BEWUSST NICHT. Massgeblich ist allein
+  config_zielgroessen.json -> messfenster_ende. Nachsehen mit:
+      python -c "import json;print(json.load(open('config_zielgroessen.json',encoding='utf-8'))['messfenster_ende'])"
+  [30.08.2026] Vorher stand hier ein festes "bis 29.08.2026". Das Fenster
+  war laengst auf den 18.09. verlaengert - diese Datei wusste es nicht.
+  Am 30.08. haette sie also gemeldet, der Freeze sei vorbei. Ein festes
+  Datum in einer zweiten Datei ist eine zweite Wahrheit, und die geht
+  irgendwann falsch aus. Siehe Befund 90.
+
+PFLICHT VOR JEDEM NEUEN BEFUND - beides, nicht eins davon:
+  python schon_bekannt.py <datei.py:zeile>     (190 Codestellen erfasst)
+  search_session_transcripts("<stichwort>")     (zwei Begriffe: Fachwort + Alltagswort)
+Meldet schon_bekannt BEKANNT, ist es eine Ergaenzung, kein Fund.
+
+KONFIDENZ - vier Stufen, keine anderen, keine Prozentzahlen:
+  SICHER (nur mit Fundstelle datei.py:zeile) / WAHRSCHEINLICH / VERMUTUNG / OFFEN
+Den Umfang der eigenen Pruefung nennen. Keine Zahl melden, die nicht gegen
+einen von Hand nachgerechneten Einzelfall geprueft ist. Lieber "nicht
+entscheidbar" als eine Zahl, die gut aussieht.

@@ -1,0 +1,64 @@
+# GESCHUETZTE DATEIEN — hier wird nicht hineingeschrieben.
+#
+# Eine Zeile = ein Stueck Pfad. Kommt es im Zielpfad vor, wird der
+# Schreibversuch abgelehnt. Gross-/Kleinschreibung egal.
+# Zeilen mit # sind Kommentare.
+#
+# Diese Liste erweitern: Zeile dazuschreiben, speichern, fertig.
+# Kein Neustart noetig.
+#
+# ANGELEGT 17.09.2026. Der Live-Ordner hatte bis dahin ueberhaupt kein
+# .claude-Verzeichnis — waehrend der Papier-Ordner seit dem 19.08. drei
+# Haken fuehrt, darunter diesen. Ausgerechnet der Ordner mit echtem Geld
+# lief ohne Schreibschutz. Gefunden von umzug_pruefen.py, nicht gesucht.
+
+# ---------------------------------------------------------------------
+# 1. DIE ZUGANGSDATEN ZUR BOERSE
+# ---------------------------------------------------------------------
+# CLAUDE.md, Svens Wortlaut: "Keine API-Schluessel anfassen. Die .env
+# liegt in beiden Ordnern, du liest sie nie aus."
+#
+# Bisher war das eine Regel, an die man sich erinnern musste. Jetzt ist
+# es eine Sperre. Der Unterschied ist derselbe wie am 19.08. bei der
+# Forschungsdatenbank: die Entscheidung stand dokumentiert und
+# durchsuchbar da — und wurde trotzdem fast uebergangen.
+.env
+
+# ---------------------------------------------------------------------
+# 2. DAS HANDELSJOURNAL
+# ---------------------------------------------------------------------
+# trades_v5.json ist der Beleg, was mit echtem Geld wirklich geschah.
+# Jede Auswertung dieses Projekts fusst darauf — die Trefferquote, das
+# Chance-Risiko-Verhaeltnis, die Freigabekriterien.
+#
+# Wer daran schreibt, aendert nicht Daten, sondern die Vergangenheit.
+# Nachtraege kann es geben (am 15.09. musste ein Verkauf nachgetragen
+# werden, den die Boerse erst verzoegert meldete) — aber sie gehoeren
+# von Hand gemacht und angesagt, nicht nebenbei von einem Werkzeug.
+trades_v5.json
+
+# ---------------------------------------------------------------------
+# 3. DER ZUSTAND DES BOTS
+# ---------------------------------------------------------------------
+# bot_state.json traegt die offenen Positionen. Ein falscher Eintrag
+# hier heisst: der Bot haelt eine Position fuer vorhanden, die es nicht
+# gibt — oder verliert eine, die es gibt. Beides kostet echtes Geld,
+# und beides faellt erst beim naechsten Verkaufsversuch auf.
+bot_state.json
+
+# ---------------------------------------------------------------------
+# 4. DIE EPOCHENGRENZEN
+# ---------------------------------------------------------------------
+# config_epochs.json entscheidet, welche Messung zu welcher Regel
+# gehoert. Verrutscht eine Grenze, sind ALLE Vorher-Nachher-Vergleiche
+# wertlos — und man merkt es nicht, weil die Zahlen weiter plausibel
+# aussehen. Am 15.09. ist genau das passiert: ein Zeitstempel mit
+# Leerzeichen statt "T" sortierte alles in die falsche Epoche.
+config_epochs.json
+
+# ---------------------------------------------------------------------
+# 5. DIE FORSCHUNGSDATENBANK
+# ---------------------------------------------------------------------
+# Bewusst abgekoppelt (CLAUDE.md Abschnitt 4, Entscheidung 13.08.2026).
+# Am 19.08. waere hier fast etwas hineingeschrieben worden.
+forschung.db

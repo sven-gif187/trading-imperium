@@ -1,0 +1,27 @@
+{
+  "_cleanup": "[CLEANUP-KEEP] Pruefstand-Datei, nicht archivieren",
+  "_zweck": "Gebuehren je Boerse aus Primaerquellen (MASTERPROMPT 3.9 I4, W3). Satz je Seite in Prozent. geprueft_am hoechstens 30 Tage alt, sonst W3-Alarm.",
+  "boersen": {
+    "bybit_eu": {"maker": 0.25, "taker": 0.25, "stufe": "VIP 0", "maerkte": "Spot, Einheitsgebuehr seit 05.10.2026 11:00 UTC",
+                 "quelle": "https://www.bybit.eu/en-EU/help-center/article/Trading-Fee-Structure", "stand_seite": "2026-10-05 13:01:39", "geprueft_am": "2026-10-14",
+                 "mica": "Bybit EU GmbH, AT FMA, 28.05.2025, Passporting DE ja", "konfidenz": "SICHER"},
+    "bitvavo_usdc": {"maker": 0.05, "taker": 0.05, "stufe": "0 EUR+ (Kategorie B: alle Krypto-Paare auf USDC-Maerkten)", "maerkte": "BTC/USDC, ETH/USDC, SOL/USDC vorhanden, min. 5 USDC",
+                 "quelle": "https://bitvavo.com/en/fees", "stand_seite": "ohne Datum; USDC-Paare mit 0,05 % seit Juli 2024 (bitvavo.com/en/news/usdc-pairs)", "geprueft_am": "2026-10-14",
+                 "mica": "Bitvavo B.V., NL AFM, 26.06.2025, Passporting DE ja", "konfidenz": "SICHER"},
+    "bitvavo_eur": {"maker": 0.15, "taker": 0.25, "stufe": "0 EUR+ (Kategorie A)", "maerkte": "EUR-Paare",
+                 "quelle": "https://bitvavo.com/en/fees", "geprueft_am": "2026-10-14", "konfidenz": "SICHER"},
+    "okx_eea_xperps": {"maker": 0.08, "taker": 0.10, "stufe": "Regular, MIT Derivate-Konto (X-Perps)", "maerkte": "BTC/ETH/SOL-USDC",
+                 "quelle": "https://www.okx.com/en-eu/help/what-are-the-new-trading-fees-for-eea-users", "stand_seite": "Updated on Sep 3, 2026", "geprueft_am": "2026-10-14",
+                 "mica": "OKX Europe Limited, MT MFSA, 27.01.2025, Passporting DE ja", "bedingung": "Derivate-Konto (X-Perps) mit Eignungstest noetig", "konfidenz": "SICHER"},
+    "okx_eea": {"maker": 0.20, "taker": 0.35, "stufe": "Regular, OHNE Derivate-Konto",
+                 "quelle": "https://www.okx.com/en-eu/help/what-are-the-new-trading-fees-for-eea-users", "geprueft_am": "2026-10-14", "konfidenz": "SICHER"},
+    "gate_eu": {"maker": 0.10, "taker": 0.10, "stufe": "VIP 0", "quelle": "https://www.gate.com/en-eu/fee", "geprueft_am": "2026-10-14",
+                 "mica": "Gate Technology Limited, MT MFSA, 29.09.2025, Passporting DE ja", "konfidenz": "SICHER"},
+    "kraken": {"maker": 0.38, "taker": 0.80, "stufe": "Stufe 1 (ab 10.000 $/30 T: 0,20/0,38)", "quelle": "https://www.kraken.com/features/fee-schedule", "geprueft_am": "2026-10-14",
+                 "mica": "Payward Europe Solutions Ltd, IE CBI, 25.06.2025, Passporting DE ja", "konfidenz": "SICHER"},
+    "coinbase": {"maker": 0.40, "taker": 0.60, "stufe": "unterste", "quelle": "nur nach Anmeldung sichtbar", "geprueft_am": null,
+                 "mica": "Coinbase Luxembourg S.A., LU CSSF, 20.06.2025, Passporting DE ja", "konfidenz": "WAHRSCHEINLICH (nicht primaer geprueft)"},
+    "binance": {"maker": null, "taker": null, "mica": "NICHT im ESMA-Register (CASPS.csv, Stand 07.10.2026) - nur Kursquelle", "geprueft_am": "2026-10-14"}
+  },
+  "esma_register": {"datei": "https://www.esma.europa.eu/sites/default/files/2024-12/CASPS.csv", "stand": "Last-Modified 07.10.2026 13:00 GMT", "eintraege": 370}
+}

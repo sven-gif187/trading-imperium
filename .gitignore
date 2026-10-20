@@ -1,0 +1,43 @@
+# Geheimnisse
+.env
+*.env
+.env.*
+!.env.example
+*.key
+*.pem
+secrets.json
+
+# Laufzeitdaten der Bots und des Prüfstands
+**/data_store/*
+!**/data_store/config.json
+*.db
+*.db-*
+*.sqlite*
+*.log
+*.log.*
+logs/
+pruefstand/status.json
+pruefstand/waechter.db*
+pruefstand/daten/
+pruefstand/sicherungen/
+pruefstand/archiv/
+pruefstand/waechter/daten_w*/
+pruefstand/labor/daten/
+pruefstand/labor/papier/daten/
+pruefstand/labor/papier/*.csv
+pruefstand/labor/papier/stand.json
+*_zustand.json
+
+# Python, Sicherungen, Systemdateien
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.bak*
+*.vor_*
+*Kopie*
+Thumbs.db
+desktop.ini
+.DS_Store
+.claude/settings.local.json
+.claude/worktrees/

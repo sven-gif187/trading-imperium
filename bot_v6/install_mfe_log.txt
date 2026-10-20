@@ -1,0 +1,20 @@
+============================================================
+MFE/MAE-LOGGING Installer  (runtime/exit_monitor.py)
+============================================================
+Backup angelegt: runtime\exit_monitor.py.bak
+OK: Patch installiert.
+    + MAE-Tracking (pos['lowest_price'])
+    + mfe_pct / mae_pct im SELL-Journal
+    + pnl_pct / fee Regression-Fix
+
+NAECHSTE SCHRITTE:
+  1. Bot neu starten.
+  2. Nach dem naechsten Verkauf pruefen: trades_v5.json -> 
+     neue SELLs haben jetzt pnl_pct, fee, mfe_pct, mae_pct.
+  3. ~2-3 Wochen sammeln, dann MFE/MAE-Auswertung.
+
+HINWEIS: lowest_price wird NICHT ueber Neustart persistiert
+  (state_manager sichert es nicht) - das ist ok, es setzt sich
+  nach Restart auf entry zurueck. Betrifft nur Positionen, die
+  einen Neustart ueberdauern; fuer die ist mae_pct dann leicht
+  konservativ. Fuer die Auswertung unkritisch.

@@ -1,0 +1,31 @@
+K1 Basis K0.15                                       Jahr    60.0 %  MaxDD  -65.0 %  Sharpe  1.23 | P1 63.85 P2 915.35 P3 7.29 | Baer -9.01
+K1 Kosten doppelt K0.30                              Jahr    57.8 %  MaxDD  -65.8 %  Sharpe  1.20 | P1 61.99 P2 905.32 P3 5.58 | Baer -10.57
+K1 Kosten K1.00                                      Jahr    47.7 %  MaxDD  -70.8 %  Sharpe  1.06 | P1 54.71 P2 871.34 P3 -3.09 | Baer -17.84
+K1 ohne besten Coin (NEAR) K0.15                     Jahr    57.7 %  MaxDD  -63.5 %  Sharpe  1.22 | P1 63.85 P2 822.38 P3 6.59 | Baer -9.67
+K1 ohne DOGE K0.15                                   Jahr    54.6 %  MaxDD  -61.7 %  Sharpe  1.19 | P1 62.88 P2 641.5 P3 8.05 | Baer -9.9
+K1 Ausfuehrung +1 Tag K0.15                          Jahr    58.9 %  MaxDD  -65.4 %  Sharpe  1.20 | P1 68.13 P2 1060.68 P3 1.41 | Baer -10.89
+K1 Bremse 'oder' K0.15                               Jahr    59.5 %  MaxDD  -63.6 %  Sharpe  1.23 | P1 59.27 P2 946.19 P3 7.79 | Baer -7.43
+K1 Schwankungsziel 20 % K0.15                        Jahr    60.4 %  MaxDD  -61.0 %  Sharpe  1.29 | P1 61.1 P2 841.99 P3 10.56 | Baer -7.91
+K1 Schwankungsziel 30 % K0.15                        Jahr    62.4 %  MaxDD  -66.6 %  Sharpe  1.23 | P1 66.7 P2 1070.51 P3 5.8 | Baer -8.56
+K2 Basis K0.15                                       Jahr    60.7 %  MaxDD  -48.8 %  Sharpe  1.30 | P1 45.65 P2 818.16 P3 18.3 | Baer -2.95
+K2 Kosten doppelt K0.30                              Jahr    59.3 %  MaxDD  -49.6 %  Sharpe  1.28 | P1 44.81 P2 812.57 P3 16.99 | Baer -2.99
+K2 Kosten K1.00                                      Jahr    53.4 %  MaxDD  -52.8 %  Sharpe  1.19 | P1 40.72 P2 787.49 P3 11.8 | Baer -3.17
+K2 ohne besten Coin (SOL) K0.15                      Jahr    56.0 %  MaxDD  -48.8 %  Sharpe  1.23 | P1 48.12 P2 639.38 P3 16.27 | Baer -3.59
+K2 ohne DOGE K0.15                                   Jahr    54.5 %  MaxDD  -49.1 %  Sharpe  1.24 | P1 45.91 P2 558.66 P3 18.01 | Baer -3.0
+K2 Ausfuehrung +1 Tag K0.15                          Jahr    59.9 %  MaxDD  -51.7 %  Sharpe  1.27 | P1 47.76 P2 937.76 P3 13.34 | Baer -2.1
+K2 Bremse 'oder' K0.15                               Jahr    58.3 %  MaxDD  -48.0 %  Sharpe  1.27 | P1 40.8 P2 814.88 P3 17.54 | Baer -2.8
+K2 Schwankungsziel 20 % K0.15                        Jahr    59.9 %  MaxDD  -46.1 %  Sharpe  1.33 | P1 45.68 P2 753.39 P3 19.03 | Baer -2.99
+K2 Schwankungsziel 30 % K0.15                        Jahr    61.2 %  MaxDD  -51.1 %  Sharpe  1.28 | P1 45.16 P2 918.02 P3 16.64 | Baer -2.68
+K3 Basis K0.15                                       Jahr    61.5 %  MaxDD  -63.4 %  Sharpe  1.04 | P1 47.02 P2 698.4 P3 22.3 | Baer -1.86
+K3 Kosten doppelt K0.30                              Jahr    60.5 %  MaxDD  -63.6 %  Sharpe  1.03 | P1 46.55 P2 689.35 P3 21.48 | Baer -1.94
+K3 Kosten K1.00                                      Jahr    56.0 %  MaxDD  -64.7 %  Sharpe  0.99 | P1 44.35 P2 648.23 P3 17.74 | Baer -2.32
+K3 ohne besten Coin (NEAR) K0.15                     Jahr    42.9 %  MaxDD  -64.9 %  Sharpe  0.87 | P1 47.02 P2 454.77 P3 5.85 | Baer -2.04
+K3 ohne DOGE K0.15                                   Jahr    59.0 %  MaxDD  -61.3 %  Sharpe  1.04 | P1 48.73 P2 538.72 P3 23.77 | Baer -2.09
+K3 Ausfuehrung +1 Tag K0.15                          Jahr    65.6 %  MaxDD  -61.8 %  Sharpe  1.08 | P1 54.33 P2 876.82 P3 19.13 | Baer 0.51
+K3 Bremse 'oder' K0.15                               Jahr    59.2 %  MaxDD  -62.4 %  Sharpe  1.02 | P1 48.12 P2 620.21 P3 21.22 | Baer -2.1
+K3 Halteband Top 5 K0.15                             Jahr    45.8 %  MaxDD  -68.4 %  Sharpe  0.90 | P1 46.35 P2 318.36 P3 16.65 | Baer -2.36
+K3 Halteband Top 8 K0.15                             Jahr    50.0 %  MaxDD  -63.4 %  Sharpe  0.95 | P1 46.6 P2 537.15 P3 12.34 | Baer -2.31
+Deflated Sharpe K1 Basis K0.15: 0.998 (N = 27)
+Deflated Sharpe K2 Basis K0.15: 0.999 (N = 27)
+Deflated Sharpe K3 Basis K0.15: 0.99 (N = 27)
+gespeichert: C:\Users\<BENUTZER>\Desktop\pruefstand\labor\ergebnisse\stufe5.json
